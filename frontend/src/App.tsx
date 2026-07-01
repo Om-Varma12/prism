@@ -28,7 +28,8 @@ export default function App() {
   };
 
   return (
-    <div className="w-full h-screen bg-[#0A0C10] text-[#e1e2ec] font-sans overflow-hidden flex">
+    <div className="w-full h-screen bg-[#0A0C10] text-[#e1e2ec] font-sans flex overflow-hidden">
+      <div className="flex-1 h-full flex overflow-hidden">
       <AnimatePresence mode="wait">
         {currentScreen === Screen.LOGIN ? (
           <motion.div
@@ -37,7 +38,7 @@ export default function App() {
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 0.4 }}
-            className="w-full h-full"
+            className="w-full h-full flex"
           >
             <LoginScreen onLoginSuccess={handleLoginSuccess} />
           </motion.div>
@@ -57,7 +58,7 @@ export default function App() {
             />
 
             {/* Right workspace panels based on navigation selection */}
-            <div className="flex-1 flex flex-col min-w-0 h-full overflow-hidden relative">
+            <div className="flex-1 flex flex-col min-w-0 h-full overflow-hidden relative md:ml-64 ml-0">
               {currentScreen === Screen.DASHBOARD && <CommandDashboardScreen />}
               {currentScreen === Screen.CHAT && <ChatScreen onNavigate={setCurrentScreen} />}
               {currentScreen === Screen.NETWORK && <NetworkExplorerScreen />}
@@ -66,6 +67,7 @@ export default function App() {
           </motion.div>
         )}
       </AnimatePresence>
+      </div>
     </div>
   );
 }

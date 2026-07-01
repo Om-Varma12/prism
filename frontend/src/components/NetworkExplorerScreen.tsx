@@ -7,17 +7,6 @@ import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { MOCK_SUSPECTS } from '../data/mockData';
 import { SuspectProfile } from '../types';
-import { 
-  Search, 
-  X, 
-  ArrowRight, 
-  Grid, 
-  ShieldAlert, 
-  BookOpen, 
-  Activity, 
-  CheckCircle, 
-  UserPlus 
-} from 'lucide-react';
 
 export default function NetworkExplorerScreen() {
   const [activeSegment, setActiveSegment] = useState<'all' | 'gang' | 'repeat'>('all');
@@ -27,12 +16,11 @@ export default function NetworkExplorerScreen() {
   const [selectedDateRange, setSelectedDateRange] = useState('Last 30 Days');
   
   // Selected Profile state
-  const [selectedProfile, setSelectedProfile] = useState<SuspectProfile>(MOCK_SUSPECTS[0]);
+  const [selectedProfile, setSelectedProfile] = useState<SuspectProfile | null>(MOCK_SUSPECTS[0]);
   const [showBriefingDialog, setShowBriefingDialog] = useState(false);
 
   // Nodes simulation positions based on segment selected
   const getNodes = () => {
-    // Standard coordinates (percentages)
     const baseNodes = [
       { id: 'SP-90210', name: 'Suresh Hegde', type: 'accused', cx: 60, cy: 50, isCentral: true },
       { id: 'SP-90211', name: 'K. Manjunath', type: 'accused', cx: 75, cy: 60 },
@@ -44,19 +32,20 @@ export default function NetworkExplorerScreen() {
       { id: 'CR-002', name: 'FIR-2023-BN-0912', type: 'crime', cx: 70, cy: 30 },
       
       // Locations
-      { id: 'LO-001', name: 'Yelahanka Industrial Area', type: 'location', cx: 35, cy: 55 },
-      { id: 'LO-002', name: 'Hebbal Flyover camera', type: 'location', cx: 80, cy: 25 },
+      { id: 'LO-001', name: 'Yelahanka PS', type: 'location', cx: 35, cy: 55 },
+      { id: 'LO-002', name: 'Hebbal Flyover', type: 'location', cx: 80, cy: 25 },
       
       // Distant Nodes
       { id: 'SP-90213', name: 'Ramesh Gowda', type: 'accused', cx: 20, cy: 30 },
-      { id: 'CR-003', name: 'FIR-2023-MW-0502', type: 'crime', cx: 15, cy: 20 }
+      { id: 'CR-003', name: 'FIR-2023-MW-0502', type: 'crime', cx: 15, cy: 20 },
+      { id: 'LO-003', name: 'Mysore West', type: 'location', cx: 80, cy: 45 }
     ];
 
     if (activeSegment === 'gang') {
       // Pull nodes closer into distinct cluster groups
       return baseNodes.map(node => {
-        if (node.id === 'SP-90210' || node.id === 'SP-90211' || node.id === 'SP-90212') {
-          return { ...node, cx: node.cx - 5, cy: node.cy - 5 };
+        if (node.id === 'SP-90210' || node.id === 'SP-90211' || node.id === 'SP-90212' || node.id === 'CR-001' || node.id === 'LO-001') {
+          return { ...node, cx: node.cx * 0.9 + 5, cy: node.cy * 0.9 + 5 };
         }
         return node;
       });
@@ -66,7 +55,7 @@ export default function NetworkExplorerScreen() {
       // Emphasize repeat offenders
       return baseNodes.map(node => {
         if (node.type === 'accused' && (node.id === 'SP-90210' || node.id === 'SP-90213')) {
-          return { ...node, cy: node.cy - 10 }; // Lift repeat offenders
+          return { ...node, cy: node.cy * 0.8 }; // Lift repeat offenders
         }
         return node;
       });
@@ -100,23 +89,6 @@ export default function NetworkExplorerScreen() {
       const suspect = MOCK_SUSPECTS.find(s => s.name === node.name);
       if (suspect) {
         setSelectedProfile(suspect);
-      } else {
-        // Create generic profile
-        setSelectedProfile({
-          id: node.id,
-          name: node.name,
-          age: 35,
-          gender: 'Male',
-          riskScore: 50,
-          firsCount: 2,
-          districtsCount: 1,
-          connections: [
-            { name: 'Suresh Hegde', type: 'ASSOC', status: 'HIGH-RISK' }
-          ],
-          recentCrime: 'Robbery',
-          status: 'MONITORED',
-          bio: 'Involved in active investigations. Status currently monitored under surveillance operations.'
-        });
       }
     }
   };
@@ -129,41 +101,40 @@ export default function NetworkExplorerScreen() {
   });
 
   return (
-    <div className="flex-1 flex flex-col h-full bg-[#050505] select-none relative">
-      {/* Header section with segments */}
-      <header className="h-16 border-b border-white/10 bg-black flex items-center justify-between px-6 shrink-0 z-10">
-        <h2 className="text-xl font-black text-white tracking-tighter uppercase leading-none">
-          NETWORK LINK EXPLORER
+    <div className="flex-1 flex flex-col relative h-screen bg-[#0A0C10] select-none">
+      {/* Header */}
+      <header className="h-16 border-b border-[#252830] bg-[#111318] flex items-center justify-between px-lg shrink-0 z-40">
+        <h2 className="font-headline-sm text-headline-sm text-on-surface">
+          Network Explorer
         </h2>
-        
-        {/* Segmented controls styling */}
-        <div className="flex items-center bg-black p-1 border border-white/10 text-[10px] font-mono font-bold uppercase tracking-wider">
-          <button 
+        {/* Segmented Control */}
+        <div className="flex items-center bg-[#0A0C10] p-1 rounded-DEFAULT border border-[#252830] text-sm font-medium">
+          <button
             onClick={() => setActiveSegment('all')}
-            className={`px-3.5 py-1.5 transition-colors ${
+            className={`px-4 py-1.5 rounded-DEFAULT transition-colors cursor-pointer ${
               activeSegment === 'all'
-                ? 'bg-[#00F0FF] text-black font-black'
-                : 'text-white/60 hover:text-white hover:bg-white/5'
+                ? 'bg-[#3B6FE8] text-white'
+                : 'text-on-surface-variant hover:text-on-surface hover:bg-[#1A1D24]'
             }`}
           >
             All Connections
           </button>
-          <button 
+          <button
             onClick={() => setActiveSegment('gang')}
-            className={`px-3.5 py-1.5 transition-colors ${
+            className={`px-4 py-1.5 rounded-DEFAULT transition-colors cursor-pointer ${
               activeSegment === 'gang'
-                ? 'bg-[#00F0FF] text-black font-black'
-                : 'text-white/60 hover:text-white hover:bg-white/5'
+                ? 'bg-[#3B6FE8] text-white'
+                : 'text-on-surface-variant hover:text-on-surface hover:bg-[#1A1D24]'
             }`}
           >
             Gang Clusters
           </button>
-          <button 
+          <button
             onClick={() => setActiveSegment('repeat')}
-            className={`px-3.5 py-1.5 transition-colors ${
+            className={`px-4 py-1.5 rounded-DEFAULT transition-colors cursor-pointer ${
               activeSegment === 'repeat'
-                ? 'bg-[#00F0FF] text-black font-black'
-                : 'text-white/60 hover:text-white hover:bg-white/5'
+                ? 'bg-[#3B6FE8] text-white'
+                : 'text-on-surface-variant hover:text-on-surface hover:bg-[#1A1D24]'
             }`}
           >
             Repeat Offenders
@@ -171,130 +142,122 @@ export default function NetworkExplorerScreen() {
         </div>
       </header>
 
-      {/* Main Workspace with canvas & side panes */}
+      {/* Canvas Area */}
       <div className="flex-1 relative overflow-hidden" id="network-canvas">
-        {/* Dot background overlay for tactical mapping feel */}
-        <div 
-          className="absolute inset-0 pointer-events-none" 
+        {/* Background Grid */}
+        <div
+          className="absolute inset-0 pointer-events-none"
           style={{
             backgroundSize: '24px 24px',
-            backgroundImage: 'linear-gradient(to right, rgba(255,255,255,0.03) 1px, transparent 1px), linear-gradient(to bottom, rgba(255,255,255,0.03) 1px, transparent 1px)',
-            opacity: 0.6
+            backgroundImage:
+              'linear-gradient(to right, #191b23 1px, transparent 1px), linear-gradient(to bottom, #191b23 1px, transparent 1px)',
+            opacity: 0.3,
           }}
         ></div>
 
-        {/* Bounding Cluster annotations */}
-        <div className="absolute border border-dashed border-[#00F0FF]/30 rounded-full pointer-events-none bg-[#00F0FF]/5" 
-          style={{ left: '22%', top: '35%', width: '26%', height: '26%' }}
-        ></div>
-        <div className="absolute text-[#00F0FF] text-[9px] font-mono font-black tracking-widest bg-black px-2 py-1 border border-[#00F0FF]/30 uppercase" 
-          style={{ left: '25%', top: '32%' }}
-        >
-          CLUSTER #3 // SUSPECTED GANG
-        </div>
-
-        {/* SVG connection lines layer */}
+        {/* SVG Lines Layer */}
         <svg className="absolute inset-0 w-full h-full pointer-events-none z-0">
           {connections.map((conn, idx) => {
-            const fromNode = nodes.find(n => n.id === conn.from);
-            const toNode = nodes.find(n => n.id === conn.to);
+            const fromNode = filteredNodes.find(n => n.id === conn.from);
+            const toNode = filteredNodes.find(n => n.id === conn.to);
             if (!fromNode || !toNode) return null;
 
             return (
-              <line 
+              <line
                 key={idx}
+                className={conn.thick ? 'line-thick' : 'line-thin'}
                 x1={`${fromNode.cx}%`}
                 y1={`${fromNode.cy}%`}
                 x2={`${toNode.cx}%`}
                 y2={`${toNode.cy}%`}
-                stroke={fromNode.isCentral || toNode.isCentral ? '#00F0FF' : 'rgba(255,255,255,0.1)'}
-                strokeWidth={conn.thick ? 2.5 : 1}
-                strokeOpacity={fromNode.isCentral || toNode.isCentral ? 0.9 : 0.4}
-                strokeDasharray={!conn.thick ? '4 4' : undefined}
+                stroke={fromNode.isCentral || toNode.isCentral ? '#ffb4ab' : undefined}
+                strokeOpacity={fromNode.isCentral || toNode.isCentral ? 0.5 : undefined}
               />
             );
           })}
         </svg>
 
-        {/* Interactive nodes layer */}
-        <div className="absolute inset-0 z-10 pointer-events-auto">
+        {/* Cluster Annotation */}
+        {activeSegment === 'gang' && (
+          <>
+            <div
+              className="cluster-boundary"
+              style={{ left: '20%', top: '35%', width: '25%', height: '25%' }}
+            ></div>
+            <div
+              className="absolute text-primary text-xs font-label-mono bg-[#0A0C10] px-2 py-1 border border-[#003fa4] rounded-sm"
+              style={{ left: '25%', top: '32%' }}
+            >
+              Cluster #3 — Suspected Gang
+            </div>
+          </>
+        )}
+
+        {/* Nodes Layer */}
+        <div className="absolute inset-0 pointer-events-auto z-10">
           {filteredNodes.map((node) => {
             const isSelected = selectedProfile && selectedProfile.name === node.name;
-            return (
-              <motion.div
-                key={node.id}
-                layout
-                transition={{ duration: 0.5, ease: 'easeInOut' }}
-                style={{ left: `${node.cx}%`, top: `${node.cy}%` }}
-                onClick={() => handleNodeClick(node)}
-                className="absolute -translate-x-1/2 -translate-y-1/2 cursor-pointer flex flex-col items-center group"
-              >
-                {/* Visual node design */}
-                {node.type === 'accused' ? (
-                  <div className={`w-3.5 h-3.5 rounded-full border transition-all ${
-                    node.isCentral 
-                      ? 'bg-[#00F0FF] border-white w-5.5 h-5.5 shadow-[0_0_15px_rgba(0,240,255,0.6)] z-10 animate-pulse'
-                      : isSelected
-                      ? 'bg-[#00F0FF] border-white w-4.5 h-4.5 shadow-[0_0_8px_#00F0FF]'
-                      : 'bg-[#00F0FF] border-black group-hover:scale-110'
-                  }`}></div>
-                ) : node.type === 'crime' ? (
-                  <div className={`w-3 h-3 border transition-all ${
-                    isSelected
-                      ? 'bg-white border-[#00F0FF] w-4 h-4'
-                      : 'bg-white/45 border-white/10 group-hover:scale-110'
-                  }`}></div>
-                ) : (
-                  <div className={`w-3 h-3 rotate-45 border transition-all ${
-                    isSelected
-                      ? 'bg-[#00F0FF] border-white w-4 h-4'
-                      : 'bg-white/20 border-white/10 group-hover:scale-110'
-                  }`}></div>
-                )}
+            let nodeClass = '';
+            if (node.type === 'accused') {
+              nodeClass = node.isCentral ? 'node-accused node-high-centrality' : 'node-accused';
+            } else if (node.type === 'crime') {
+              nodeClass = 'node-crime';
+            } else {
+              nodeClass = 'node-location';
+            }
 
-                {/* Floating Node Title */}
-                <span className={`mt-1.5 px-2 py-0.5 text-[9px] font-mono border whitespace-nowrap bg-black/95 transition-all uppercase tracking-wider ${
-                  node.isCentral
-                    ? 'border-[#00F0FF] text-[#00F0FF] font-black'
-                    : isSelected
-                    ? 'border-white text-white font-bold'
-                    : 'border-white/10 text-white/60 opacity-85 group-hover:opacity-100'
-                }`}>
-                  {node.name}
-                </span>
-              </motion.div>
+            return (
+              <div
+                key={node.id}
+                onClick={() => handleNodeClick(node)}
+                className={`${nodeClass} transition-all duration-500 hover:scale-125 cursor-pointer`}
+                style={{
+                  left: `${node.cx}%`,
+                  top: `${node.cy}%`,
+                  transform: 'translate(-50%, -50%)',
+                }}
+                title={node.name}
+              />
             );
           })}
+
+          {/* Central Label for Suresh Hegde */}
+          {filteredNodes.find(n => n.id === 'SP-90210') && (
+            <div
+              className="absolute text-error text-xs font-label-mono bg-[#111318] px-2 py-0.5 border border-[#93000a] rounded-sm whitespace-nowrap"
+              style={{ left: 'calc(60% + 15px)', top: 'calc(50% - 10px)' }}
+            >
+              Suresh Hegde
+            </div>
+          )}
         </div>
 
-        {/* FLOATING FILTER PANEL (Left Column overlay) */}
-        <div className="absolute left-6 top-6 w-72 bg-black/95 border border-white/10 rounded-none shadow-2xl flex flex-col z-20 max-h-[calc(100%-48px)]">
-          <div className="p-4 border-b border-white/10">
-            <h3 className="text-xs font-black text-white uppercase tracking-[0.2em]">
-              Tactical Filters
+        {/* LEFT FLOATING PANEL: Filters */}
+        <div className="absolute left-lg top-lg w-72 bg-[#111318] panel-border rounded-lg shadow-xl flex flex-col z-20 max-h-[calc(100%-48px)] overflow-y-auto">
+          <div className="p-4 border-b border-[#252830]">
+            <h3 className="font-headline-sm text-headline-sm text-on-surface">
+              Filters
             </h3>
           </div>
-          
           <div className="p-4 flex flex-col gap-4">
-            {/* Query Input */}
-            <div className="relative border border-white/10 bg-black flex items-center px-3.5 py-2">
-              <Search className="w-4 h-4 text-white/30 mr-2 shrink-0" />
-              <input 
+            {/* Search */}
+            <div className="relative input-border rounded-DEFAULT bg-[#0A0C10] flex items-center px-3 py-2">
+              <span className="material-symbols-outlined text-outline text-[18px] mr-2">search</span>
+              <input
+                className="bg-transparent border-none p-0 text-sm text-on-surface placeholder:text-outline w-full focus:ring-0 outline-none"
+                placeholder="Search by name, location, case..."
                 type="text"
-                placeholder="Search suspect name..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="bg-transparent border-none p-0 text-xs text-white placeholder-white/20 w-full outline-none focus:ring-0"
               />
             </div>
-
-            {/* District filter dropdown */}
-            <div className="space-y-1.5">
-              <label className="text-[9px] font-mono font-black text-white/40 tracking-[0.2em] uppercase">District</label>
-              <select 
+            {/* Dropdowns */}
+            <div className="flex flex-col gap-1">
+              <label className="text-xs font-medium text-on-surface-variant">District</label>
+              <select
                 value={selectedDistrict}
                 onChange={(e) => setSelectedDistrict(e.target.value)}
-                className="w-full bg-black border border-white/10 text-xs text-white/80 p-2.5 focus:ring-0 focus:border-[#00F0FF] outline-none"
+                className="bg-[#0A0C10] input-border text-sm text-on-surface rounded-DEFAULT p-2 focus:ring-0 focus:border-[#3b6fe8] outline-none"
               >
                 <option>All Districts</option>
                 <option>Central</option>
@@ -302,14 +265,12 @@ export default function NetworkExplorerScreen() {
                 <option>South</option>
               </select>
             </div>
-
-            {/* Crime Type */}
-            <div className="space-y-1.5">
-              <label className="text-[9px] font-mono font-black text-white/40 tracking-[0.2em] uppercase">Crime Type</label>
-              <select 
+            <div className="flex flex-col gap-1">
+              <label className="text-xs font-medium text-on-surface-variant">Crime Type</label>
+              <select
                 value={selectedCrimeType}
                 onChange={(e) => setSelectedCrimeType(e.target.value)}
-                className="w-full bg-black border border-white/10 text-xs text-white/80 p-2.5 focus:ring-0 focus:border-[#00F0FF] outline-none"
+                className="bg-[#0A0C10] input-border text-sm text-on-surface rounded-DEFAULT p-2 focus:ring-0 focus:border-[#3b6fe8] outline-none"
               >
                 <option>All Types</option>
                 <option>Assault</option>
@@ -317,14 +278,12 @@ export default function NetworkExplorerScreen() {
                 <option>Robbery</option>
               </select>
             </div>
-
-            {/* Date Range */}
-            <div className="space-y-1.5">
-              <label className="text-[9px] font-mono font-black text-white/40 tracking-[0.2em] uppercase">Date Range</label>
-              <select 
+            <div className="flex flex-col gap-1">
+              <label className="text-xs font-medium text-on-surface-variant">Date Range</label>
+              <select
                 value={selectedDateRange}
                 onChange={(e) => setSelectedDateRange(e.target.value)}
-                className="w-full bg-black border border-white/10 text-xs text-white/80 p-2.5 focus:ring-0 focus:border-[#00F0FF] outline-none"
+                className="bg-[#0A0C10] input-border text-sm text-on-surface rounded-DEFAULT p-2 focus:ring-0 focus:border-[#3b6fe8] outline-none"
               >
                 <option>Last 30 Days</option>
                 <option>Last 6 Months</option>
@@ -332,85 +291,86 @@ export default function NetworkExplorerScreen() {
               </select>
             </div>
           </div>
-
-          {/* Legend indicator */}
-          <div className="mt-auto p-4 border-t border-white/10 bg-white/5">
-            <h4 className="text-[9px] font-mono font-black text-white/40 mb-3 uppercase tracking-[0.2em]">Legend</h4>
-            <ul className="flex flex-col gap-2.5 text-xs text-white/80">
-              <li className="flex items-center gap-2.5">
-                <div className="w-3.5 h-3.5 rounded-full bg-[#00F0FF] border border-white"></div>
-                <span className="font-mono text-[10px] uppercase font-bold tracking-wider">Accused</span>
+          {/* Legend */}
+          <div className="mt-auto p-4 border-t border-[#252830] bg-[#0c0e15]">
+            <h4 className="text-xs font-semibold text-on-surface-variant mb-3 uppercase tracking-wider">
+              Legend
+            </h4>
+            <ul className="flex flex-col gap-2 text-sm text-on-surface">
+              <li className="flex items-center gap-3">
+                <div className="w-3 h-3 rounded-full bg-[#ffb4ab] border border-[#93000a]"></div>
+                <span>Accused</span>
               </li>
-              <li className="flex items-center gap-2.5">
-                <div className="w-3.5 h-3.5 bg-white border border-white/10"></div>
-                <span className="font-mono text-[10px] uppercase font-bold tracking-wider">Crime Incident</span>
+              <li className="flex items-center gap-3">
+                <div className="w-3 h-3 bg-[#44474f] border border-[#191c22]"></div>
+                <span>Crime Incident</span>
               </li>
-              <li className="flex items-center gap-2.5">
-                <div className="w-3.5 h-3.5 bg-white/20 border border-white/10 rotate-45"></div>
-                <span className="font-mono text-[10px] uppercase font-bold tracking-wider">Location Node</span>
+              <li className="flex items-center gap-3">
+                <div className="w-3 h-3 bg-[#b3c5ff] border border-[#003fa4] rotate-45"></div>
+                <span>Location</span>
               </li>
             </ul>
           </div>
         </div>
 
-        {/* FLOATING PROFILE DETAIL PANEL (Right Column overlay) */}
+        {/* RIGHT FLOATING PANEL: Entity Details */}
         {selectedProfile && (
-          <div className="absolute right-6 top-6 w-80 bg-black/95 border border-white/10 rounded-none shadow-2xl flex flex-col z-20">
-            {/* Profile heading details */}
-            <div className="p-4 border-b border-white/10 flex justify-between items-start">
+          <div className="absolute right-lg top-lg w-80 bg-[#111318] panel-border rounded-lg shadow-xl flex flex-col z-20">
+            <div className="p-4 border-b border-[#252830] flex justify-between items-start">
               <div>
-                <div className="text-[9px] text-[#00F0FF] font-mono mb-1 uppercase tracking-[0.2em] font-black">
-                  Selected Profile // Intel
+                <div className="text-xs text-error font-label-mono mb-1 uppercase tracking-wider">
+                  Selected Profile
                 </div>
-                <h3 className="text-lg font-black tracking-tight text-white uppercase">
+                <h3 className="font-headline-md text-[20px] font-bold text-on-surface leading-tight">
                   {selectedProfile.name}
                 </h3>
-                <p className="text-xs text-white/50 mt-1.5 font-mono">
+                <p className="text-sm text-on-surface-variant mt-1">
                   Age: {selectedProfile.age} | Gender: {selectedProfile.gender}
                 </p>
               </div>
               <button 
-                onClick={() => setSelectedProfile(MOCK_SUSPECTS[0])}
-                className="text-white/40 hover:text-[#00F0FF] transition-colors"
+                onClick={() => setSelectedProfile(null)}
+                className="text-outline hover:text-on-surface cursor-pointer"
               >
-                <X className="w-4 h-4" />
+                <span className="material-symbols-outlined text-[20px]">close</span>
               </button>
             </div>
-
-            {/* Profile statistics */}
-            <div className="p-4 flex flex-col gap-4">
-              {/* Risk Score indicator */}
+            <div className="p-4 flex flex-col gap-5">
+              {/* Risk Score */}
               <div>
-                <div className="flex justify-between text-[10px] font-mono font-black tracking-wider mb-1">
-                  <span className="text-white/40 uppercase">THREAT INDEX</span>
-                  <span className="text-[#00F0FF] font-bold">{selectedProfile.riskScore}/100</span>
+                <div className="flex justify-between text-sm mb-2">
+                  <span className="text-on-surface-variant">Risk Score</span>
+                  <span className="text-error font-data-mono-bold">{selectedProfile.riskScore}/100</span>
                 </div>
-                <div className="h-1.5 w-full bg-white/5 rounded-full overflow-hidden">
-                  <div 
-                    className="h-full bg-[#00F0FF] rounded-full" 
+                <div className="h-1.5 w-full bg-[#0A0C10] rounded-full overflow-hidden">
+                  <div
+                    className="h-full bg-error rounded-full"
                     style={{ width: `${selectedProfile.riskScore}%` }}
                   ></div>
                 </div>
               </div>
-
-              {/* Distrist count info */}
-              <div className="bg-white/5 p-3 border border-white/10 text-xs leading-relaxed font-mono text-white/70">
-                Appears in <span className="text-[#00F0FF] font-black">{selectedProfile.firsCount} FIRs</span> across <span className="text-[#00F0FF] font-black">{selectedProfile.districtsCount} districts</span>
+              {/* Stats */}
+              <div className="bg-[#0A0C10] p-3 rounded-DEFAULT border border-[#252830]">
+                <p className="text-sm text-on-surface">
+                  Appears in{' '}
+                  <span className="font-data-mono-bold text-primary">{selectedProfile.firsCount} FIRs</span>
+                  {' '}across{' '}
+                  <span className="font-data-mono-bold text-primary">{selectedProfile.districtsCount} districts</span>
+                </p>
               </div>
-
-              {/* Connections list */}
+              {/* Connections */}
               <div>
-                <h4 className="text-[9px] font-mono font-black text-white/40 mb-2.5 uppercase tracking-[0.2em] border-b border-white/10 pb-1">
-                  Connected To
+                <h4 className="text-xs font-semibold text-on-surface-variant mb-2 uppercase tracking-wider border-b border-[#252830] pb-1">
+                  Connected to
                 </h4>
-                <ul className="space-y-2">
+                <ul className="flex flex-col gap-2">
                   {selectedProfile.connections.map((conn, idx) => (
-                    <li key={idx} className="flex items-center justify-between text-xs font-mono">
+                    <li key={idx} className="flex items-center justify-between text-sm">
                       <div className="flex items-center gap-2">
-                        <div className="w-1.5 h-1.5 rounded-full bg-[#00F0FF]"></div>
-                        <span className="text-white/80 font-bold">{conn.name}</span>
+                        <div className="w-2 h-2 rounded-full bg-[#ffb4ab]"></div>
+                        <span className="text-on-surface">{conn.name}</span>
                       </div>
-                      <span className="text-[9px] text-white/40 border border-white/10 px-1.5 py-0.5 uppercase tracking-wider font-bold">
+                      <span className="text-xs text-outline font-label-mono border border-[#252830] px-1 rounded-sm">
                         {conn.type}
                       </span>
                     </li>
@@ -418,49 +378,50 @@ export default function NetworkExplorerScreen() {
                 </ul>
               </div>
             </div>
-
-            {/* View Profile brief detail button */}
-            <div className="p-4 border-t border-white/10 bg-white/5">
-              <button 
+            {/* Footer Action */}
+            <div className="p-4 border-t border-[#252830] bg-[#0c0e15] rounded-b-lg">
+              <button
                 onClick={() => setShowBriefingDialog(true)}
-                className="w-full py-3 bg-[#00F0FF] hover:bg-white text-black font-black text-xs transition-colors flex items-center justify-center gap-2 font-mono uppercase tracking-[0.2em] cursor-pointer"
+                className="w-full py-2 bg-transparent border border-[#252830] text-on-surface font-semibold text-sm hover:bg-[#191b23] transition-colors rounded-DEFAULT flex items-center justify-center gap-2 cursor-pointer"
               >
                 <span>View Full Profile</span>
-                <ArrowRight className="w-3.5 h-3.5" />
+                <span className="material-symbols-outlined text-[16px]">arrow_forward</span>
               </button>
             </div>
           </div>
         )}
       </div>
 
-      {/* DETAILED LOG BRIEFING DIALOG */}
+      {/* DETAILED BRIEFING DIALOG */}
       <AnimatePresence>
-        {showBriefingDialog && (
+        {showBriefingDialog && selectedProfile && (
           <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm">
-            <motion.div 
+            <motion.div
               initial={{ scale: 0.95, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
               exit={{ scale: 0.95, opacity: 0 }}
               className="bg-[#050505] border border-white/10 rounded-none shadow-2xl max-w-md w-full overflow-hidden"
             >
-              <div className="p-4 border-b border-white/10 bg-black flex justify-between items-center">
+              <div className="p-4 border-b border-white/10 bg-black flex justify-between items-center select-none">
                 <div className="flex items-center gap-2">
-                  <ShieldAlert className="w-4 h-4 text-[#ff4d4d]" />
+                  <span className="material-symbols-outlined text-[#ff4d4d] text-[18px]">warning</span>
                   <span className="text-xs font-mono font-black tracking-[0.2em] text-[#ff4d4d] uppercase">
                     INTELLIGENCE BRIEFING
                   </span>
                 </div>
-                <button 
+                <button
                   onClick={() => setShowBriefingDialog(false)}
-                  className="text-white/40 hover:text-[#00F0FF] transition-colors"
+                  className="text-white/40 hover:text-white transition-colors cursor-pointer"
                 >
-                  <X className="w-4 h-4" />
+                  <span className="material-symbols-outlined text-[18px]">close</span>
                 </button>
               </div>
 
               <div className="p-5 space-y-4">
                 <div>
-                  <h4 className="text-xl font-black text-white uppercase tracking-tight">{selectedProfile.name}</h4>
+                  <h4 className="text-xl font-black text-white uppercase tracking-tight">
+                    {selectedProfile.name}
+                  </h4>
                   <div className="text-[10px] text-white/40 font-mono mt-1.5 uppercase tracking-wider">
                     TARGET ID: {selectedProfile.id} // Status: {selectedProfile.status}
                   </div>
@@ -477,26 +438,34 @@ export default function NetworkExplorerScreen() {
 
                 <div className="grid grid-cols-2 gap-3 text-xs">
                   <div className="p-3 border border-white/10 bg-black flex items-center gap-2">
-                    <Activity className="w-4 h-4 text-[#00F0FF]" />
+                    <span className="material-symbols-outlined text-primary text-[18px]">analytics</span>
                     <div>
-                      <div className="text-[9px] text-white/40 font-mono leading-none uppercase tracking-wider">RISK INDEX</div>
-                      <div className="font-black text-white font-mono mt-1 text-sm">{selectedProfile.riskScore}%</div>
+                      <div className="text-[9px] text-white/40 font-mono leading-none uppercase tracking-wider">
+                        RISK INDEX
+                      </div>
+                      <div className="font-black text-white font-mono mt-1 text-sm">
+                        {selectedProfile.riskScore}%
+                      </div>
                     </div>
                   </div>
                   <div className="p-3 border border-white/10 bg-black flex items-center gap-2">
-                    <BookOpen className="w-4 h-4 text-[#00F0FF]" />
+                    <span className="material-symbols-outlined text-primary text-[18px]">menu_book</span>
                     <div>
-                      <div className="text-[9px] text-white/40 font-mono leading-none uppercase tracking-wider">PRIMARY FOCUS</div>
-                      <div className="font-black text-white font-mono mt-1 text-sm uppercase">{selectedProfile.recentCrime}</div>
+                      <div className="text-[9px] text-white/40 font-mono leading-none uppercase tracking-wider">
+                        PRIMARY FOCUS
+                      </div>
+                      <div className="font-black text-white font-mono mt-1 text-sm uppercase">
+                        {selectedProfile.recentCrime}
+                      </div>
                     </div>
                   </div>
                 </div>
               </div>
 
               <div className="p-4 border-t border-white/10 bg-black flex justify-end gap-2">
-                <button 
+                <button
                   onClick={() => setShowBriefingDialog(false)}
-                  className="px-5 py-3 bg-[#00F0FF] hover:bg-white text-black text-xs font-black font-mono transition-colors uppercase tracking-[0.2em] cursor-pointer"
+                  className="px-5 py-3 bg-[#3B6FE8] hover:bg-[#2b5bc2] text-white text-xs font-black font-mono transition-colors uppercase tracking-[0.2em] cursor-pointer"
                 >
                   ACKNOWLEDGE BRIEFING
                 </button>

@@ -5,17 +5,6 @@
 
 import React from 'react';
 import { Screen } from '../types';
-import { 
-  Shield, 
-  LayoutDashboard, 
-  MessageSquare, 
-  Network, 
-  BarChart2, 
-  User, 
-  Settings as SettingsIcon,
-  LogOut,
-  ChevronRight
-} from 'lucide-react';
 
 interface SidebarProps {
   currentScreen: Screen;
@@ -28,106 +17,101 @@ export default function Sidebar({ currentScreen, onNavigate, onLogout }: Sidebar
     {
       screen: Screen.DASHBOARD,
       label: 'Dashboard',
-      icon: LayoutDashboard,
-      description: 'Situation overview and tactical map'
+      icon: 'dashboard',
     },
     {
       screen: Screen.CHAT,
       label: 'Intelligence Chat',
-      icon: MessageSquare,
-      description: 'AI query and case search'
+      icon: 'forum',
     },
     {
       screen: Screen.NETWORK,
       label: 'Network Explorer',
-      icon: Network,
-      description: 'Suspect linkages and associations'
+      icon: 'hub',
     },
     {
       screen: Screen.ANALYTICS,
       label: 'Analytics',
-      icon: BarChart2,
-      description: 'Pattern and hotspot discovery'
+      icon: 'analytics',
     }
   ];
 
   return (
-    <nav className="hidden md:flex flex-col h-full bg-black border-r border-white/10 w-64 flex-shrink-0 relative z-30 select-none">
+    <nav className="hidden md:flex flex-col h-full border-r border-outline-variant bg-surface w-64 fixed left-0 top-0 shrink-0 z-10 text-primary dark:text-primary font-body-md text-body-md font-label-mono text-label-mono select-none">
       {/* Brand Header */}
-      <div className="p-6 border-b border-white/10 flex items-center gap-3">
-        <div className="w-10 h-10 bg-[#00F0FF]/10 border border-[#00F0FF]/30 flex items-center justify-center text-[#00F0FF]">
-          <Shield className="w-5 h-5" />
+      <div className="p-6 border-b border-outline-variant flex items-center gap-3">
+        <div className="w-10 h-10 rounded-full bg-surface-container-high flex items-center justify-center border border-outline-variant overflow-hidden shrink-0">
+          <span
+            className="material-symbols-outlined text-primary"
+            style={{ fontVariationSettings: '"FILL" 1' }}
+          >
+            security
+          </span>
         </div>
         <div>
-          <div className="text-3xl font-black tracking-tighter leading-none text-white">
-            PRISM<span className="text-[#00F0FF]">.</span>
-          </div>
-          <div className="text-white/40 text-[9px] uppercase font-bold tracking-[0.2em] mt-1.5">
-            Intel Division
-          </div>
+          <h1 className="font-headline-sm text-headline-sm font-bold text-primary tracking-tight">
+            PRISM
+          </h1>
+          <p className="font-label-mono text-label-mono text-on-surface-variant">
+            Operator 724
+          </p>
         </div>
-      </div>
-
-      {/* Operator Status bar */}
-      <div className="px-6 py-3 bg-white/5 border-b border-white/10 flex items-center justify-between text-[10px] font-mono">
-        <span className="text-white/50 font-medium">OP_ID: KSP-724</span>
-        <span className="flex items-center gap-1.5 text-[#00F0FF] font-bold tracking-wider">
-          <span className="w-1.5 h-1.5 rounded-full bg-[#00F0FF] animate-pulse"></span>
-          ACTIVE
-        </span>
       </div>
 
       {/* Navigation Menu */}
-      <ul className="flex-1 py-6 px-3 space-y-1.5 overflow-y-auto custom-scrollbar">
-        {menuItems.map((item, idx) => {
-          const isActive = currentScreen === item.screen;
-          const Icon = item.icon;
-          return (
-            <li key={item.screen}>
-              <button
-                onClick={() => onNavigate(item.screen)}
-                className={`w-full flex items-center justify-between px-3.5 py-3 transition-all group ${
-                  isActive
-                    ? 'bg-[#00F0FF] text-black font-black border-l-4 border-white'
-                    : 'text-white/70 hover:bg-white/5 hover:text-white'
-                }`}
-              >
-                <div className="flex items-center gap-3">
-                  <Icon className={`w-4.5 h-4.5 shrink-0 transition-transform group-hover:scale-105 ${
-                    isActive ? 'text-black' : 'text-white/40 group-hover:text-[#00F0FF]'
-                  }`} />
-                  <div>
-                    <span className="text-xs uppercase font-bold tracking-[0.15em]">
-                      {idx + 1}. {item.label}
-                    </span>
-                  </div>
-                </div>
-                {isActive && (
-                  <ChevronRight className="w-4 h-4 text-black shrink-0" />
-                )}
-              </button>
-            </li>
-          );
-        })}
-      </ul>
+      <div className="flex-1 py-4 overflow-y-auto">
+        <ul className="space-y-1 px-2">
+          {menuItems.map((item) => {
+            const isActive = currentScreen === item.screen;
+            return (
+              <li key={item.screen}>
+                <button
+                  onClick={() => onNavigate(item.screen)}
+                  className={`w-full text-left px-4 py-3 flex items-center gap-3 transition-colors duration-150 cursor-pointer ${
+                    isActive
+                      ? 'text-primary border-l-2 border-primary bg-surface-container-high active:bg-surface-container-highest'
+                      : 'text-on-surface-variant hover:text-on-surface hover:bg-surface-variant active:bg-surface-container-highest'
+                  }`}
+                >
+                  <span
+                    className="material-symbols-outlined text-[20px]"
+                    style={{ fontVariationSettings: isActive ? '"FILL" 1' : undefined }}
+                  >
+                    {item.icon}
+                  </span>
+                  <span>{item.label}</span>
+                </button>
+              </li>
+            );
+          })}
+        </ul>
+      </div>
 
-      {/* User Actions Profile & Logout */}
-      <div className="p-4 border-t border-white/10 bg-white/5 space-y-1">
-        <button className="w-full flex items-center gap-3 px-3.5 py-2.5 text-white/60 hover:bg-white/5 text-[10px] font-mono font-bold tracking-wider">
-          <User className="w-4 h-4 text-white/30" />
-          <span>PROFILE // SAHIL.V</span>
-        </button>
-        <button className="w-full flex items-center gap-3 px-3.5 py-2.5 text-white/60 hover:bg-white/5 text-[10px] font-mono font-bold tracking-wider">
-          <SettingsIcon className="w-4 h-4 text-white/30" />
-          <span>CONFIGURATION</span>
-        </button>
-        <button 
-          onClick={onLogout}
-          className="w-full flex items-center gap-3 px-3.5 py-2.5 text-[#ff4d4d] hover:bg-red-500/10 text-[10px] font-mono font-bold tracking-wider mt-1"
-        >
-          <LogOut className="w-4 h-4 text-[#ff4d4d]" />
-          <span>TERMINATE SESSION</span>
-        </button>
+      {/* Bottom Profile and Settings */}
+      <div className="p-4 border-t border-outline-variant bg-surface">
+        <ul className="space-y-1">
+          <li>
+            <button className="w-full text-left px-4 py-3 flex items-center gap-3 text-on-surface-variant hover:text-on-surface hover:bg-surface-variant transition-colors duration-150 active:bg-surface-container-highest cursor-pointer">
+              <span className="material-symbols-outlined text-[20px]">account_circle</span>
+              <span>Profile</span>
+            </button>
+          </li>
+          <li>
+            <button className="w-full text-left px-4 py-3 flex items-center gap-3 text-on-surface-variant hover:text-on-surface hover:bg-surface-variant transition-colors duration-150 active:bg-surface-container-highest cursor-pointer">
+              <span className="material-symbols-outlined text-[20px]">settings</span>
+              <span>Settings</span>
+            </button>
+          </li>
+          <li>
+            <button
+              onClick={onLogout}
+              className="w-full text-left px-4 py-3 flex items-center gap-3 text-error hover:bg-error/10 transition-colors duration-150 rounded-btn cursor-pointer font-bold"
+            >
+              <span className="material-symbols-outlined text-[20px]">logout</span>
+              <span>Logout</span>
+            </button>
+          </li>
+        </ul>
       </div>
     </nav>
   );
