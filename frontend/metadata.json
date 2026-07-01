@@ -1,0 +1,6 @@
+{
+  "name": "PRISM Intelligence",
+  "description": "An advanced crime intelligence, network analysis, and hotspot mapping dashboard for police departments.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
