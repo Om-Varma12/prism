@@ -1,0 +1,30 @@
+{
+  "defaults": {
+    "project": 1,
+    "env": 1
+  },
+  "actives": {
+    "project": 1,
+    "env": 1
+  },
+  "projects": [
+    {
+      "idx": 1,
+      "id": "46143000000022001",
+      "name": "prism",
+      "domain": {
+        "id": "50043594137",
+        "name": "prism-60074849663.development"
+      },
+      "timezone": "Asia/Kolkata",
+      "env": [
+        {
+          "idx": 1,
+          "id": "60074849663",
+          "name": "Development",
+          "type": 3
+        }
+      ]
+    }
+  ]
+}
