@@ -7,67 +7,78 @@ import React, { useState } from 'react';
 import { Screen } from './types';
 import LoginScreen from './components/LoginScreen';
 import Sidebar from './components/Sidebar';
+import CommandDashboardScreen from './components/CommandDashboardScreen';
 import ChatScreen from './components/ChatScreen';
 import NetworkExplorerScreen from './components/NetworkExplorerScreen';
-import CommandDashboardScreen from './components/CommandDashboardScreen';
 import AnalyticsScreen from './components/AnalyticsScreen';
-import { AnimatePresence, motion } from 'motion/react';
 
-export default function App() {
+function App() {
   const [currentScreen, setCurrentScreen] = useState<Screen>(Screen.LOGIN);
-  const [employeeId, setEmployeeId] = useState<string | null>(null);
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
 
-  const handleLoginSuccess = (id: string) => {
-    setEmployeeId(id);
-    setCurrentScreen(Screen.DASHBOARD); // Go to situation overview dashboard upon login
+  const handleLogin = () => {
+    setIsLoggedIn(true);
+    setCurrentScreen(Screen.DASHBOARD);
   };
 
   const handleLogout = () => {
-    setEmployeeId(null);
+    setIsLoggedIn(false);
     setCurrentScreen(Screen.LOGIN);
   };
 
-  return (
-    <div className="w-full h-screen bg-[#0A0C10] text-[#e1e2ec] font-sans flex overflow-hidden">
-      <div className="flex-1 h-full flex overflow-hidden">
-      <AnimatePresence mode="wait">
-        {currentScreen === Screen.LOGIN ? (
-          <motion.div
-            key="login"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 0.4 }}
-            className="w-full h-full flex"
-          >
-            <LoginScreen onLoginSuccess={handleLoginSuccess} />
-          </motion.div>
-        ) : (
-          <motion.div
-            key="app-shell"
-            initial={{ opacity: 0, scale: 0.99 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ duration: 0.4 }}
-            className="w-full h-full flex overflow-hidden"
-          >
-            {/* Sidebar menu on left */}
-            <Sidebar 
-              currentScreen={currentScreen} 
-              onNavigate={setCurrentScreen} 
-              onLogout={handleLogout} 
-            />
+  const handleNavigate = (screen: Screen) => {
+    setCurrentScreen(screen);
+  };
 
-            {/* Right workspace panels based on navigation selection */}
-            <div className="flex-1 flex flex-col min-w-0 h-full overflow-hidden relative md:ml-64 ml-0">
-              {currentScreen === Screen.DASHBOARD && <CommandDashboardScreen />}
-              {currentScreen === Screen.CHAT && <ChatScreen onNavigate={setCurrentScreen} />}
-              {currentScreen === Screen.NETWORK && <NetworkExplorerScreen />}
-              {currentScreen === Screen.ANALYTICS && <AnalyticsScreen />}
-            </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
+  const renderScreen = () => {
+    switch (currentScreen) {
+      case Screen.DASHBOARD:
+        return <CommandDashboardScreen />;
+      case Screen.CHAT:
+        return <ChatScreen onNavigate={handleNavigate} />;
+      case Screen.NETWORK:
+        return <NetworkExplorerScreen />;
+      case Screen.ANALYTICS:
+        return <AnalyticsScreen />;
+      default:
+        return <CommandDashboardScreen />;
+    }
+  };
+
+  // Show login screen when not authenticated
+  if (!isLoggedIn) {
+    return (
+      <div className="flex h-screen bg-[#0A0C10] overflow-hidden">
+        {/* Intercept the login redirect for local dev — clicking LOGIN logs in directly */}
+        <div className="flex-1 flex flex-col" onClick={(e) => {
+          // If the user clicks the LOGIN button we log in directly in local dev
+          const target = e.target as HTMLElement;
+          if (target.closest('button[type="button"]')) {
+            e.preventDefault();
+            handleLogin();
+          }
+        }}>
+          <LoginScreen />
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="flex h-screen bg-[#0A0C10] overflow-hidden">
+      {/* Persistent Sidebar */}
+      <Sidebar
+        currentScreen={currentScreen}
+        onNavigate={handleNavigate}
+        onLogout={handleLogout}
+      />
+
+      {/* Main content area — offset by sidebar width on md+ */}
+      <div className="flex-1 flex flex-col overflow-hidden md:ml-64">
+        {renderScreen()}
       </div>
     </div>
   );
 }
+
+export default App;

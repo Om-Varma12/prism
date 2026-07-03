@@ -3,43 +3,11 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import React, { useState } from 'react';
+import React from 'react';
 
-interface LoginScreenProps {
-  onLoginSuccess: (employeeId: string) => void;
-}
-
-export default function LoginScreen({ onLoginSuccess }: LoginScreenProps) {
-  const [employeeId, setEmployeeId] = useState('');
-  const [password, setPassword] = useState('');
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [errorMessage, setErrorMessage] = useState('');
-
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    setErrorMessage('');
-
-    if (!employeeId.trim()) {
-      setErrorMessage('Employee ID is required');
-      return;
-    }
-    if (!password) {
-      setErrorMessage('Password is required');
-      return;
-    }
-
-    setIsSubmitting(true);
-
-    // Simulate database lookup/auth
-    setTimeout(() => {
-      setIsSubmitting(false);
-      onLoginSuccess(employeeId);
-    }, 1200);
-  };
-
-  const loadDemoCredentials = () => {
-    setEmployeeId('KSP-90210');
-    setPassword('demo1234');
+export default function LoginScreen() {
+  const handleLoginRedirect = () => {
+    window.location.href = 'https://prism-60074849663.development.catalystserverless.in/__catalyst/auth/login';
   };
 
   return (
@@ -117,114 +85,21 @@ export default function LoginScreen({ onLoginSuccess }: LoginScreenProps) {
               Crime Intelligence &amp; Analytics Platform
             </div>
           </div>
-          <button
-            type="button"
-            onClick={loadDemoCredentials}
-            className="text-[10px] font-mono font-bold tracking-[0.15em] border border-primary-container px-3 py-1.5 text-primary-container bg-primary-container/10 hover:bg-primary-container/20 transition-colors uppercase rounded-btn shrink-0 cursor-pointer"
-          >
-            LOAD DEMO
-          </button>
         </div>
 
         {/* Centered Login Container */}
         <div className="w-full flex flex-col justify-center py-16">
-          <h1 className="font-headline-md text-headline-md text-on-surface mb-8">
+          <h1 className="font-headline-md text-headline-md text-on-surface mb-8 text-center">
             System Access
           </h1>
 
-          {errorMessage && (
-            <div className="mb-5 bg-red-500/10 border border-red-500/30 text-red-400 px-4 py-3 text-xs font-mono flex items-center gap-2.5">
-              <span className="material-symbols-outlined text-[16px] text-red-400 shrink-0">lock</span>
-              <span>{errorMessage}</span>
-            </div>
-          )}
-
-          <form onSubmit={handleSubmit} className="space-y-6">
-            {/* Employee ID Field */}
-            <div className="space-y-2">
-              <label className="block font-body-sm text-body-sm text-on-surface-variant" htmlFor="employee-id">
-                Employee ID
-              </label>
-              <div className="relative">
-                <span className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                  <span className="material-symbols-outlined text-outline text-[18px]">badge</span>
-                </span>
-                <input
-                  className="input-field block w-full pl-10 pr-3 py-2 sm:text-sm font-data-mono-bold text-data-mono-bold rounded-none transition-colors duration-200 outline-none"
-                  id="employee-id"
-                  name="employee-id"
-                  placeholder="e.g. KSP-90210"
-                  required
-                  type="text"
-                  value={employeeId}
-                  onChange={(e) => setEmployeeId(e.target.value)}
-                />
-              </div>
-            </div>
-
-            {/* Password Field */}
-            <div className="space-y-2">
-              <label className="block font-body-sm text-body-sm text-on-surface-variant" htmlFor="password">
-                Password
-              </label>
-              <div className="relative">
-                <span className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                  <span className="material-symbols-outlined text-outline text-[18px]">lock</span>
-                </span>
-                <input
-                  className="input-field block w-full pl-10 pr-3 py-2 sm:text-sm font-data-mono-bold text-data-mono-bold rounded-none transition-colors duration-200 outline-none"
-                  id="password"
-                  name="password"
-                  placeholder="••••••••"
-                  required
-                  type="password"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                />
-              </div>
-            </div>
-
-            {/* Helper Text */}
-            <p className="font-body-sm text-[12px] text-outline leading-tight">
-              Role is automatically assigned based on your credentials.
-            </p>
-
-            {/* Submit Button */}
-            <button
-              disabled={isSubmitting}
-              className="btn-primary w-full flex justify-center items-center gap-2 py-3 px-4 rounded-btn font-body-md text-body-md font-semibold transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary focus:ring-offset-[#0A0C10] cursor-pointer disabled:opacity-60"
-              type="submit"
-            >
-              {isSubmitting ? (
-                <>
-                  <svg className="animate-spin w-4 h-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
-                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
-                  </svg>
-                  <span>Authorizing...</span>
-                </>
-              ) : (
-                <span>Sign In</span>
-              )}
-            </button>
-
-            <div className="flex items-center justify-between mt-4">
-              <button
-                type="button"
-                onClick={() => setErrorMessage('Access request requires supervisor approval.')}
-                className="font-body-sm text-body-sm text-primary hover:text-primary-fixed transition-colors cursor-pointer"
-              >
-                Request Access
-              </button>
-              <button
-                type="button"
-                onClick={() => setErrorMessage('Password recovery is offline. Contact Intel Desk.')}
-                className="font-body-sm text-body-sm text-primary hover:text-primary-fixed transition-colors cursor-pointer"
-              >
-                Forgot Password?
-              </button>
-            </div>
-          </form>
+          <button
+            onClick={handleLoginRedirect}
+            className="btn-primary w-full flex justify-center items-center gap-2 py-3 px-4 rounded-btn font-body-md text-body-md font-semibold transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary focus:ring-offset-[#0A0C10] cursor-pointer"
+            type="button"
+          >
+            <span>LOGIN</span>
+          </button>
         </div>
 
         {/* Footer */}
