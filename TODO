@@ -1,7 +1,4 @@
-db schema file in backend folder
-
-catalyst project init dekh
-
 auth setup
 
-db connection and demo data insertion
+db connection toh huigyo
+claude su insertion ka python files le and another single file to execute all
