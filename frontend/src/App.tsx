@@ -1,9 +1,15 @@
 /**
  * @license
  * SPDX-License-Identifier: Apache-2.0
+ *
+ * Authentication flow (Zoho Catalyst Hosted Auth):
+ * 1. User clicks LOGIN → redirected to /__catalyst/auth/login (Zoho SSO)
+ * 2. After login, Catalyst sets a session cookie and redirects back to login_redirect (index.html)
+ * 3. On reload, we check for the Catalyst session cookie to decide if the user is authenticated.
+ * 4. If no session, show LoginScreen. If session exists, show the app shell.
  */
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Screen } from './types';
 import LoginScreen from './components/LoginScreen';
 import Sidebar from './components/Sidebar';
@@ -12,18 +18,34 @@ import ChatScreen from './components/ChatScreen';
 import NetworkExplorerScreen from './components/NetworkExplorerScreen';
 import AnalyticsScreen from './components/AnalyticsScreen';
 
-function App() {
-  const [currentScreen, setCurrentScreen] = useState<Screen>(Screen.LOGIN);
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
+/**
+ * Checks if a Catalyst session cookie is present.
+ * Catalyst sets `__zcsCookieSecurity` or `__z_cac` after a successful login.
+ * On localhost this will always return false (no cookie), so the login screen
+ * is shown and clicking LOGIN does the real Catalyst redirect.
+ */
+function isCatalystSessionActive(): boolean {
+  return document.cookie
+    .split(';')
+    .some((c) => c.trim().startsWith('__zcsCookieSecurity=') || c.trim().startsWith('__z_cac='));
+}
 
-  const handleLogin = () => {
-    setIsLoggedIn(true);
-    setCurrentScreen(Screen.DASHBOARD);
-  };
+function App() {
+  const [isLoggedIn, setIsLoggedIn] = useState<boolean>(false);
+  const [currentScreen, setCurrentScreen] = useState<Screen>(Screen.DASHBOARD);
+  const [checking, setChecking] = useState<boolean>(true);
+
+  // On mount, check for an existing Catalyst session
+  useEffect(() => {
+    const sessionActive = isCatalystSessionActive();
+    setIsLoggedIn(sessionActive);
+    setChecking(false);
+  }, []);
 
   const handleLogout = () => {
-    setIsLoggedIn(false);
-    setCurrentScreen(Screen.LOGIN);
+    // Redirect to Catalyst logout endpoint which clears the session cookie
+    window.location.href =
+      'https://prism-60074849663.development.catalystserverless.in/__catalyst/auth/logout';
   };
 
   const handleNavigate = (screen: Screen) => {
@@ -45,35 +67,34 @@ function App() {
     }
   };
 
-  // Show login screen when not authenticated
-  if (!isLoggedIn) {
+  // Splash while checking session
+  if (checking) {
     return (
-      <div className="flex h-screen bg-[#0A0C10] overflow-hidden">
-        {/* Intercept the login redirect for local dev — clicking LOGIN logs in directly */}
-        <div className="flex-1 flex flex-col" onClick={(e) => {
-          // If the user clicks the LOGIN button we log in directly in local dev
-          const target = e.target as HTMLElement;
-          if (target.closest('button[type="button"]')) {
-            e.preventDefault();
-            handleLogin();
-          }
-        }}>
-          <LoginScreen />
-        </div>
+      <div className="flex h-screen items-center justify-center bg-[#0A0C10]">
+        <span className="w-3 h-3 rounded-full bg-primary animate-ping" />
       </div>
     );
   }
 
+  // Not authenticated — show login screen.
+  // LoginScreen's button does window.location.href = '/__catalyst/auth/login'
+  // which is the real Catalyst SSO redirect. We do NOT intercept it here.
+  if (!isLoggedIn) {
+    return (
+      <div className="flex h-screen bg-[#0A0C10] overflow-hidden">
+        <LoginScreen />
+      </div>
+    );
+  }
+
+  // Authenticated — show the full app shell
   return (
     <div className="flex h-screen bg-[#0A0C10] overflow-hidden">
-      {/* Persistent Sidebar */}
       <Sidebar
         currentScreen={currentScreen}
         onNavigate={handleNavigate}
         onLogout={handleLogout}
       />
-
-      {/* Main content area — offset by sidebar width on md+ */}
       <div className="flex-1 flex flex-col overflow-hidden md:ml-64">
         {renderScreen()}
       </div>
