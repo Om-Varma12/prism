@@ -3,28 +3,17 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
+// ─── Navigation ───────────────────────────────────────────────────────────────
+
 export enum Screen {
   LOGIN = 'LOGIN',
+  DASHBOARD = 'DASHBOARD',
   CHAT = 'CHAT',
   NETWORK = 'NETWORK',
-  DASHBOARD = 'DASHBOARD',
-  ANALYTICS = 'ANALYTICS'
+  ANALYTICS = 'ANALYTICS',
 }
 
-export interface ChatMessage {
-  id: string;
-  sender: 'user' | 'ai';
-  text: string;
-  timestamp: string;
-  tableData?: {
-    firNo: string;
-    crimeType: string;
-    district: string;
-    status: 'ACTIVE' | 'INVESTIGATION' | 'CLOSED';
-  }[];
-  sqlQuery?: string;
-  scannedRecords?: number;
-}
+// ─── Dashboard ────────────────────────────────────────────────────────────────
 
 export interface Alert {
   id: string;
@@ -35,7 +24,9 @@ export interface Alert {
   source: string;
 }
 
-export interface Connection {
+// ─── Network Explorer ─────────────────────────────────────────────────────────
+
+export interface SuspectConnection {
   name: string;
   type: 'ASSOC' | 'KIN';
   status: string;
@@ -49,11 +40,13 @@ export interface SuspectProfile {
   riskScore: number;
   firsCount: number;
   districtsCount: number;
-  connections: Connection[];
+  connections: SuspectConnection[];
   recentCrime: string;
-  status: 'HIGH-RISK' | 'MONITORED' | 'ACTIVE';
+  status: string;
   bio?: string;
 }
+
+// ─── Analytics ────────────────────────────────────────────────────────────────
 
 export interface ClusterItem {
   id: string;
@@ -64,4 +57,24 @@ export interface ClusterItem {
   rangeDays: number;
   primaryType: string;
   hourlyDistribution: number[];
+}
+
+// ─── Chat ─────────────────────────────────────────────────────────────────────
+
+export interface ChatTableRow {
+  firNo: string;
+  crimeType: string;
+  district: string;
+  status: string;
+}
+
+export interface ChatMessage {
+  id: string;
+  sender: 'user' | 'ai';
+  text: string;
+  timestamp: string;
+  tableData?: ChatTableRow[];
+  sqlQuery?: string;
+  scannedRecords?: number;
+  status?: string;
 }
