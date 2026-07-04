@@ -19,6 +19,13 @@ import NetworkExplorerScreen from './components/NetworkExplorerScreen';
 import AnalyticsScreen from './components/AnalyticsScreen';
 
 /**
+ * Checks if the app is running in local development mode.
+ */
+function isLocalDevelopment(): boolean {
+  return window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+}
+
+/**
  * Checks if a Catalyst session cookie is present.
  * Catalyst sets `__zcsCookieSecurity` or `__z_cac` after a successful login.
  * On localhost this will always return false (no cookie), so the login screen
@@ -36,10 +43,16 @@ function App() {
   const [checking, setChecking] = useState<boolean>(true);
 
   // On mount, check for an existing Catalyst session
+  // Skip authentication check for local development
   useEffect(() => {
-    const sessionActive = isCatalystSessionActive();
-    setIsLoggedIn(sessionActive);
-    setChecking(false);
+    if (isLocalDevelopment()) {
+      setIsLoggedIn(true);
+      setChecking(false);
+    } else {
+      const sessionActive = isCatalystSessionActive();
+      setIsLoggedIn(sessionActive);
+      setChecking(false);
+    }
   }, []);
 
   const handleLogout = () => {

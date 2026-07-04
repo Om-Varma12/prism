@@ -1,6 +1,6 @@
 {
     "name": "frontend",
     "version": "0.0.1",
-    "homepage": "https://prism-60074849663.development.catalystserverless.in",
-    "login_redirect": "index.html"
+    "homepage": "index.html",
+    "login_redirect": "/app/index.html"
 }

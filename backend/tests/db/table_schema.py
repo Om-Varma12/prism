@@ -15,37 +15,25 @@ def get_datastore(req: Request):
 @router.get("/schema")
 def print_schema(request: Request):
     datastore = get_datastore(request)
-
-    print("\n" + "=" * 100)
-    print("PRISM DATABASE SCHEMA")
-    print("=" * 100)
+    schema_dict = {}
 
     try:
         tables = datastore.get_all_tables()
 
         for table in tables:
-
             table_name = table._table_details["table_name"]
-
             metadata = datastore.get_table_details(table_name)
-
-            print("\n" + "=" * 100)
-            print(f"TABLE: {table_name}")
-            print("=" * 100)
-            print(f"{'COLUMN':30} {'TYPE':15} {'MANDATORY':10} {'UNIQUE':10}")
-            print("-" * 100)
-
+            cols = []
             for column in metadata["column_details"]:
-                print(
-                    f"{column['column_name']:30}"
-                    f"{column['data_type']:15}"
-                    f"{str(column['is_mandatory']):10}"
-                    f"{str(column['is_unique']):10}"
-                )
+                cols.append({
+                    "column_name": column['column_name'],
+                    "data_type": column['data_type'],
+                    "is_mandatory": column['is_mandatory'],
+                    "is_unique": column['is_unique']
+                })
+            schema_dict[table_name] = cols
 
-        print("\n" + "=" * 100)
-
-        return {"status": "success"}
+        return {"status": "success", "schema": schema_dict}
 
     except Exception as e:
         print(e)
