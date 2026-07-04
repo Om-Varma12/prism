@@ -10,7 +10,6 @@ import { DistrictCrimeData } from '../services/dashboard.service';
 export default function CommandDashboardScreen() {
   const [activeTimeframe, setActiveTimeframe] = useState<'24h' | '7d' | '30d'>('30d');
   const [selectedDistrict, setSelectedDistrict] = useState<DistrictCrimeData | null>(null);
-  const [activeDistrict, setActiveDistrict] = useState<string>('BENGALURU_N');
   const [currentTime, setCurrentTime] = useState('');
 
   const { stats, loading: statsLoading } = useDashboardStats();
@@ -22,8 +21,6 @@ export default function CommandDashboardScreen() {
   useEffect(() => {
     const updateTime = () => {
       const now = new Date();
-      const months = ['OCT', 'NOV', 'DEC', 'JAN', 'FEB', 'MAR', 'APR', 'MAY', 'JUN', 'JUL', 'AUG', 'SEP']; // Representative month matching mockup format
-      // We will construct "OCT 24, 2023 // 08:42:15 IST" dynamically
       const dateStr = now.toLocaleDateString('en-IN', {
         month: 'short', day: '2-digit', year: 'numeric'
       }).toUpperCase();
@@ -64,10 +61,8 @@ export default function CommandDashboardScreen() {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-gutter mb-lg">
           {/* KPI 1 */}
           <div
-            onClick={() => setActiveDistrict('BENGALURU_N')}
-            className={`bg-panel border-tactical rounded flex flex-col p-md relative overflow-hidden group cursor-pointer transition-all duration-200 ${
-              activeDistrict === 'BENGALURU_N' ? 'border-primary' : 'hover:border-primary-container/50'
-            }`}
+            onClick={() => setSelectedDistrict(null)}
+            className="bg-panel border border-tactical rounded flex flex-col p-md relative overflow-hidden group cursor-pointer transition-all duration-200 hover:border-primary-container/50"
           >
             <div className="absolute top-0 left-0 w-1 h-full bg-outline-variant group-hover:bg-primary-container transition-colors"></div>
             <span className="font-label-mono text-label-mono text-on-surface-variant mb-2 pl-2">
@@ -82,7 +77,7 @@ export default function CommandDashboardScreen() {
             )}
           </div>
           {/* KPI 2 */}
-          <div className="bg-panel border-tactical rounded flex flex-col p-md relative overflow-hidden group">
+          <div className="bg-panel border border-tactical rounded flex flex-col p-md relative overflow-hidden group">
             <div className="absolute top-0 left-0 w-1 h-full bg-outline-variant group-hover:bg-primary-container transition-colors"></div>
             <span className="font-label-mono text-label-mono text-on-surface-variant mb-2 pl-2">
               ACTIVE CASES
@@ -96,7 +91,7 @@ export default function CommandDashboardScreen() {
             )}
           </div>
           {/* KPI 3 */}
-          <div className="bg-panel border-tactical rounded flex flex-col p-md relative overflow-hidden group">
+          <div className="bg-panel border border-tactical rounded flex flex-col p-md relative overflow-hidden group">
             <div className="absolute top-0 left-0 w-1 h-full bg-tertiary-container group-hover:bg-tertiary transition-colors"></div>
             <span className="font-label-mono text-label-mono text-on-surface-variant mb-2 pl-2">
               HIGH-RISK OFFENDERS
@@ -110,7 +105,7 @@ export default function CommandDashboardScreen() {
             )}
           </div>
           {/* KPI 4 */}
-          <div className="bg-panel border-tactical rounded flex flex-col p-md relative overflow-hidden group">
+          <div className="bg-panel border border-tactical rounded flex flex-col p-md relative overflow-hidden group">
             <div className="absolute top-0 left-0 w-1 h-full bg-error-container group-hover:bg-error transition-colors"></div>
             <span className="font-label-mono text-label-mono text-on-surface-variant mb-2 pl-2">
               ACTIVE ALERTS
@@ -128,7 +123,7 @@ export default function CommandDashboardScreen() {
         {/* Main Row (65/35) */}
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-gutter mb-lg min-h-[400px]">
           {/* Left: Map (8 cols) */}
-          <div className="lg:col-span-8 bg-panel border-tactical rounded flex flex-col overflow-hidden">
+          <div className="lg:col-span-8 bg-panel border border-tactical rounded flex flex-col overflow-hidden">
             <div className="p-4 border-b border-tactical flex items-center justify-between">
               <div className="flex items-center gap-2">
                 <span className="material-symbols-outlined text-on-surface-variant text-[20px]">
@@ -224,7 +219,7 @@ export default function CommandDashboardScreen() {
           </div>
 
           {/* Right: Active Alerts (4 cols) */}
-          <div className="lg:col-span-4 bg-panel border-tactical rounded flex flex-col overflow-hidden">
+          <div className="lg:col-span-4 bg-panel border border-tactical rounded flex flex-col overflow-hidden">
             <div className="p-4 border-b border-tactical flex items-center justify-between">
               <div className="flex items-center gap-2">
                 <span className="material-symbols-outlined text-error text-[20px]">
@@ -282,7 +277,7 @@ export default function CommandDashboardScreen() {
         </div>
 
         {/* Bottom Row: Sparklines */}
-        <div className="bg-panel border-tactical rounded flex flex-col overflow-hidden mb-xl">
+        <div className="bg-panel border border-tactical rounded flex flex-col overflow-hidden mb-xl">
           <div className="p-4 border-b border-tactical flex items-center justify-between">
             <h3 className="font-body-md text-body-md font-semibold text-on-surface uppercase tracking-wide">
               30-Day Crime Trend Analytics

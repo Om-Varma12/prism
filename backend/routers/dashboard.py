@@ -76,9 +76,12 @@ async def get_district_crimes(
         if incident_date and isinstance(incident_date, str):
             try:
                 case_date = datetime.fromisoformat(incident_date.replace('Z', '+00:00'))
+                # Normalize to naive for comparison with naive `since`
+                if case_date.tzinfo is not None:
+                    case_date = case_date.replace(tzinfo=None)
                 if case_date < since:
                     continue
-            except:
+            except (ValueError, TypeError):
                 continue
         
         unit = units.get(case.get("PoliceStationID"))
@@ -130,7 +133,10 @@ async def get_active_alerts(
         crime_sub_heads = {row["ROWID"]: row for row in crime_sub_head_table.get_all_rows()}
         
         unacknowledged = [r for r in rows if not r.get("is_acknowledged", False)]
-        unacknowledged.sort(key=lambda r: (r.get("severity") != "HIGH", r.get("created_at", "")), reverse=True)
+        # Step 1: newest first; Step 2: stable-sort severity (HIGH=0 first) — Python sort is stable
+        unacknowledged.sort(key=lambda r: str(r.get("created_at", "")), reverse=True)
+        unacknowledged.sort(key=lambda r: 0 if r.get("severity") == "HIGH" else 1)
+
         
         results = []
         for row in unacknowledged[:limit]:
@@ -144,6 +150,9 @@ async def get_active_alerts(
                 except:
                     created_at = datetime.utcnow()
             
+            created_at_naive = created_at
+            if hasattr(created_at_naive, 'tzinfo') and created_at_naive.tzinfo is not None:
+                created_at_naive = created_at_naive.replace(tzinfo=None)
             results.append(AlertResponse(
                 alert_id=row.get("ROWID", 0),
                 title=f"{csh.get('CrimeSubHeadName', 'Crime')} Spike — {dist.get('DistrictName', 'Unknown')}" if csh and dist else "Crime Spike",
@@ -153,7 +162,7 @@ async def get_active_alerts(
                 crime_type=csh.get("CrimeSubHeadName", "Unknown") if csh else "Unknown",
                 spike_ratio=row.get("spike_ratio", 1.0),
                 created_at=created_at,
-                time_ago=format_time_ago(created_at)
+                time_ago=format_time_ago(created_at_naive)
             ))
         
         return results
@@ -186,20 +195,40 @@ async def get_crime_trends(
     
     crime_sub_head_table = db.table("CrimeSubHead")
     crime_sub_heads = {row["ROWID"]: row for row in crime_sub_head_table.get_all_rows()}
+
+    def safe_parse_date(val) -> datetime | None:
+        if not val or not isinstance(val, str):
+            return None
+        try:
+            return datetime.fromisoformat(val.replace('Z', '+00:00'))
+        except ValueError:
+            return None
     
     results = []
+    now = datetime.utcnow()
     for category, sub_head_names in TREND_CATEGORIES.items():
         sub_head_ids = [rid for rid, r in crime_sub_heads.items() if r.get("CrimeSubHeadName") in sub_head_names]
         
         category_cases = [c for c in all_cases if c.get("CrimeMinorHeadID") in sub_head_ids]
         
-        now = datetime.utcnow()
-        current_30d = sum(1 for c in category_cases if c.get("IncidentFromDate") and (now - datetime.fromisoformat(c["IncidentFromDate"].replace('Z', '+00:00'))).days <= 30)
-        prior_30d = sum(1 for c in category_cases if c.get("IncidentFromDate") and 30 < (now - datetime.fromisoformat(c["IncidentFromDate"].replace('Z', '+00:00'))).days <= 60)
+        current_30d = 0
+        prior_30d = 0
+        for c in category_cases:
+            dt = safe_parse_date(c.get("IncidentFromDate"))
+            if dt is None:
+                continue
+            # Make offset-naive for comparison
+            if dt.tzinfo is not None:
+                dt = dt.replace(tzinfo=None)
+            age_days = (now - dt).days
+            if age_days <= 30:
+                current_30d += 1
+            elif 30 < age_days <= 60:
+                prior_30d += 1
         
         change_pct, trend = compute_trend(current_30d, prior_30d)
         
-        # Mock weekly counts for now (would need proper date grouping)
+        # Distribute evenly across 7 weeks as approximation
         weekly_counts = [current_30d // 7] * 7
         bar_heights = normalize(weekly_counts)
         

@@ -84,3 +84,167 @@ Response Headers: {"server":"ZGS","date":"Sat, 04 Jul 2026 11:41:39 GMT","conten
 [info] [2026-07-04T11:47:34.901Z] : [react-plugin]: Note that the development build is not optimized.
 [info] [2026-07-04T11:47:34.901Z] : [react-plugin]: To create a production build, use npm run build.
 [info] [2026-07-04T11:47:34.902Z] : [react-plugin]: 
+[info] [2026-07-04T16:42:08.534Z] : [react-plugin]: Compiling...
+[info] [2026-07-04T16:42:11.229Z] : [react-plugin]: Compiled successfully!
+[info] [2026-07-04T16:42:11.230Z] : [react-plugin]: 
+[info] [2026-07-04T16:42:11.230Z] : [react-plugin]: You can now view fron in the browser.
+[info] [2026-07-04T16:42:11.230Z] : [react-plugin]: 
+[info] [2026-07-04T16:42:11.230Z] : [react-plugin]:   http://localhost:3000/app/
+[info] [2026-07-04T16:42:11.231Z] : [react-plugin]: 
+[info] [2026-07-04T16:42:11.231Z] : [react-plugin]: Note that the development build is not optimized.
+[info] [2026-07-04T16:42:11.231Z] : [react-plugin]: To create a production build, use npm run build.
+[info] [2026-07-04T16:42:11.231Z] : [react-plugin]: 
+[info] [2026-07-04T16:42:24.104Z] : [react-plugin]: Compiling...
+[info] [2026-07-04T16:42:24.308Z] : [react-plugin]: Compiled successfully!
+[info] [2026-07-04T16:42:24.309Z] : [react-plugin]: 
+[info] [2026-07-04T16:42:24.309Z] : [react-plugin]: You can now view fron in the browser.
+[info] [2026-07-04T16:42:24.309Z] : [react-plugin]: 
+[info] [2026-07-04T16:42:24.309Z] : [react-plugin]:   http://localhost:3000/app/
+[info] [2026-07-04T16:42:24.309Z] : [react-plugin]: 
+[info] [2026-07-04T16:42:24.309Z] : [react-plugin]: Note that the development build is not optimized.
+[info] [2026-07-04T16:42:24.310Z] : [react-plugin]: To create a production build, use npm run build.
+[info] [2026-07-04T16:42:24.310Z] : [react-plugin]: 
+[info] [2026-07-04T16:42:37.341Z] : [react-plugin]: Compiling...
+[info] [2026-07-04T16:42:37.721Z] : [react-plugin]: Compiled successfully!
+[info] [2026-07-04T16:42:37.721Z] : [react-plugin]: 
+[info] [2026-07-04T16:42:37.721Z] : [react-plugin]: You can now view fron in the browser.
+[info] [2026-07-04T16:42:37.721Z] : [react-plugin]: 
+[info] [2026-07-04T16:42:37.722Z] : [react-plugin]:   http://localhost:3000/app/
+[info] [2026-07-04T16:42:37.722Z] : [react-plugin]: 
+[info] [2026-07-04T16:42:37.722Z] : [react-plugin]: Note that the development build is not optimized.
+[info] [2026-07-04T16:42:37.722Z] : [react-plugin]: To create a production build, use npm run build.
+[info] [2026-07-04T16:42:37.722Z] : [react-plugin]: 
+[info] [2026-07-04T16:42:37.748Z] : [react-plugin]: Compiling...
+[info] [2026-07-04T16:42:37.908Z] : [react-plugin]: Compiled successfully!
+[info] [2026-07-04T16:42:37.908Z] : [react-plugin]: 
+[info] [2026-07-04T16:42:37.908Z] : [react-plugin]: You can now view fron in the browser.
+[info] [2026-07-04T16:42:37.909Z] : [react-plugin]: 
+[info] [2026-07-04T16:42:37.909Z] : [react-plugin]:   http://localhost:3000/app/
+[info] [2026-07-04T16:42:37.909Z] : [react-plugin]: 
+[info] [2026-07-04T16:42:37.909Z] : [react-plugin]: Note that the development build is not optimized.
+[info] [2026-07-04T16:42:37.909Z] : [react-plugin]: To create a production build, use npm run build.
+[info] [2026-07-04T16:42:37.909Z] : [react-plugin]: 
+[info] [2026-07-04T16:42:39.454Z] : [react-plugin]: Compiling...
+[info] [2026-07-04T16:42:39.572Z] : [react-plugin]: Compiled successfully!
+[info] [2026-07-04T16:42:39.572Z] : [react-plugin]: 
+[info] [2026-07-04T16:42:39.573Z] : [react-plugin]: You can now view fron in the browser.
+[info] [2026-07-04T16:42:39.573Z] : [react-plugin]: 
+[info] [2026-07-04T16:42:39.573Z] : [react-plugin]:   http://localhost:3000/app/
+[info] [2026-07-04T16:42:39.573Z] : [react-plugin]: 
+[info] [2026-07-04T16:42:39.573Z] : [react-plugin]: Note that the development build is not optimized.
+[info] [2026-07-04T16:42:39.574Z] : [react-plugin]: To create a production build, use npm run build.
+[info] [2026-07-04T16:42:39.574Z] : [react-plugin]: 
+[info] [2026-07-04T16:44:22.005Z] : [react-plugin]: Compiling...
+[info] [2026-07-04T16:44:22.312Z] : [react-plugin]: Compiled successfully!
+[info] [2026-07-04T16:44:22.313Z] : [react-plugin]: 
+[info] [2026-07-04T16:44:22.313Z] : [react-plugin]: You can now view fron in the browser.
+[info] [2026-07-04T16:44:22.313Z] : [react-plugin]: 
+[info] [2026-07-04T16:44:22.313Z] : [react-plugin]:   http://localhost:3000/app/
+[info] [2026-07-04T16:44:22.313Z] : [react-plugin]: 
+[info] [2026-07-04T16:44:22.313Z] : [react-plugin]: Note that the development build is not optimized.
+[info] [2026-07-04T16:44:22.313Z] : [react-plugin]: To create a production build, use npm run build.
+[info] [2026-07-04T16:44:22.313Z] : [react-plugin]: 
+[info] [2026-07-04T16:44:24.077Z] : [react-plugin]: Compiling...
+[info] [2026-07-04T16:44:24.186Z] : [react-plugin]: Compiled successfully!
+[info] [2026-07-04T16:44:24.186Z] : [react-plugin]: 
+[info] [2026-07-04T16:44:24.186Z] : [react-plugin]: You can now view fron in the browser.
+[info] [2026-07-04T16:44:24.186Z] : [react-plugin]: 
+[info] [2026-07-04T16:44:24.187Z] : [react-plugin]:   http://localhost:3000/app/
+[info] [2026-07-04T16:44:24.187Z] : [react-plugin]: 
+[info] [2026-07-04T16:44:24.187Z] : [react-plugin]: Note that the development build is not optimized.
+[info] [2026-07-04T16:44:24.187Z] : [react-plugin]: To create a production build, use npm run build.
+[info] [2026-07-04T16:44:24.187Z] : [react-plugin]: 
+[info] [2026-07-04T16:45:32.112Z] : [react-plugin]: Compiling...
+[info] [2026-07-04T16:45:32.257Z] : [react-plugin]: Compiled successfully!
+[info] [2026-07-04T16:45:32.258Z] : [react-plugin]: 
+[info] [2026-07-04T16:45:32.258Z] : [react-plugin]: You can now view fron in the browser.
+[info] [2026-07-04T16:45:32.258Z] : [react-plugin]: 
+[info] [2026-07-04T16:45:32.258Z] : [react-plugin]:   http://localhost:3000/app/
+[info] [2026-07-04T16:45:32.258Z] : [react-plugin]: 
+[info] [2026-07-04T16:45:32.258Z] : [react-plugin]: Note that the development build is not optimized.
+[info] [2026-07-04T16:45:32.258Z] : [react-plugin]: To create a production build, use npm run build.
+[info] [2026-07-04T16:45:32.258Z] : [react-plugin]: 
+[info] [2026-07-04T16:45:34.209Z] : [react-plugin]: Compiling...
+[info] [2026-07-04T16:45:34.298Z] : [react-plugin]: Compiled successfully!
+[info] [2026-07-04T16:45:34.298Z] : [react-plugin]: 
+[info] [2026-07-04T16:45:34.298Z] : [react-plugin]: You can now view fron in the browser.
+[info] [2026-07-04T16:45:34.298Z] : [react-plugin]: 
+[info] [2026-07-04T16:45:34.298Z] : [react-plugin]:   http://localhost:3000/app/
+[info] [2026-07-04T16:45:34.299Z] : [react-plugin]: 
+[info] [2026-07-04T16:45:34.299Z] : [react-plugin]: Note that the development build is not optimized.
+[info] [2026-07-04T16:45:34.299Z] : [react-plugin]: To create a production build, use npm run build.
+[info] [2026-07-04T16:45:34.299Z] : [react-plugin]: 
+[info] [2026-07-04T16:48:36.750Z] : [react-plugin]: Compiling...
+[info] [2026-07-04T16:48:38.443Z] : [react-plugin]: Compiled with warnings.
+
+[info] [2026-07-04T16:48:38.443Z] : [react-plugin]: [eslint] 
+src\components\CommandDashboardScreen.tsx
+  Line 13:18:   'setAlerts' is assigned a value but never used                          @typescript-eslint/no-unused-vars
+  Line 23:13:   'months' is assigned a value but never used                             @typescript-eslint/no-unused-vars
+  Line 50:9:    'kpis' is assigned a value but never used                               @typescript-eslint/no-unused-vars
+  Line 282:39:  Comments inside children section of tag should be placed inside braces  react/jsx-no-comment-textnodes
+[info] [2026-07-04T16:48:38.443Z] : [react-plugin]: 
+Search for the keywords to learn more about each warning.
+[info] [2026-07-04T16:48:38.443Z] : [react-plugin]: To ignore, add // eslint-disable-next-line to the line before.
+
+[info] [2026-07-04T16:52:09.993Z] : [react-plugin]: Compiling...
+[info] [2026-07-04T16:52:10.682Z] : [react-plugin]: Compiled with warnings.
+
+[info] [2026-07-04T16:52:10.682Z] : [react-plugin]: [eslint] 
+src\components\CommandDashboardScreen.tsx
+  Line 14:10:   'alerts' is assigned a value but never used                             @typescript-eslint/no-unused-vars
+  Line 14:18:   'setAlerts' is assigned a value but never used                          @typescript-eslint/no-unused-vars
+  Line 15:10:   'selectedDistrict' is assigned a value but never used                   @typescript-eslint/no-unused-vars
+  Line 15:28:   'setSelectedDistrict' is assigned a value but never used                @typescript-eslint/no-unused-vars
+  Line 20:17:   'districts' is assigned a value but never used                          @typescript-eslint/no-unused-vars
+  Line 20:37:   'mapLoading' is assigned a value but never used                         @typescript-eslint/no-unused-vars
+  Line 27:13:   'months' is assigned a value but never used                             @typescript-eslint/no-unused-vars
+  Line 54:9:    'kpis' is assigned a value but never used                               @typescript-eslint/no-unused-vars
+  Line 290:43:  Comments inside children section of tag should be placed inside braces  react/jsx-no-comment-textnodes
+[info] [2026-07-04T16:52:10.682Z] : [react-plugin]: 
+Search for the keywords to learn more about each warning.
+[info] [2026-07-04T16:52:10.682Z] : [react-plugin]: To ignore, add // eslint-disable-next-line to the line before.
+
+[info] [2026-07-04T16:52:14.765Z] : [react-plugin]: Compiling...
+[info] [2026-07-04T16:52:15.233Z] : [react-plugin]: Compiled with warnings.
+
+[info] [2026-07-04T16:52:15.233Z] : [react-plugin]: [eslint] 
+src\components\CommandDashboardScreen.tsx
+  Line 14:10:   'alerts' is assigned a value but never used                             @typescript-eslint/no-unused-vars
+  Line 14:18:   'setAlerts' is assigned a value but never used                          @typescript-eslint/no-unused-vars
+  Line 15:10:   'selectedDistrict' is assigned a value but never used                   @typescript-eslint/no-unused-vars
+  Line 15:28:   'setSelectedDistrict' is assigned a value but never used                @typescript-eslint/no-unused-vars
+  Line 20:17:   'districts' is assigned a value but never used                          @typescript-eslint/no-unused-vars
+  Line 20:37:   'mapLoading' is assigned a value but never used                         @typescript-eslint/no-unused-vars
+  Line 27:13:   'months' is assigned a value but never used                             @typescript-eslint/no-unused-vars
+  Line 54:9:    'kpis' is assigned a value but never used                               @typescript-eslint/no-unused-vars
+  Line 290:43:  Comments inside children section of tag should be placed inside braces  react/jsx-no-comment-textnodes
+[info] [2026-07-04T16:52:15.233Z] : [react-plugin]: 
+Search for the keywords to learn more about each warning.
+[info] [2026-07-04T16:52:15.233Z] : [react-plugin]: To ignore, add // eslint-disable-next-line to the line before.
+
+[info] [2026-07-04T16:52:35.043Z] : [react-plugin]: Compiling...
+[info] [2026-07-04T16:52:35.688Z] : [react-plugin]: Compiled with warnings.
+
+[info] [2026-07-04T16:52:35.689Z] : [react-plugin]: [eslint] 
+src\components\CommandDashboardScreen.tsx
+  Line 14:10:   'alerts' is assigned a value but never used                             @typescript-eslint/no-unused-vars
+  Line 14:18:   'setAlerts' is assigned a value but never used                          @typescript-eslint/no-unused-vars
+  Line 27:13:   'months' is assigned a value but never used                             @typescript-eslint/no-unused-vars
+  Line 54:9:    'kpis' is assigned a value but never used                               @typescript-eslint/no-unused-vars
+  Line 289:43:  Comments inside children section of tag should be placed inside braces  react/jsx-no-comment-textnodes
+[info] [2026-07-04T16:52:35.689Z] : [react-plugin]: 
+Search for the keywords to learn more about each warning.
+[info] [2026-07-04T16:52:35.689Z] : [react-plugin]: To ignore, add // eslint-disable-next-line to the line before.
+
+[info] [2026-07-04T16:53:56.873Z] : [react-plugin]: Compiling...
+[info] [2026-07-04T16:53:57.496Z] : [react-plugin]: Compiled with warnings.
+
+[info] [2026-07-04T16:53:57.497Z] : [react-plugin]: [eslint] 
+src\components\CommandDashboardScreen.tsx
+  Line 25:13:   'months' is assigned a value but never used                             @typescript-eslint/no-unused-vars
+  Line 273:43:  Comments inside children section of tag should be placed inside braces  react/jsx-no-comment-textnodes
+[info] [2026-07-04T16:53:57.497Z] : [react-plugin]: 
+Search for the keywords to learn more about each warning.
+[info] [2026-07-04T16:53:57.497Z] : [react-plugin]: To ignore, add // eslint-disable-next-line to the line before.
+
