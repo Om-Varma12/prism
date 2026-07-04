@@ -21,7 +21,7 @@ async def get_dashboard_stats(
 ):
     try:
         table = db.table("dashboard_stats")
-        rows = table.get_all_rows()
+        rows = table.get_paged_rows().rows
         if rows:
             latest = sorted(rows, key=lambda r: r.get("computed_at", ""), reverse=True)[0]
             return DashboardStatsResponse(**latest)
@@ -30,11 +30,11 @@ async def get_dashboard_stats(
     
     # Fallback: compute on-the-fly if table doesn't exist
     case_table = db.table("CaseMaster")
-    all_cases = case_table.get_all_rows()
+    all_cases = case_table.get_paged_rows().rows
     total_firs = len(all_cases)
     
     status_table = db.table("CaseStatusMaster")
-    status_map = {row["ROWID"]: row["CaseStatusName"] for row in status_table.get_all_rows()}
+    status_map = {row["ROWID"]: row["CaseStatusName"] for row in status_table.get_paged_rows().rows}
     active_cases = sum(1 for c in all_cases if status_map.get(c.get("CaseStatusID")) == "Under Investigation")
     
     return DashboardStatsResponse(
@@ -58,16 +58,16 @@ async def get_district_crimes(
     since = datetime.utcnow() - timedelta(days=days)
     
     case_table = db.table("CaseMaster")
-    all_cases = case_table.get_all_rows()
+    all_cases = case_table.get_paged_rows().rows
     
     unit_table = db.table("Unit")
-    units = {row["ROWID"]: row for row in unit_table.get_all_rows()}
+    units = {row["ROWID"]: row for row in unit_table.get_paged_rows().rows}
     
     district_table = db.table("District")
-    districts = {row["ROWID"]: row for row in district_table.get_all_rows()}
+    districts = {row["ROWID"]: row for row in district_table.get_paged_rows().rows}
     
     crime_sub_head_table = db.table("CrimeSubHead")
-    crime_sub_heads = {row["ROWID"]: row for row in crime_sub_head_table.get_all_rows()}
+    crime_sub_heads = {row["ROWID"]: row for row in crime_sub_head_table.get_paged_rows().rows}
     
     district_stats = defaultdict(lambda: {"total_firs": 0, "crime_types": []})
     
@@ -124,13 +124,13 @@ async def get_active_alerts(
 ):
     try:
         alerts_table = db.table("crime_alerts")
-        rows = alerts_table.get_all_rows()
+        rows = alerts_table.get_paged_rows().rows
         
         district_table = db.table("District")
-        districts = {row["ROWID"]: row for row in district_table.get_all_rows()}
+        districts = {row["ROWID"]: row for row in district_table.get_paged_rows().rows}
         
         crime_sub_head_table = db.table("CrimeSubHead")
-        crime_sub_heads = {row["ROWID"]: row for row in crime_sub_head_table.get_all_rows()}
+        crime_sub_heads = {row["ROWID"]: row for row in crime_sub_head_table.get_paged_rows().rows}
         
         unacknowledged = [r for r in rows if not r.get("is_acknowledged", False)]
         # Step 1: newest first; Step 2: stable-sort severity (HIGH=0 first) — Python sort is stable
@@ -178,7 +178,7 @@ async def get_crime_trends(
 ):
     try:
         table = db.table("dashboard_stats")
-        rows = table.get_all_rows()
+        rows = table.get_paged_rows().rows
         if rows:
             latest = sorted(rows, key=lambda r: r.get("computed_at", ""), reverse=True)[0]
             trend_json = latest.get("trend_sparklines_json")
@@ -191,10 +191,10 @@ async def get_crime_trends(
     
     # Fallback: compute on-the-fly
     case_table = db.table("CaseMaster")
-    all_cases = case_table.get_all_rows()
+    all_cases = case_table.get_paged_rows().rows
     
     crime_sub_head_table = db.table("CrimeSubHead")
-    crime_sub_heads = {row["ROWID"]: row for row in crime_sub_head_table.get_all_rows()}
+    crime_sub_heads = {row["ROWID"]: row for row in crime_sub_head_table.get_paged_rows().rows}
 
     def safe_parse_date(val) -> datetime | None:
         if not val or not isinstance(val, str):
