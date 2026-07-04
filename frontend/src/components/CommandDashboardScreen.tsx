@@ -6,15 +6,19 @@
 import React, { useState, useEffect } from 'react';
 import { INITIAL_ALERTS } from '../data/mockData';
 import { Alert } from '../types';
-import { useDashboardStats } from '../hooks/useDashboardStats';
+import { useDashboardStats, useDistrictCrimes, useAlerts } from '../hooks/useDashboardStats';
+import { DistrictCrimeData } from '../services/dashboard.service';
 
 export default function CommandDashboardScreen() {
   const [activeTimeframe, setActiveTimeframe] = useState<'24h' | '7d' | '30d'>('30d');
   const [alerts, setAlerts] = useState<Alert[]>(INITIAL_ALERTS);
+  const [selectedDistrict, setSelectedDistrict] = useState<DistrictCrimeData | null>(null);
   const [activeDistrict, setActiveDistrict] = useState<string>('BENGALURU_N');
   const [currentTime, setCurrentTime] = useState('');
 
   const { stats, loading: statsLoading } = useDashboardStats();
+  const { data: districts, loading: mapLoading } = useDistrictCrimes(activeTimeframe);
+  const { alerts: apiAlerts, loading: alertsLoading } = useAlerts();
 
   // Clock ticks every second
   useEffect(() => {
@@ -182,45 +186,44 @@ export default function CommandDashboardScreen() {
                   src="https://lh3.googleusercontent.com/aida-public/AB6AXuAHzq0WEhaL8_wtUyZPd5cih-cTu7AEGYoNL5_TJkfqobmOkPKANRwdyzgDRk3LV8-VeVdfuFrdse2Rwb-wx7fmXmBfrdtCHNukqm8FNS3OPEsA26p_aSb2xVkzlEgOcLrhnC6Nf9MM_JxPqYGexVA-8TwqJpOQI8dfAfiv6PoPquSOGVurIcEkB6gx2ESNgep6M_HJNAdLbhoOeQYfgZya9T21IBkUg6YM-ZMUUTe4l4AjDC_0TkifoZwomDxGp8nX-8cJYiSMLxE"
                 />
 
-                {/* Markers corresponding to Bengaluru, Mysore, Hubballi */}
-                <button
-                  onClick={() => setActiveDistrict('BENGALURU_N')}
-                  className="absolute group cursor-pointer"
-                  style={{ left: '55%', top: '65%' }}
-                >
-                  <span className={`absolute -translate-x-1/2 -translate-y-1/2 w-4 h-4 rounded-full border bg-red-500/30 border-red-500 flex items-center justify-center ${activeDistrict === 'BENGALURU_N' ? 'scale-125 shadow-[0_0_12px_rgba(239,68,68,0.8)]' : 'hover:scale-110'}`}>
-                    <span className="w-1.5 h-1.5 rounded-full bg-red-500 animate-ping"></span>
-                  </span>
-                  <span className="absolute left-3 -top-3 bg-black border border-white/10 text-[9px] font-mono font-bold px-1.5 py-0.5 text-[#ff4d4d] whitespace-nowrap opacity-90 group-hover:opacity-100 transition-opacity uppercase tracking-wider">
-                    Bengaluru North
-                  </span>
-                </button>
-
-                <button
-                  onClick={() => setActiveDistrict('MYSURU')}
-                  className="absolute group cursor-pointer"
-                  style={{ left: '46%', top: '78%' }}
-                >
-                  <span className={`absolute -translate-x-1/2 -translate-y-1/2 w-3.5 h-3.5 rounded-full border bg-orange-500/20 border-orange-500 flex items-center justify-center ${activeDistrict === 'MYSURU' ? 'scale-125 shadow-[0_0_12px_rgba(249,115,22,0.8)]' : 'hover:scale-110'}`}>
-                    <span className="w-1 h-1 rounded-full bg-orange-500"></span>
-                  </span>
-                  <span className="absolute left-3 -top-3 bg-black border border-white/10 text-[9px] font-mono font-bold px-1.5 py-0.5 text-orange-400 whitespace-nowrap opacity-80 group-hover:opacity-100 transition-opacity uppercase tracking-wider">
-                    Mysuru West
-                  </span>
-                </button>
-
-                <button
-                  onClick={() => setActiveDistrict('HUBBALLI')}
-                  className="absolute group cursor-pointer"
-                  style={{ left: '33%', top: '35%' }}
-                >
-                  <span className={`absolute -translate-x-1/2 -translate-y-1/2 w-3.5 h-3.5 rounded-full border bg-orange-500/20 border-orange-500 flex items-center justify-center ${activeDistrict === 'HUBBALLI' ? 'scale-125 shadow-[0_0_12px_rgba(249,115,22,0.8)]' : 'hover:scale-110'}`}>
-                    <span className="w-1 h-1 rounded-full bg-orange-500"></span>
-                  </span>
-                  <span className="absolute left-3 -top-3 bg-black border border-white/10 text-[9px] font-mono font-bold px-1.5 py-0.5 text-orange-400 whitespace-nowrap opacity-80 group-hover:opacity-100 transition-opacity uppercase tracking-wider">
-                    Hubballi Central
-                  </span>
-                </button>
+                {/* Dynamic district markers from API */}
+                {!mapLoading && districts.map((district) => {
+                  const KA_LAT_MIN = 11.6, KA_LAT_MAX = 18.5;
+                  const KA_LNG_MIN = 74.0, KA_LNG_MAX = 78.6;
+                  const project = (lat: number, lng: number) => ({
+                    left: ((lng - KA_LNG_MIN) / (KA_LNG_MAX - KA_LNG_MIN)) * 100,
+                    top: ((KA_LAT_MAX - lat) / (KA_LAT_MAX - KA_LAT_MIN)) * 100,
+                  });
+                  const pos = project(district.lat, district.lng);
+                  const maxFirs = Math.max(...districts.map(d => d.total_firs), 1);
+                  const ratio = district.total_firs / maxFirs;
+                  const getIntensity = (r: number) => {
+                    if (r > 0.7) return { dot: 'bg-red-500 border-red-500', label: 'text-[#ff4d4d]' };
+                    if (r > 0.4) return { dot: 'bg-orange-500 border-orange-500', label: 'text-orange-400' };
+                    return { dot: 'bg-yellow-500 border-yellow-500', label: 'text-yellow-400' };
+                  };
+                  const intensity = getIntensity(ratio);
+                  const isActive = selectedDistrict?.district_id === district.district_id;
+                  return (
+                    <button
+                      key={district.district_id}
+                      onClick={() => setSelectedDistrict(isActive ? null : district)}
+                      className="absolute group cursor-pointer"
+                      style={{ left: `${pos.left}%`, top: `${pos.top}%` }}
+                    >
+                      <span className={`absolute -translate-x-1/2 -translate-y-1/2 w-4 h-4 rounded-full border flex items-center justify-center ${intensity.dot}
+                        ${isActive ? 'scale-125 shadow-[0_0_12px_rgba(239,68,68,0.8)]' : 'hover:scale-110'}
+                        transition-transform`}>
+                        <span className="w-1.5 h-1.5 rounded-full bg-current animate-ping" />
+                      </span>
+                      <span className={`absolute left-3 -top-3 bg-black border border-white/10 text-[9px]
+                        font-mono font-bold px-1.5 py-0.5 whitespace-nowrap uppercase tracking-wider
+                        opacity-90 group-hover:opacity-100 transition-opacity ${intensity.label}`}>
+                        {district.district_name}
+                      </span>
+                    </button>
+                  );
+                })}
               </div>
 
               {/* Map Legend */}
@@ -248,15 +251,19 @@ export default function CommandDashboardScreen() {
                 </h3>
               </div>
               <span className="w-5 h-5 rounded flex items-center justify-center bg-error-container text-on-error-container font-label-mono text-[11px]">
-                {alerts.length}
+                {alertsLoading ? '—' : apiAlerts.length}
               </span>
             </div>
             <div className="flex-1 overflow-y-auto p-2 space-y-2 max-h-[400px] custom-scrollbar">
-              {alerts.map((alert) => {
+              {alertsLoading
+                ? Array.from({ length: 3 }).map((_, i) => (
+                    <div key={i} className="h-16 bg-surface animate-pulse rounded border border-tactical" />
+                  ))
+                : apiAlerts.map((alert) => {
                 const isCritical = alert.level === 'CRITICAL';
                 return (
                   <div
-                    key={alert.id}
+                    key={alert.alert_id}
                     className={`p-3 border border-tactical bg-surface transition-colors rounded relative overflow-hidden group cursor-pointer ${
                       isCritical ? 'hover:border-error-container' : 'hover:border-tertiary-container'
                     }`}
@@ -279,7 +286,7 @@ export default function CommandDashboardScreen() {
                           schedule
                         </span>
                         <span className="font-label-mono text-[11px]">
-                          {alert.time} // {alert.source}
+                          {alert.time_ago} // {alert.district_name}
                         </span>
                       </div>
                     </div>
