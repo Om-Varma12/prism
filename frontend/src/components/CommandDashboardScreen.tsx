@@ -4,26 +4,28 @@
  */
 
 import React, { useState, useEffect } from 'react';
-import { INITIAL_ALERTS } from '../data/mockData';
-import { Alert } from '../types';
+import { useDashboardStats, useDistrictCrimes, useAlerts, useTrends } from '../hooks/useDashboardStats';
+import { DistrictCrimeData } from '../services/dashboard.service';
 
 export default function CommandDashboardScreen() {
   const [activeTimeframe, setActiveTimeframe] = useState<'24h' | '7d' | '30d'>('30d');
-  const [alerts, setAlerts] = useState<Alert[]>(INITIAL_ALERTS);
-  const [activeDistrict, setActiveDistrict] = useState<string>('BENGALURU_N');
+  const [selectedDistrict, setSelectedDistrict] = useState<DistrictCrimeData | null>(null);
   const [currentTime, setCurrentTime] = useState('');
+
+  const { stats, loading: statsLoading } = useDashboardStats();
+  const { data: districts, loading: mapLoading } = useDistrictCrimes(activeTimeframe);
+  const { alerts: apiAlerts, loading: alertsLoading } = useAlerts();
+  const { trends, loading: trendsLoading } = useTrends();
 
   // Clock ticks every second
   useEffect(() => {
     const updateTime = () => {
       const now = new Date();
-      const months = ['OCT', 'NOV', 'DEC', 'JAN', 'FEB', 'MAR', 'APR', 'MAY', 'JUN', 'JUL', 'AUG', 'SEP']; // Representative month matching mockup format
-      // We will construct "OCT 24, 2023 // 08:42:15 IST" dynamically
-      const monthStr = months[now.getMonth() % 12];
-      const day = String(now.getDate()).padStart(2, '0');
-      const year = now.getFullYear();
+      const dateStr = now.toLocaleDateString('en-IN', {
+        month: 'short', day: '2-digit', year: 'numeric'
+      }).toUpperCase();
       const timeStr = now.toLocaleTimeString('en-US', { hour12: false });
-      setCurrentTime(`OCT 24, 2023 // ${timeStr} IST`);
+      setCurrentTime(`${dateStr} // ${timeStr} IST`);
     };
 
     updateTime();
@@ -31,20 +33,6 @@ export default function CommandDashboardScreen() {
     return () => clearInterval(interval);
   }, []);
 
-  // District KPIs data
-  const getKpis = () => {
-    switch (activeDistrict) {
-      case 'HUBBALLI':
-        return { totalFirs: '1,420', activeCases: '88', highRisk: '12', alerts: '2' };
-      case 'MYSURU':
-        return { totalFirs: '984', activeCases: '45', highRisk: '8', alerts: '1' };
-      case 'BENGALURU_N':
-      default:
-        return { totalFirs: '5,847', activeCases: '312', highRisk: '47', alerts: '8' };
-    }
-  };
-
-  const kpis = getKpis();
 
   return (
     <div className="flex-1 flex flex-col overflow-hidden bg-[#0A0C10] select-none">
@@ -73,55 +61,69 @@ export default function CommandDashboardScreen() {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-gutter mb-lg">
           {/* KPI 1 */}
           <div
-            onClick={() => setActiveDistrict('BENGALURU_N')}
-            className={`bg-panel border-tactical rounded flex flex-col p-md relative overflow-hidden group cursor-pointer transition-all duration-200 ${
-              activeDistrict === 'BENGALURU_N' ? 'border-primary' : 'hover:border-primary-container/50'
-            }`}
+            onClick={() => setSelectedDistrict(null)}
+            className="bg-panel border border-tactical rounded flex flex-col p-md relative overflow-hidden group cursor-pointer transition-all duration-200 hover:border-primary-container/50"
           >
             <div className="absolute top-0 left-0 w-1 h-full bg-outline-variant group-hover:bg-primary-container transition-colors"></div>
             <span className="font-label-mono text-label-mono text-on-surface-variant mb-2 pl-2">
               TOTAL FIRs
             </span>
-            <span className="font-display-lg text-display-lg text-on-surface font-data-mono-bold pl-2">
-              {kpis.totalFirs}
-            </span>
+            {statsLoading ? (
+              <span className="font-display-lg text-display-lg text-on-surface-variant animate-pulse pl-2">——</span>
+            ) : (
+              <span className="font-display-lg text-display-lg text-on-surface font-data-mono-bold pl-2">
+                {stats?.total_firs.toLocaleString('en-IN') ?? '—'}
+              </span>
+            )}
           </div>
           {/* KPI 2 */}
-          <div className="bg-panel border-tactical rounded flex flex-col p-md relative overflow-hidden group">
+          <div className="bg-panel border border-tactical rounded flex flex-col p-md relative overflow-hidden group">
             <div className="absolute top-0 left-0 w-1 h-full bg-outline-variant group-hover:bg-primary-container transition-colors"></div>
             <span className="font-label-mono text-label-mono text-on-surface-variant mb-2 pl-2">
               ACTIVE CASES
             </span>
-            <span className="font-display-lg text-display-lg text-on-surface font-data-mono-bold pl-2">
-              {kpis.activeCases}
-            </span>
+            {statsLoading ? (
+              <span className="font-display-lg text-display-lg text-on-surface-variant animate-pulse pl-2">——</span>
+            ) : (
+              <span className="font-display-lg text-display-lg text-on-surface font-data-mono-bold pl-2">
+                {stats?.active_cases.toLocaleString('en-IN') ?? '—'}
+              </span>
+            )}
           </div>
           {/* KPI 3 */}
-          <div className="bg-panel border-tactical rounded flex flex-col p-md relative overflow-hidden group">
+          <div className="bg-panel border border-tactical rounded flex flex-col p-md relative overflow-hidden group">
             <div className="absolute top-0 left-0 w-1 h-full bg-tertiary-container group-hover:bg-tertiary transition-colors"></div>
             <span className="font-label-mono text-label-mono text-on-surface-variant mb-2 pl-2">
               HIGH-RISK OFFENDERS
             </span>
-            <span className="font-display-lg text-display-lg text-tertiary font-data-mono-bold pl-2">
-              {kpis.highRisk}
-            </span>
+            {statsLoading ? (
+              <span className="font-display-lg text-display-lg text-on-surface-variant animate-pulse pl-2">——</span>
+            ) : (
+              <span className="font-display-lg text-display-lg text-tertiary font-data-mono-bold pl-2">
+                {stats?.high_risk_offender_count.toLocaleString('en-IN') ?? '—'}
+              </span>
+            )}
           </div>
           {/* KPI 4 */}
-          <div className="bg-panel border-tactical rounded flex flex-col p-md relative overflow-hidden group">
+          <div className="bg-panel border border-tactical rounded flex flex-col p-md relative overflow-hidden group">
             <div className="absolute top-0 left-0 w-1 h-full bg-error-container group-hover:bg-error transition-colors"></div>
             <span className="font-label-mono text-label-mono text-on-surface-variant mb-2 pl-2">
               ACTIVE ALERTS
             </span>
-            <span className="font-display-lg text-display-lg text-error font-data-mono-bold pl-2">
-              {kpis.alerts}
-            </span>
+            {statsLoading ? (
+              <span className="font-display-lg text-display-lg text-on-surface-variant animate-pulse pl-2">——</span>
+            ) : (
+              <span className="font-display-lg text-display-lg text-error font-data-mono-bold pl-2">
+                {stats?.active_alert_count.toLocaleString('en-IN') ?? '—'}
+              </span>
+            )}
           </div>
         </div>
 
         {/* Main Row (65/35) */}
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-gutter mb-lg min-h-[400px]">
           {/* Left: Map (8 cols) */}
-          <div className="lg:col-span-8 bg-panel border-tactical rounded flex flex-col overflow-hidden">
+          <div className="lg:col-span-8 bg-panel border border-tactical rounded flex flex-col overflow-hidden">
             <div className="p-4 border-b border-tactical flex items-center justify-between">
               <div className="flex items-center gap-2">
                 <span className="material-symbols-outlined text-on-surface-variant text-[20px]">
@@ -163,45 +165,44 @@ export default function CommandDashboardScreen() {
                   src="https://lh3.googleusercontent.com/aida-public/AB6AXuAHzq0WEhaL8_wtUyZPd5cih-cTu7AEGYoNL5_TJkfqobmOkPKANRwdyzgDRk3LV8-VeVdfuFrdse2Rwb-wx7fmXmBfrdtCHNukqm8FNS3OPEsA26p_aSb2xVkzlEgOcLrhnC6Nf9MM_JxPqYGexVA-8TwqJpOQI8dfAfiv6PoPquSOGVurIcEkB6gx2ESNgep6M_HJNAdLbhoOeQYfgZya9T21IBkUg6YM-ZMUUTe4l4AjDC_0TkifoZwomDxGp8nX-8cJYiSMLxE"
                 />
 
-                {/* Markers corresponding to Bengaluru, Mysore, Hubballi */}
-                <button
-                  onClick={() => setActiveDistrict('BENGALURU_N')}
-                  className="absolute group cursor-pointer"
-                  style={{ left: '55%', top: '65%' }}
-                >
-                  <span className={`absolute -translate-x-1/2 -translate-y-1/2 w-4 h-4 rounded-full border bg-red-500/30 border-red-500 flex items-center justify-center ${activeDistrict === 'BENGALURU_N' ? 'scale-125 shadow-[0_0_12px_rgba(239,68,68,0.8)]' : 'hover:scale-110'}`}>
-                    <span className="w-1.5 h-1.5 rounded-full bg-red-500 animate-ping"></span>
-                  </span>
-                  <span className="absolute left-3 -top-3 bg-black border border-white/10 text-[9px] font-mono font-bold px-1.5 py-0.5 text-[#ff4d4d] whitespace-nowrap opacity-90 group-hover:opacity-100 transition-opacity uppercase tracking-wider">
-                    Bengaluru North
-                  </span>
-                </button>
-
-                <button
-                  onClick={() => setActiveDistrict('MYSURU')}
-                  className="absolute group cursor-pointer"
-                  style={{ left: '46%', top: '78%' }}
-                >
-                  <span className={`absolute -translate-x-1/2 -translate-y-1/2 w-3.5 h-3.5 rounded-full border bg-orange-500/20 border-orange-500 flex items-center justify-center ${activeDistrict === 'MYSURU' ? 'scale-125 shadow-[0_0_12px_rgba(249,115,22,0.8)]' : 'hover:scale-110'}`}>
-                    <span className="w-1 h-1 rounded-full bg-orange-500"></span>
-                  </span>
-                  <span className="absolute left-3 -top-3 bg-black border border-white/10 text-[9px] font-mono font-bold px-1.5 py-0.5 text-orange-400 whitespace-nowrap opacity-80 group-hover:opacity-100 transition-opacity uppercase tracking-wider">
-                    Mysuru West
-                  </span>
-                </button>
-
-                <button
-                  onClick={() => setActiveDistrict('HUBBALLI')}
-                  className="absolute group cursor-pointer"
-                  style={{ left: '33%', top: '35%' }}
-                >
-                  <span className={`absolute -translate-x-1/2 -translate-y-1/2 w-3.5 h-3.5 rounded-full border bg-orange-500/20 border-orange-500 flex items-center justify-center ${activeDistrict === 'HUBBALLI' ? 'scale-125 shadow-[0_0_12px_rgba(249,115,22,0.8)]' : 'hover:scale-110'}`}>
-                    <span className="w-1 h-1 rounded-full bg-orange-500"></span>
-                  </span>
-                  <span className="absolute left-3 -top-3 bg-black border border-white/10 text-[9px] font-mono font-bold px-1.5 py-0.5 text-orange-400 whitespace-nowrap opacity-80 group-hover:opacity-100 transition-opacity uppercase tracking-wider">
-                    Hubballi Central
-                  </span>
-                </button>
+                {/* Dynamic district markers from API */}
+                {!mapLoading && districts.map((district) => {
+                  const KA_LAT_MIN = 11.6, KA_LAT_MAX = 18.5;
+                  const KA_LNG_MIN = 74.0, KA_LNG_MAX = 78.6;
+                  const project = (lat: number, lng: number) => ({
+                    left: ((lng - KA_LNG_MIN) / (KA_LNG_MAX - KA_LNG_MIN)) * 100,
+                    top: ((KA_LAT_MAX - lat) / (KA_LAT_MAX - KA_LAT_MIN)) * 100,
+                  });
+                  const pos = project(district.lat, district.lng);
+                  const maxFirs = Math.max(...districts.map(d => d.total_firs), 1);
+                  const ratio = district.total_firs / maxFirs;
+                  const getIntensity = (r: number) => {
+                    if (r > 0.7) return { dot: 'bg-red-500 border-red-500', label: 'text-[#ff4d4d]' };
+                    if (r > 0.4) return { dot: 'bg-orange-500 border-orange-500', label: 'text-orange-400' };
+                    return { dot: 'bg-yellow-500 border-yellow-500', label: 'text-yellow-400' };
+                  };
+                  const intensity = getIntensity(ratio);
+                  const isActive = selectedDistrict?.district_id === district.district_id;
+                  return (
+                    <button
+                      key={district.district_id}
+                      onClick={() => setSelectedDistrict(isActive ? null : district)}
+                      className="absolute group cursor-pointer"
+                      style={{ left: `${pos.left}%`, top: `${pos.top}%` }}
+                    >
+                      <span className={`absolute -translate-x-1/2 -translate-y-1/2 w-4 h-4 rounded-full border flex items-center justify-center ${intensity.dot}
+                        ${isActive ? 'scale-125 shadow-[0_0_12px_rgba(239,68,68,0.8)]' : 'hover:scale-110'}
+                        transition-transform`}>
+                        <span className="w-1.5 h-1.5 rounded-full bg-current animate-ping" />
+                      </span>
+                      <span className={`absolute left-3 -top-3 bg-black border border-white/10 text-[9px]
+                        font-mono font-bold px-1.5 py-0.5 whitespace-nowrap uppercase tracking-wider
+                        opacity-90 group-hover:opacity-100 transition-opacity ${intensity.label}`}>
+                        {district.district_name}
+                      </span>
+                    </button>
+                  );
+                })}
               </div>
 
               {/* Map Legend */}
@@ -218,7 +219,7 @@ export default function CommandDashboardScreen() {
           </div>
 
           {/* Right: Active Alerts (4 cols) */}
-          <div className="lg:col-span-4 bg-panel border-tactical rounded flex flex-col overflow-hidden">
+          <div className="lg:col-span-4 bg-panel border border-tactical rounded flex flex-col overflow-hidden">
             <div className="p-4 border-b border-tactical flex items-center justify-between">
               <div className="flex items-center gap-2">
                 <span className="material-symbols-outlined text-error text-[20px]">
@@ -229,15 +230,19 @@ export default function CommandDashboardScreen() {
                 </h3>
               </div>
               <span className="w-5 h-5 rounded flex items-center justify-center bg-error-container text-on-error-container font-label-mono text-[11px]">
-                {alerts.length}
+                {alertsLoading ? '—' : apiAlerts.length}
               </span>
             </div>
             <div className="flex-1 overflow-y-auto p-2 space-y-2 max-h-[400px] custom-scrollbar">
-              {alerts.map((alert) => {
+              {alertsLoading
+                ? Array.from({ length: 3 }).map((_, i) => (
+                    <div key={i} className="h-16 bg-surface animate-pulse rounded border border-tactical" />
+                  ))
+                : apiAlerts.map((alert) => {
                 const isCritical = alert.level === 'CRITICAL';
                 return (
                   <div
-                    key={alert.id}
+                    key={alert.alert_id}
                     className={`p-3 border border-tactical bg-surface transition-colors rounded relative overflow-hidden group cursor-pointer ${
                       isCritical ? 'hover:border-error-container' : 'hover:border-tertiary-container'
                     }`}
@@ -260,7 +265,7 @@ export default function CommandDashboardScreen() {
                           schedule
                         </span>
                         <span className="font-label-mono text-[11px]">
-                          {alert.time} // {alert.source}
+                          {alert.time_ago} // {alert.district_name}
                         </span>
                       </div>
                     </div>
@@ -272,7 +277,7 @@ export default function CommandDashboardScreen() {
         </div>
 
         {/* Bottom Row: Sparklines */}
-        <div className="bg-panel border-tactical rounded flex flex-col overflow-hidden mb-xl">
+        <div className="bg-panel border border-tactical rounded flex flex-col overflow-hidden mb-xl">
           <div className="p-4 border-b border-tactical flex items-center justify-between">
             <h3 className="font-body-md text-body-md font-semibold text-on-surface uppercase tracking-wide">
               30-Day Crime Trend Analytics
@@ -282,45 +287,44 @@ export default function CommandDashboardScreen() {
             </span>
           </div>
           <div className="p-md grid grid-cols-1 md:grid-cols-5 gap-4 divide-y md:divide-y-0 md:divide-x divide-tactical">
-            {[
-              { label: 'Robbery', change: '+12%', colorClass: 'text-error', isUp: true, bars: [25, 50, 35, 75, 60, 85, 100], animate: true },
-              { label: 'Theft', change: '-2%', colorClass: 'text-on-surface-variant', isFlat: true, bars: [75, 65, 50, 55, 50, 45, 50], animate: false },
-              { label: 'Assault', change: '+5%', colorClass: 'text-tertiary', isUp: true, bars: [25, 30, 25, 40, 35, 60, 70], animate: false },
-              { label: 'Vehicle Crime', change: '-15%', colorClass: 'text-primary', isDown: true, bars: [100, 80, 70, 50, 40, 35, 25], animate: false },
-              { label: 'Burglary', change: '0%', colorClass: 'text-on-surface-variant', isFlat: true, bars: [40, 45, 35, 50, 40, 45, 40], animate: false },
-            ].map((trend, idx) => (
-              <div key={idx} className="pt-2 md:pt-0 md:px-4 flex flex-col first:pl-0">
-                <div className="flex justify-between items-center mb-2">
-                  <span className="font-label-mono text-[12px] text-on-surface-variant uppercase">
-                    {trend.label}
-                  </span>
-                  <span className={`font-data-mono-bold text-[13px] ${trend.colorClass} flex items-center`}>
-                    <span className="material-symbols-outlined text-[14px] mr-0.5">
-                      {trend.isUp ? 'trending_up' : trend.isDown ? 'trending_down' : 'trending_flat'}
+            {(trendsLoading ? [] : trends).map((trend, idx) => {
+              const isUp = trend.trend === 'up';
+              const isDown = trend.trend === 'down';
+              const changeStr = `${trend.change_pct > 0 ? '+' : ''}${trend.change_pct}%`;
+              const colorClass = isUp ? 'text-error' : isDown ? 'text-primary' : 'text-on-surface-variant';
+              const icon = isUp ? 'trending_up' : isDown ? 'trending_down' : 'trending_flat';
+              return (
+                <div key={idx} className="pt-2 md:pt-0 md:px-4 flex flex-col first:pl-0">
+                  <div className="flex justify-between items-center mb-2">
+                    <span className="font-label-mono text-[12px] text-on-surface-variant uppercase">
+                      {trend.crime_category}
                     </span>
-                    {trend.change}
-                  </span>
+                    <span className={`font-data-mono-bold text-[13px] ${colorClass} flex items-center`}>
+                      <span className="material-symbols-outlined text-[14px] mr-0.5">
+                        {icon}
+                      </span>
+                      {changeStr}
+                    </span>
+                  </div>
+                  <div className="h-12 w-full flex items-end gap-1 opacity-80">
+                    {trend.bar_heights.map((height, bIdx) => {
+                      const isLast = bIdx === trend.bar_heights.length - 1;
+                      return (
+                        <div
+                          key={bIdx}
+                          className={`w-full rounded-t-sm ${
+                            isLast && isUp ? 'bg-error animate-pulse'
+                              : isUp ? 'bg-tertiary'
+                              : 'bg-primary-container'
+                          }`}
+                          style={{ height: `${height}%` }}
+                        ></div>
+                      );
+                    })}
+                  </div>
                 </div>
-                <div className="h-12 w-full flex items-end gap-1 opacity-80">
-                  {trend.bars.map((height, bIdx) => {
-                    const isLast = bIdx === trend.bars.length - 1;
-                    return (
-                      <div
-                        key={bIdx}
-                        className={`w-full rounded-t-sm ${
-                          isLast && trend.animate
-                            ? 'bg-error animate-pulse'
-                            : trend.isUp
-                            ? 'bg-tertiary'
-                            : 'bg-primary-container'
-                        }`}
-                        style={{ height: `${height}%` }}
-                      ></div>
-                    );
-                  })}
-                </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
         </div>
       </div>
