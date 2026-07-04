@@ -4,14 +4,11 @@
  */
 
 import React, { useState, useEffect } from 'react';
-import { INITIAL_ALERTS } from '../data/mockData';
-import { Alert } from '../types';
-import { useDashboardStats, useDistrictCrimes, useAlerts } from '../hooks/useDashboardStats';
+import { useDashboardStats, useDistrictCrimes, useAlerts, useTrends } from '../hooks/useDashboardStats';
 import { DistrictCrimeData } from '../services/dashboard.service';
 
 export default function CommandDashboardScreen() {
   const [activeTimeframe, setActiveTimeframe] = useState<'24h' | '7d' | '30d'>('30d');
-  const [alerts, setAlerts] = useState<Alert[]>(INITIAL_ALERTS);
   const [selectedDistrict, setSelectedDistrict] = useState<DistrictCrimeData | null>(null);
   const [activeDistrict, setActiveDistrict] = useState<string>('BENGALURU_N');
   const [currentTime, setCurrentTime] = useState('');
@@ -19,6 +16,7 @@ export default function CommandDashboardScreen() {
   const { stats, loading: statsLoading } = useDashboardStats();
   const { data: districts, loading: mapLoading } = useDistrictCrimes(activeTimeframe);
   const { alerts: apiAlerts, loading: alertsLoading } = useAlerts();
+  const { trends, loading: trendsLoading } = useTrends();
 
   // Clock ticks every second
   useEffect(() => {
@@ -38,20 +36,6 @@ export default function CommandDashboardScreen() {
     return () => clearInterval(interval);
   }, []);
 
-  // District KPIs data
-  const getKpis = () => {
-    switch (activeDistrict) {
-      case 'HUBBALLI':
-        return { totalFirs: '1,420', activeCases: '88', highRisk: '12', alerts: '2' };
-      case 'MYSURU':
-        return { totalFirs: '984', activeCases: '45', highRisk: '8', alerts: '1' };
-      case 'BENGALURU_N':
-      default:
-        return { totalFirs: '5,847', activeCases: '312', highRisk: '47', alerts: '8' };
-    }
-  };
-
-  const kpis = getKpis();
 
   return (
     <div className="flex-1 flex flex-col overflow-hidden bg-[#0A0C10] select-none">
@@ -308,45 +292,44 @@ export default function CommandDashboardScreen() {
             </span>
           </div>
           <div className="p-md grid grid-cols-1 md:grid-cols-5 gap-4 divide-y md:divide-y-0 md:divide-x divide-tactical">
-            {[
-              { label: 'Robbery', change: '+12%', colorClass: 'text-error', isUp: true, bars: [25, 50, 35, 75, 60, 85, 100], animate: true },
-              { label: 'Theft', change: '-2%', colorClass: 'text-on-surface-variant', isFlat: true, bars: [75, 65, 50, 55, 50, 45, 50], animate: false },
-              { label: 'Assault', change: '+5%', colorClass: 'text-tertiary', isUp: true, bars: [25, 30, 25, 40, 35, 60, 70], animate: false },
-              { label: 'Vehicle Crime', change: '-15%', colorClass: 'text-primary', isDown: true, bars: [100, 80, 70, 50, 40, 35, 25], animate: false },
-              { label: 'Burglary', change: '0%', colorClass: 'text-on-surface-variant', isFlat: true, bars: [40, 45, 35, 50, 40, 45, 40], animate: false },
-            ].map((trend, idx) => (
-              <div key={idx} className="pt-2 md:pt-0 md:px-4 flex flex-col first:pl-0">
-                <div className="flex justify-between items-center mb-2">
-                  <span className="font-label-mono text-[12px] text-on-surface-variant uppercase">
-                    {trend.label}
-                  </span>
-                  <span className={`font-data-mono-bold text-[13px] ${trend.colorClass} flex items-center`}>
-                    <span className="material-symbols-outlined text-[14px] mr-0.5">
-                      {trend.isUp ? 'trending_up' : trend.isDown ? 'trending_down' : 'trending_flat'}
+            {(trendsLoading ? [] : trends).map((trend, idx) => {
+              const isUp = trend.trend === 'up';
+              const isDown = trend.trend === 'down';
+              const changeStr = `${trend.change_pct > 0 ? '+' : ''}${trend.change_pct}%`;
+              const colorClass = isUp ? 'text-error' : isDown ? 'text-primary' : 'text-on-surface-variant';
+              const icon = isUp ? 'trending_up' : isDown ? 'trending_down' : 'trending_flat';
+              return (
+                <div key={idx} className="pt-2 md:pt-0 md:px-4 flex flex-col first:pl-0">
+                  <div className="flex justify-between items-center mb-2">
+                    <span className="font-label-mono text-[12px] text-on-surface-variant uppercase">
+                      {trend.crime_category}
                     </span>
-                    {trend.change}
-                  </span>
+                    <span className={`font-data-mono-bold text-[13px] ${colorClass} flex items-center`}>
+                      <span className="material-symbols-outlined text-[14px] mr-0.5">
+                        {icon}
+                      </span>
+                      {changeStr}
+                    </span>
+                  </div>
+                  <div className="h-12 w-full flex items-end gap-1 opacity-80">
+                    {trend.bar_heights.map((height, bIdx) => {
+                      const isLast = bIdx === trend.bar_heights.length - 1;
+                      return (
+                        <div
+                          key={bIdx}
+                          className={`w-full rounded-t-sm ${
+                            isLast && isUp ? 'bg-error animate-pulse'
+                              : isUp ? 'bg-tertiary'
+                              : 'bg-primary-container'
+                          }`}
+                          style={{ height: `${height}%` }}
+                        ></div>
+                      );
+                    })}
+                  </div>
                 </div>
-                <div className="h-12 w-full flex items-end gap-1 opacity-80">
-                  {trend.bars.map((height, bIdx) => {
-                    const isLast = bIdx === trend.bars.length - 1;
-                    return (
-                      <div
-                        key={bIdx}
-                        className={`w-full rounded-t-sm ${
-                          isLast && trend.animate
-                            ? 'bg-error animate-pulse'
-                            : trend.isUp
-                            ? 'bg-tertiary'
-                            : 'bg-primary-container'
-                        }`}
-                        style={{ height: `${height}%` }}
-                      ></div>
-                    );
-                  })}
-                </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
         </div>
       </div>
