@@ -6,6 +6,7 @@
 import React, { useState, useEffect } from 'react';
 import { INITIAL_ALERTS } from '../data/mockData';
 import { Alert } from '../types';
+import { useDashboardStats } from '../hooks/useDashboardStats';
 
 export default function CommandDashboardScreen() {
   const [activeTimeframe, setActiveTimeframe] = useState<'24h' | '7d' | '30d'>('30d');
@@ -13,17 +14,19 @@ export default function CommandDashboardScreen() {
   const [activeDistrict, setActiveDistrict] = useState<string>('BENGALURU_N');
   const [currentTime, setCurrentTime] = useState('');
 
+  const { stats, loading: statsLoading } = useDashboardStats();
+
   // Clock ticks every second
   useEffect(() => {
     const updateTime = () => {
       const now = new Date();
       const months = ['OCT', 'NOV', 'DEC', 'JAN', 'FEB', 'MAR', 'APR', 'MAY', 'JUN', 'JUL', 'AUG', 'SEP']; // Representative month matching mockup format
       // We will construct "OCT 24, 2023 // 08:42:15 IST" dynamically
-      const monthStr = months[now.getMonth() % 12];
-      const day = String(now.getDate()).padStart(2, '0');
-      const year = now.getFullYear();
+      const dateStr = now.toLocaleDateString('en-IN', {
+        month: 'short', day: '2-digit', year: 'numeric'
+      }).toUpperCase();
       const timeStr = now.toLocaleTimeString('en-US', { hour12: false });
-      setCurrentTime(`OCT 24, 2023 // ${timeStr} IST`);
+      setCurrentTime(`${dateStr} // ${timeStr} IST`);
     };
 
     updateTime();
@@ -82,9 +85,13 @@ export default function CommandDashboardScreen() {
             <span className="font-label-mono text-label-mono text-on-surface-variant mb-2 pl-2">
               TOTAL FIRs
             </span>
-            <span className="font-display-lg text-display-lg text-on-surface font-data-mono-bold pl-2">
-              {kpis.totalFirs}
-            </span>
+            {statsLoading ? (
+              <span className="font-display-lg text-display-lg text-on-surface-variant animate-pulse pl-2">——</span>
+            ) : (
+              <span className="font-display-lg text-display-lg text-on-surface font-data-mono-bold pl-2">
+                {stats?.total_firs.toLocaleString('en-IN') ?? '—'}
+              </span>
+            )}
           </div>
           {/* KPI 2 */}
           <div className="bg-panel border-tactical rounded flex flex-col p-md relative overflow-hidden group">
@@ -92,9 +99,13 @@ export default function CommandDashboardScreen() {
             <span className="font-label-mono text-label-mono text-on-surface-variant mb-2 pl-2">
               ACTIVE CASES
             </span>
-            <span className="font-display-lg text-display-lg text-on-surface font-data-mono-bold pl-2">
-              {kpis.activeCases}
-            </span>
+            {statsLoading ? (
+              <span className="font-display-lg text-display-lg text-on-surface-variant animate-pulse pl-2">——</span>
+            ) : (
+              <span className="font-display-lg text-display-lg text-on-surface font-data-mono-bold pl-2">
+                {stats?.active_cases.toLocaleString('en-IN') ?? '—'}
+              </span>
+            )}
           </div>
           {/* KPI 3 */}
           <div className="bg-panel border-tactical rounded flex flex-col p-md relative overflow-hidden group">
@@ -102,9 +113,13 @@ export default function CommandDashboardScreen() {
             <span className="font-label-mono text-label-mono text-on-surface-variant mb-2 pl-2">
               HIGH-RISK OFFENDERS
             </span>
-            <span className="font-display-lg text-display-lg text-tertiary font-data-mono-bold pl-2">
-              {kpis.highRisk}
-            </span>
+            {statsLoading ? (
+              <span className="font-display-lg text-display-lg text-on-surface-variant animate-pulse pl-2">——</span>
+            ) : (
+              <span className="font-display-lg text-display-lg text-tertiary font-data-mono-bold pl-2">
+                {stats?.high_risk_offender_count.toLocaleString('en-IN') ?? '—'}
+              </span>
+            )}
           </div>
           {/* KPI 4 */}
           <div className="bg-panel border-tactical rounded flex flex-col p-md relative overflow-hidden group">
@@ -112,9 +127,13 @@ export default function CommandDashboardScreen() {
             <span className="font-label-mono text-label-mono text-on-surface-variant mb-2 pl-2">
               ACTIVE ALERTS
             </span>
-            <span className="font-display-lg text-display-lg text-error font-data-mono-bold pl-2">
-              {kpis.alerts}
-            </span>
+            {statsLoading ? (
+              <span className="font-display-lg text-display-lg text-on-surface-variant animate-pulse pl-2">——</span>
+            ) : (
+              <span className="font-display-lg text-display-lg text-error font-data-mono-bold pl-2">
+                {stats?.active_alert_count.toLocaleString('en-IN') ?? '—'}
+              </span>
+            )}
           </div>
         </div>
 
