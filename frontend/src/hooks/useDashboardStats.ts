@@ -13,10 +13,14 @@ export function useDashboardStats() {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    dashboardService.getStats()
-      .then(setStats)
-      .catch(() => setError('Failed to load stats'))
-      .finally(() => setLoading(false));
+    const timer = setTimeout(() => {
+      dashboardService.getStats()
+        .then(setStats)
+        .catch(() => setError('Failed to load stats'))
+        .finally(() => setLoading(false));
+    }, 3000);
+
+    return () => clearTimeout(timer);
   }, []);
 
   return { stats, loading, error };
@@ -27,10 +31,14 @@ export function useDistrictCrimes(timeframe: '24h' | '7d' | '30d') {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    setLoading(true);
-    dashboardService.getDistrictCrimes(timeframe)
-      .then(setData)
-      .finally(() => setLoading(false));
+    const timer = setTimeout(() => {
+      setLoading(true);
+      dashboardService.getDistrictCrimes(timeframe)
+        .then(setData)
+        .finally(() => setLoading(false));
+    }, 3000);
+
+    return () => clearTimeout(timer);
   }, [timeframe]);
 
   return { data, loading };
@@ -41,13 +49,17 @@ export function useAlerts() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    dashboardService.getAlerts().then(setAlerts).finally(() => setLoading(false));
+    const timer = setTimeout(() => {
+      dashboardService.getAlerts().then(setAlerts).finally(() => setLoading(false));
 
-    const interval = setInterval(() => {
-      dashboardService.getAlerts().then(setAlerts);
-    }, 60_000);
+      const interval = setInterval(() => {
+        dashboardService.getAlerts().then(setAlerts);
+      }, 60_000);
 
-    return () => clearInterval(interval);
+      return () => clearInterval(interval);
+    }, 3000);
+
+    return () => clearTimeout(timer);
   }, []);
 
   return { alerts, loading };
@@ -58,9 +70,13 @@ export function useTrends() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    dashboardService.getTrends()
-      .then(setTrends)
-      .finally(() => setLoading(false));
+    const timer = setTimeout(() => {
+      dashboardService.getTrends()
+        .then(setTrends)
+        .finally(() => setLoading(false));
+    }, 3000);
+
+    return () => clearTimeout(timer);
   }, []);
 
   return { trends, loading };
