@@ -17,6 +17,7 @@ html, body, #root {
   color: #E2E2E5;
   font-family: 'Inter', system-ui, sans-serif;
   -webkit-font-smoothing: antialiased;
+  overflow: hidden;
 }
 
 /* ─── Typography scale (used as class names) ────────────────────────────────── */

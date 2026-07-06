@@ -11,6 +11,10 @@ export default function CommandDashboardScreen() {
   const [activeTimeframe, setActiveTimeframe] = useState<'24h' | '7d' | '30d'>('30d');
   const [selectedDistrict, setSelectedDistrict] = useState<DistrictCrimeData | null>(null);
   const [currentTime, setCurrentTime] = useState('');
+  const [mapZoom, setMapZoom] = useState(1);
+  const [mapPan, setMapPan] = useState({ x: 0, y: 0 });
+  const [isDragging, setIsDragging] = useState(false);
+  const [dragStart, setDragStart] = useState({ x: 0, y: 0 });
 
   const { stats, loading: statsLoading } = useDashboardStats();
   const { data: districts, loading: mapLoading } = useDistrictCrimes(activeTimeframe);
@@ -32,6 +36,31 @@ export default function CommandDashboardScreen() {
     const interval = setInterval(updateTime, 1000);
     return () => clearInterval(interval);
   }, []);
+
+  const handleMapWheel = (e: React.WheelEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    const delta = e.deltaY > 0 ? -0.1 : 0.1;
+    setMapZoom(prev => Math.max(0.5, Math.min(5, prev + delta)));
+  };
+
+  const handleMouseDown = (e: React.MouseEvent) => {
+    if (e.button === 0) {
+      setIsDragging(true);
+      setDragStart({ x: e.clientX - mapPan.x, y: e.clientY - mapPan.y });
+    }
+  };
+
+  const handleMouseMove = (e: React.MouseEvent) => {
+    if (isDragging) {
+      e.preventDefault();
+      setMapPan({ x: e.clientX - dragStart.x, y: e.clientY - dragStart.y });
+    }
+  };
+
+  const handleMouseUp = () => {
+    setIsDragging(false);
+  };
 
 
   return (
@@ -149,7 +178,15 @@ export default function CommandDashboardScreen() {
                 ))}
               </div>
             </div>
-            <div className="flex-1 relative bg-[#050608] min-h-[300px]">
+            <div 
+              className="flex-1 relative bg-[#050608] min-h-[300px] overflow-hidden"
+              onWheel={handleMapWheel}
+              onMouseDown={handleMouseDown}
+              onMouseMove={handleMouseMove}
+              onMouseUp={handleMouseUp}
+              onMouseLeave={handleMouseUp}
+              style={{ cursor: isDragging ? 'grabbing' : 'grab' }}
+            >
               {/* Simulated Tactical Map */}
               <div
                 className="absolute inset-0 opacity-20 pointer-events-none"
@@ -158,11 +195,18 @@ export default function CommandDashboardScreen() {
                   backgroundSize: '20px 20px',
                 }}
               ></div>
-              <div className="absolute inset-0 flex items-center justify-center p-4">
+              <div 
+                className="absolute inset-0 flex items-center justify-center p-4 transition-transform duration-100 ease-out"
+                style={{ 
+                  transform: `translate(${mapPan.x}px, ${mapPan.y}px) scale(${mapZoom})`,
+                  transformOrigin: 'center center'
+                }}
+              >
                 <img
-                  className="w-full h-full object-contain opacity-60 mix-blend-screen grayscale"
+                  className="w-full h-full object-contain opacity-60 mix-blend-screen pointer-events-none"
                   alt="A tactical, high-contrast digital map of Karnataka state"
-                  src="https://lh3.googleusercontent.com/aida-public/AB6AXuAHzq0WEhaL8_wtUyZPd5cih-cTu7AEGYoNL5_TJkfqobmOkPKANRwdyzgDRk3LV8-VeVdfuFrdse2Rwb-wx7fmXmBfrdtCHNukqm8FNS3OPEsA26p_aSb2xVkzlEgOcLrhnC6Nf9MM_JxPqYGexVA-8TwqJpOQI8dfAfiv6PoPquSOGVurIcEkB6gx2ESNgep6M_HJNAdLbhoOeQYfgZya9T21IBkUg6YM-ZMUUTe4l4AjDC_0TkifoZwomDxGp8nX-8cJYiSMLxE"
+                  src={process.env.PUBLIC_URL + '/map.svg'}
+                  style={{ imageRendering: 'crisp-edges' }}
                 />
 
                 {/* Dynamic district markers from API */}
@@ -214,6 +258,11 @@ export default function CommandDashboardScreen() {
                   <div className="w-24 h-2 bg-gradient-to-r from-[#050608] to-primary-container rounded-sm"></div>
                   <span className="font-label-mono text-[10px] text-primary">HIGH</span>
                 </div>
+              </div>
+
+              {/* Zoom Indicator */}
+              <div className="absolute top-4 right-4 bg-panel border border-tactical rounded px-2 py-1 font-mono text-xs text-on-surface-variant pointer-events-none">
+                Zoom: {Math.round(mapZoom * 100)}%
               </div>
             </div>
           </div>
