@@ -124,3 +124,67 @@ html, body, #root {
   -webkit-font-feature-settings: 'liga';
   -webkit-font-smoothing: antialiased;
 }
+
+/* ─── Map district markers ───────────────────────────────────────────────────── */
+.map-marker {
+  position: absolute;
+  cursor: pointer;
+  z-index: 10;
+}
+
+.map-marker-dot {
+  position: absolute;
+  transform: translate(-50%, -50%);
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  border: 2px solid;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform 0.2s ease-out;
+}
+
+.map-marker-dot:hover {
+  transform: translate(-50%, -50%) scale(1.1);
+}
+
+.map-marker-dot.active {
+  transform: translate(-50%, -50%) scale(1.25);
+  box-shadow: 0 0 12px rgba(239, 68, 68, 0.8);
+}
+
+.map-marker-ping {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background-color: currentColor;
+  animation: ping 1s cubic-bezier(0, 0, 0.2, 1) infinite;
+}
+
+@keyframes ping {
+  75%, 100% {
+    transform: scale(2);
+    opacity: 0;
+  }
+}
+
+.map-marker-tooltip {
+  position: absolute;
+  left: 24px;
+  top: -8px;
+  background: rgba(0, 0, 0, 0.95);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 8px;
+  padding: 8px;
+  min-width: 140px;
+  opacity: 0;
+  transition: opacity 0.2s ease-out;
+  pointer-events: none;
+  z-index: 50;
+}
+
+.map-marker:hover .map-marker-tooltip,
+.map-marker.active .map-marker-tooltip {
+  opacity: 1;
+}
