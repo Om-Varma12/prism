@@ -139,3 +139,158 @@ Response Headers: {"server":"ZGS","date":"Mon, 06 Jul 2026 08:45:35 GMT","conten
 [info] [2026-07-06T08:45:43.160Z] : [1783327543160]  "GET"  "/app/manifest.json"
 [info] [2026-07-06T08:45:43.632Z] : [1783327543632]  "GET"  "/app/favicon.ico"
 [info] [2026-07-06T08:45:43.634Z] : [1783327543634]  "GET"  "/app/logo192.png"
+[info] [2026-07-06T08:45:46.597Z] : [1783327546597]  Appsail[backend]  "GET"  "/api/dashboard/stats"
+[info] [2026-07-06T08:45:46.603Z] : [1783327546603]  Appsail[backend]  "GET"  "/api/dashboard/district-crimes?timeframe=30d"
+[info] [2026-07-06T08:45:46.605Z] : [1783327546604]  Appsail[backend]  "GET"  "/api/dashboard/alerts?limit=10"
+[info] [2026-07-06T08:45:46.606Z] : [1783327546606]  Appsail[backend]  "GET"  "/api/dashboard/trends"
+[info] [2026-07-06T08:46:46.815Z] : [1783327606815]  Appsail[backend]  "GET"  "/api/dashboard/alerts?limit=10"
+[info] [2026-07-06T08:47:23.935Z] : [1783327643935]  "GET"  "/app/"
+[info] [2026-07-06T08:47:23.978Z] : [1783327643978]  "GET"  "/app/static/js/bundle.js"
+[info] [2026-07-06T08:47:25.117Z] : [1783327645116]  "GET"  "/app/favicon.ico"
+[info] [2026-07-06T08:47:25.329Z] : [1783327645329]  "GET"  "/app/manifest.json"
+[info] [2026-07-06T08:47:25.641Z] : [1783327645641]  "GET"  "/app/logo192.png"
+[info] [2026-07-06T08:47:29.140Z] : [1783327649140]  Appsail[backend]  "GET"  "/api/dashboard/stats"
+[info] [2026-07-06T08:47:29.141Z] : [1783327649141]  Appsail[backend]  "GET"  "/api/dashboard/district-crimes?timeframe=30d"
+[info] [2026-07-06T08:47:29.142Z] : [1783327649142]  Appsail[backend]  "GET"  "/api/dashboard/alerts?limit=10"
+[info] [2026-07-06T08:47:29.142Z] : [1783327649142]  Appsail[backend]  "GET"  "/api/dashboard/trends"
+[info] [2026-07-06T08:47:35.387Z] : [1783327655386]  "GET"  "/app/"
+[info] [2026-07-06T08:47:35.496Z] : [1783327655496]  "GET"  "/app/manifest.json"
+[info] [2026-07-06T08:47:35.695Z] : [1783327655694]  "GET"  "/app/static/js/bundle.js"
+[info] [2026-07-06T08:47:36.358Z] : [1783327656358]  "GET"  "/app/favicon.ico"
+[info] [2026-07-06T08:47:36.359Z] : [1783327656359]  "GET"  "/app/logo192.png"
+[info] [2026-07-06T08:47:39.828Z] : [1783327659828]  Appsail[backend]  "GET"  "/api/dashboard/stats"
+[info] [2026-07-06T08:47:40.132Z] : [1783327660131]  Appsail[backend]  "GET"  "/api/dashboard/district-crimes?timeframe=30d"
+[info] [2026-07-06T08:47:40.134Z] : [1783327660133]  Appsail[backend]  "GET"  "/api/dashboard/alerts?limit=10"
+[info] [2026-07-06T08:47:40.135Z] : [1783327660135]  Appsail[backend]  "GET"  "/api/dashboard/trends"
+[info] [2026-07-06T08:47:45.659Z] : [1783327665659]  "GET"  "/app/"
+[info] [2026-07-06T08:47:45.964Z] : [1783327665964]  "GET"  "/app/static/js/bundle.js"
+[info] [2026-07-06T08:47:46.072Z] : [1783327666072]  "GET"  "/app/manifest.json"
+[info] [2026-07-06T08:47:46.594Z] : [1783327666594]  "GET"  "/app/favicon.ico"
+[info] [2026-07-06T08:47:46.595Z] : [1783327666595]  "GET"  "/app/logo192.png"
+[info] [2026-07-06T08:47:50.128Z] : [1783327670128]  Appsail[backend]  "GET"  "/api/dashboard/stats"
+[info] [2026-07-06T08:47:50.130Z] : [1783327670130]  Appsail[backend]  "GET"  "/api/dashboard/district-crimes?timeframe=30d"
+[info] [2026-07-06T08:47:50.132Z] : [1783327670132]  Appsail[backend]  "GET"  "/api/dashboard/alerts?limit=10"
+[info] [2026-07-06T08:47:50.133Z] : [1783327670133]  Appsail[backend]  "GET"  "/api/dashboard/trends"
+[info] [2026-07-06T08:47:59.640Z] : [1783327679640]  "GET"  "/app/"
+[info] [2026-07-06T08:47:59.750Z] : [1783327679750]  "GET"  "/app/manifest.json"
+[info] [2026-07-06T08:47:59.946Z] : [1783327679946]  "GET"  "/app/static/js/bundle.js"
+[info] [2026-07-06T08:48:00.575Z] : [1783327680574]  "GET"  "/app/favicon.ico"
+[info] [2026-07-06T08:48:00.577Z] : [1783327680576]  "GET"  "/app/logo192.png"
+[info] [2026-07-06T08:48:03.815Z] : [1783327683814]  Appsail[backend]  "GET"  "/api/dashboard/stats"
+[info] [2026-07-06T08:48:04.126Z] : [1783327684125]  Appsail[backend]  "GET"  "/api/dashboard/district-crimes?timeframe=30d"
+[info] [2026-07-06T08:48:04.127Z] : [1783327684126]  Appsail[backend]  "GET"  "/api/dashboard/alerts?limit=10"
+[info] [2026-07-06T08:48:04.127Z] : [1783327684127]  Appsail[backend]  "GET"  "/api/dashboard/trends"
+[info] [2026-07-06T08:48:14.940Z] : [1783327694940]  "GET"  "/app/"
+[info] [2026-07-06T08:48:15.244Z] : [1783327695243]  "GET"  "/app/static/js/bundle.js"
+[info] [2026-07-06T08:48:15.355Z] : [1783327695355]  "GET"  "/app/manifest.json"
+[info] [2026-07-06T08:48:15.908Z] : [1783327695908]  "GET"  "/app/favicon.ico"
+[info] [2026-07-06T08:48:15.909Z] : [1783327695909]  "GET"  "/app/logo192.png"
+[info] [2026-07-06T08:48:19.139Z] : [1783327699138]  Appsail[backend]  "GET"  "/api/dashboard/trends"
+[info] [2026-07-06T08:48:19.141Z] : [1783327699140]  Appsail[backend]  "GET"  "/api/dashboard/stats"
+[info] [2026-07-06T08:48:19.143Z] : [1783327699142]  Appsail[backend]  "GET"  "/api/dashboard/district-crimes?timeframe=30d"
+[info] [2026-07-06T08:48:19.145Z] : [1783327699144]  Appsail[backend]  "GET"  "/api/dashboard/alerts?limit=10"
+[info] [2026-07-06T08:48:24.164Z] : [1783327704164]  "GET"  "/app/"
+[info] [2026-07-06T08:48:24.286Z] : [1783327704286]  "GET"  "/app/manifest.json"
+[info] [2026-07-06T08:48:24.471Z] : [1783327704471]  "GET"  "/app/static/js/bundle.js"
+[info] [2026-07-06T08:48:25.136Z] : [1783327705136]  "GET"  "/app/favicon.ico"
+[info] [2026-07-06T08:48:25.138Z] : [1783327705137]  "GET"  "/app/logo192.png"
+[info] [2026-07-06T08:48:27.823Z] : [1783327707823]  Appsail[backend]  "GET"  "/api/dashboard/stats"
+[info] [2026-07-06T08:48:28.138Z] : [1783327708138]  Appsail[backend]  "GET"  "/api/dashboard/district-crimes?timeframe=30d"
+[info] [2026-07-06T08:48:28.139Z] : [1783327708138]  Appsail[backend]  "GET"  "/api/dashboard/alerts?limit=10"
+[info] [2026-07-06T08:48:28.139Z] : [1783327708139]  Appsail[backend]  "GET"  "/api/dashboard/trends"
+[info] [2026-07-06T08:49:29.126Z] : [1783327769126]  Appsail[backend]  "GET"  "/api/dashboard/alerts?limit=10"
+[info] [2026-07-06T08:49:47.124Z] : [react-plugin]: Compiling...
+[info] [2026-07-06T08:49:52.622Z] : [react-plugin]: Compiled with warnings.
+
+[info] [2026-07-06T08:49:52.622Z] : [react-plugin]: [eslint] 
+src\components\CommandDashboardScreen.tsx
+  Line 319:43:  Comments inside children section of tag should be placed inside braces  react/jsx-no-comment-textnodes
+[info] [2026-07-06T08:49:52.622Z] : [react-plugin]: 
+Search for the keywords to learn more about each warning.
+[info] [2026-07-06T08:49:52.622Z] : [react-plugin]: To ignore, add // eslint-disable-next-line to the line before.
+
+[info] [2026-07-06T08:49:52.941Z] : [1783327792940]  "GET"  "/app/main.233dd5153a5f99bb8190.hot-update.json"
+[info] [2026-07-06T08:49:53.186Z] : [1783327793186]  "GET"  "/app/main.233dd5153a5f99bb8190.hot-update.js"
+[info] [2026-07-06T08:49:53.869Z] : [1783327793869]  "GET"  "/map.svg"
+[info] [2026-07-06T08:50:27.824Z] : [1783327827823]  Appsail[backend]  "GET"  "/api/dashboard/alerts?limit=10"
+[info] [2026-07-06T08:50:28.854Z] : [1783327828853]  "GET"  "/app/"
+[info] [2026-07-06T08:50:28.883Z] : [1783327828882]  "GET"  "/app/static/js/bundle.js"
+[info] [2026-07-06T08:50:29.139Z] : [1783327829138]  "GET"  "/map.svg"
+[info] [2026-07-06T08:50:29.224Z] : [1783327829224]  "GET"  "/app/manifest.json"
+[info] [2026-07-06T08:50:29.801Z] : [1783327829801]  "GET"  "/app/favicon.ico"
+[info] [2026-07-06T08:50:29.803Z] : [1783327829803]  "GET"  "/app/logo192.png"
+[info] [2026-07-06T08:50:32.457Z] : [1783327832457]  Appsail[backend]  "GET"  "/api/dashboard/stats"
+[info] [2026-07-06T08:50:32.459Z] : [1783327832459]  Appsail[backend]  "GET"  "/api/dashboard/district-crimes?timeframe=30d"
+[info] [2026-07-06T08:50:32.461Z] : [1783327832460]  Appsail[backend]  "GET"  "/api/dashboard/alerts?limit=10"
+[info] [2026-07-06T08:50:32.463Z] : [1783327832463]  Appsail[backend]  "GET"  "/api/dashboard/trends"
+[info] [2026-07-06T08:50:56.285Z] : [react-plugin]: Compiling...
+[info] [2026-07-06T08:50:57.032Z] : [react-plugin]: Compiled with warnings.
+
+[info] [2026-07-06T08:50:57.032Z] : [react-plugin]: [eslint] 
+src\components\CommandDashboardScreen.tsx
+  Line 9:8:     'mapSvg' is defined but never used                                      @typescript-eslint/no-unused-vars
+  Line 320:43:  Comments inside children section of tag should be placed inside braces  react/jsx-no-comment-textnodes
+[info] [2026-07-06T08:50:57.033Z] : [react-plugin]: 
+Search for the keywords to learn more about each warning.
+[info] [2026-07-06T08:50:57.033Z] : [react-plugin]: To ignore, add // eslint-disable-next-line to the line before.
+
+[info] [2026-07-06T08:50:57.056Z] : [1783327857055]  "GET"  "/app/main.19e52855d528565be2d5.hot-update.json"
+[info] [2026-07-06T08:50:57.374Z] : [1783327857374]  "GET"  "/app/main.19e52855d528565be2d5.hot-update.js"
+[info] [2026-07-06T08:51:01.325Z] : [1783327861325]  "GET"  "/app/"
+[info] [2026-07-06T08:51:01.398Z] : [1783327861397]  "GET"  "/app/manifest.json"
+[info] [2026-07-06T08:51:01.626Z] : [1783327861626]  "GET"  "/app/static/js/bundle.js"
+[info] [2026-07-06T08:51:02.062Z] : [1783327862062]  "GET"  "/map.svg"
+[info] [2026-07-06T08:51:02.341Z] : [1783327862340]  "GET"  "/app/favicon.ico"
+[info] [2026-07-06T08:51:02.656Z] : [1783327862656]  "GET"  "/app/logo192.png"
+[info] [2026-07-06T08:51:04.833Z] : [1783327864833]  Appsail[backend]  "GET"  "/api/dashboard/stats"
+[info] [2026-07-06T08:51:05.152Z] : [1783327865151]  Appsail[backend]  "GET"  "/api/dashboard/district-crimes?timeframe=30d"
+[info] [2026-07-06T08:51:05.153Z] : [1783327865153]  Appsail[backend]  "GET"  "/api/dashboard/alerts?limit=10"
+[info] [2026-07-06T08:51:05.154Z] : [1783327865154]  Appsail[backend]  "GET"  "/api/dashboard/trends"
+[info] [2026-07-06T08:51:05.607Z] : [react-plugin]: Compiling...
+[info] [2026-07-06T08:51:06.105Z] : [react-plugin]: Compiled with warnings.
+
+[info] [2026-07-06T08:51:06.105Z] : [react-plugin]: [eslint] 
+src\components\CommandDashboardScreen.tsx
+  Line 319:43:  Comments inside children section of tag should be placed inside braces  react/jsx-no-comment-textnodes
+[info] [2026-07-06T08:51:06.105Z] : [react-plugin]: 
+Search for the keywords to learn more about each warning.
+[info] [2026-07-06T08:51:06.105Z] : [react-plugin]: To ignore, add // eslint-disable-next-line to the line before.
+
+[info] [2026-07-06T08:51:06.426Z] : [1783327866426]  "GET"  "/app/main.8591d564a2f588643ea8.hot-update.json"
+[info] [2026-07-06T08:51:06.677Z] : [1783327866677]  "GET"  "/app/main.8591d564a2f588643ea8.hot-update.js"
+[info] [2026-07-06T08:51:08.940Z] : [1783327868939]  "GET"  "/app/"
+[info] [2026-07-06T08:51:09.256Z] : [1783327869256]  "GET"  "/app/static/js/bundle.js"
+[info] [2026-07-06T08:51:09.318Z] : [1783327869317]  "GET"  "/app/manifest.json"
+[info] [2026-07-06T08:51:09.687Z] : [1783327869687]  "GET"  "/map.svg"
+[info] [2026-07-06T08:51:09.942Z] : [1783327869942]  "GET"  "/app/favicon.ico"
+[info] [2026-07-06T08:51:10.248Z] : [1783327870248]  "GET"  "/app/logo192.png"
+[info] [2026-07-06T08:51:11.656Z] : [react-plugin]: Compiling...
+[info] [2026-07-06T08:51:12.161Z] : [react-plugin]: Compiled with warnings.
+
+[info] [2026-07-06T08:51:12.161Z] : [react-plugin]: [eslint] 
+src\components\CommandDashboardScreen.tsx
+  Line 319:43:  Comments inside children section of tag should be placed inside braces  react/jsx-no-comment-textnodes
+[info] [2026-07-06T08:51:12.161Z] : [react-plugin]: 
+Search for the keywords to learn more about each warning.
+[info] [2026-07-06T08:51:12.161Z] : [react-plugin]: To ignore, add // eslint-disable-next-line to the line before.
+
+[info] [2026-07-06T08:51:12.477Z] : [1783327872477]  "GET"  "/app/main.94a1b4950a6800be37b5.hot-update.json"
+[info] [2026-07-06T08:51:12.694Z] : [1783327872694]  Appsail[backend]  "GET"  "/api/dashboard/stats"
+[info] [2026-07-06T08:51:12.696Z] : [1783327872696]  Appsail[backend]  "GET"  "/api/dashboard/district-crimes?timeframe=30d"
+[info] [2026-07-06T08:51:12.697Z] : [1783327872697]  Appsail[backend]  "GET"  "/api/dashboard/alerts?limit=10"
+[info] [2026-07-06T08:51:12.698Z] : [1783327872698]  Appsail[backend]  "GET"  "/api/dashboard/trends"
+[info] [2026-07-06T08:51:12.739Z] : [1783327872739]  "GET"  "/app/main.94a1b4950a6800be37b5.hot-update.js"
+[info] [2026-07-06T08:51:12.785Z] : [1783327872785]  "GET"  "/app/map.svg"
+[info] [2026-07-06T08:52:04.460Z] : [react-plugin]: Compiling...
+[info] [2026-07-06T08:52:05.176Z] : [react-plugin]: Compiled with warnings.
+
+[info] [2026-07-06T08:52:05.176Z] : [react-plugin]: [eslint] 
+src\components\CommandDashboardScreen.tsx
+  Line 317:43:  Comments inside children section of tag should be placed inside braces  react/jsx-no-comment-textnodes
+[info] [2026-07-06T08:52:05.176Z] : [react-plugin]: 
+Search for the keywords to learn more about each warning.
+[info] [2026-07-06T08:52:05.176Z] : [react-plugin]: To ignore, add // eslint-disable-next-line to the line before.
+
+[info] [2026-07-06T08:52:05.196Z] : [1783327925196]  "GET"  "/app/main.4140a36b589e5342411c.hot-update.json"
+[info] [2026-07-06T08:52:05.527Z] : [1783327925527]  "GET"  "/app/main.4140a36b589e5342411c.hot-update.js"
+[info] [2026-07-06T08:52:12.397Z] : [1783327932396]  Appsail[backend]  "GET"  "/api/dashboard/alerts?limit=10"
