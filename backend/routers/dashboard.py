@@ -78,28 +78,41 @@ async def get_district_crimes(
         SELECT 
             District.DistrictName,
             COUNT(CaseMaster.ROWID) as total_firs,
-            CrimeSubHead.CrimeSubHeadName as crime_type
+            CrimeSubHead.CrimeHeadName as crime_type
         FROM CaseMaster
         INNER JOIN Unit ON CaseMaster.PoliceStationID = Unit.ROWID
         INNER JOIN District ON Unit.DistrictID = District.ROWID
         LEFT JOIN CrimeSubHead ON CaseMaster.CrimeMinorHeadID = CrimeSubHead.ROWID
         WHERE CaseMaster.IncidentFromDate >= '{since_str}'
-        GROUP BY District.DistrictName, CrimeSubHead.CrimeSubHeadName
+        GROUP BY District.DistrictName, CrimeSubHead.CrimeHeadName
     """
+    
+    print(f"\n=== DISTRICT CRIMES DEBUG ===")
+    print(f"Timeframe: {timeframe}, Since: {since_str}")
+    print(f"Query: {query}")
     
     try:
         result = zcql.execute_query(query)
-    except Exception:
+        print(f"Query result count: {len(result)}")
+        print(f"Query result: {result}")
+    except Exception as e:
+        print(f"Query error: {e}")
         result = []
     
     district_stats = defaultdict(lambda: {"total_firs": 0, "crime_types": []})
     
     for row in result:
-        d_name = row.get("DistrictName", "Unknown")
-        district_stats[d_name]["total_firs"] += row.get("total_firs", 0)
-        crime_type = row.get("crime_type")
+        # Handle nested result structure from ZCQL
+        d_name = row.get("District", {}).get("DistrictName", "Unknown")
+        fir_count = row.get("CaseMaster", {}).get("COUNT(ROWID)", 0)
+        crime_type = row.get("CrimeSubHead", {}).get("CrimeHeadName")
+        
+        district_stats[d_name]["total_firs"] += int(fir_count) if fir_count else 0
         if crime_type:
             district_stats[d_name]["crime_types"].append(crime_type)
+    
+    print(f"District stats: {dict(district_stats)}")
+    print(f"=== END DEBUG ===\n")
     
     results = []
     for d_name, d_data in district_stats.items():
@@ -136,7 +149,7 @@ async def get_active_alerts(
                 crime_alerts.created_at,
                 crime_alerts.is_acknowledged,
                 District.DistrictName,
-                CrimeSubHead.CrimeSubHeadName
+                CrimeSubHead.CrimeHeadName
             FROM crime_alerts
             LEFT JOIN District ON crime_alerts.district_id = District.ROWID
             LEFT JOIN CrimeSubHead ON crime_alerts.crime_sub_head_id = CrimeSubHead.ROWID
@@ -167,11 +180,11 @@ async def get_active_alerts(
         spike_ratio = row.get("spike_ratio", 1.0)
         results.append(AlertResponse(
             alert_id=row.get("alert_id", 0),
-            title=f"{row.get('CrimeSubHeadName', 'Crime')} Spike — {row.get('DistrictName', 'Unknown')}",
+            title=f"{row.get('CrimeHeadName', 'Crime')} Spike — {row.get('DistrictName', 'Unknown')}",
             level=level,
             details=f"+{int((spike_ratio - 1) * 100)}% above 90-day average",
             district_name=row.get("DistrictName", "Unknown"),
-            crime_type=row.get("CrimeSubHeadName", "Unknown"),
+            crime_type=row.get("CrimeHeadName", "Unknown"),
             spike_ratio=spike_ratio,
             created_at=created_at,
             time_ago=format_time_ago(created_at_naive)
@@ -206,15 +219,15 @@ async def get_crime_trends(
     
     try:
         query = f"""
-            SELECT CrimeSubHead.CrimeSubHeadName, COUNT(CaseMaster.ROWID) as count
+            SELECT CrimeSubHead.CrimeHeadName, COUNT(CaseMaster.ROWID) as count
             FROM CaseMaster
             LEFT JOIN CrimeSubHead ON CaseMaster.CrimeMinorHeadID = CrimeSubHead.ROWID
             WHERE CaseMaster.IncidentFromDate >= '{prior_30d_start}'
-            GROUP BY CrimeSubHead.CrimeSubHeadName
+            GROUP BY CrimeSubHead.CrimeHeadName
         """
         result = zcql.execute_query(query)
         
-        crime_counts = {row.get("CrimeSubHeadName", "Unknown"): row.get("count", 0) for row in result}
+        crime_counts = {row.get("CrimeHeadName", "Unknown"): row.get("count", 0) for row in result}
     except Exception:
         crime_counts = {}
     

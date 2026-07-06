@@ -6,6 +6,7 @@
 import React, { useState, useEffect } from 'react';
 import { useDashboardStats, useDistrictCrimes, useAlerts, useTrends } from '../hooks/useDashboardStats';
 import { DistrictCrimeData } from '../services/dashboard.service';
+import { districtCoordinates } from '../constants/districtCoordinates';
 
 export default function CommandDashboardScreen() {
   const [activeTimeframe, setActiveTimeframe] = useState<'24h' | '7d' | '30d'>('30d');
@@ -84,8 +85,8 @@ export default function CommandDashboardScreen() {
         </div>
       </header>
 
-      {/* Scrollable Canvas */}
-      <div className="flex-1 overflow-y-auto p-margin-desktop custom-scrollbar">
+      {/* Main Canvas */}
+      <div className="flex-1 overflow-hidden p-margin-desktop">
         {/* KPI Strip */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-gutter mb-lg">
           {/* KPI 1 */}
@@ -211,19 +212,26 @@ export default function CommandDashboardScreen() {
 
                 {/* Dynamic district markers from API */}
                 {!mapLoading && districts.map((district) => {
-                  const KA_LAT_MIN = 11.6, KA_LAT_MAX = 18.5;
-                  const KA_LNG_MIN = 74.0, KA_LNG_MAX = 78.6;
-                  const project = (lat: number, lng: number) => ({
-                    left: ((lng - KA_LNG_MIN) / (KA_LNG_MAX - KA_LNG_MIN)) * 100,
-                    top: ((KA_LAT_MAX - lat) / (KA_LAT_MAX - KA_LAT_MIN)) * 100,
-                  });
-                  const pos = project(district.lat, district.lng);
+                  const coords = districtCoordinates[district.district_name];
+                  
+                  // Only show marker if district has SVG coordinates
+                  if (!coords) return null;
+                  
+                  // Convert SVG coordinates to percentage positions
+                  // SVG viewBox: 0 0 4.12756 6.33471
+                  const SVG_WIDTH = 4.12756;
+                  const SVG_HEIGHT = 6.33471;
+                  const pos = {
+                    left: (coords.cx / SVG_WIDTH) * 100,
+                    top: (coords.cy / SVG_HEIGHT) * 100,
+                  };
+                  
                   const maxFirs = Math.max(...districts.map(d => d.total_firs), 1);
                   const ratio = district.total_firs / maxFirs;
                   const getIntensity = (r: number) => {
-                    if (r > 0.7) return { dot: 'bg-red-500 border-red-500', label: 'text-[#ff4d4d]' };
-                    if (r > 0.4) return { dot: 'bg-orange-500 border-orange-500', label: 'text-orange-400' };
-                    return { dot: 'bg-yellow-500 border-yellow-500', label: 'text-yellow-400' };
+                    if (r > 0.7) return { dot: '#ef4444', border: '#ef4444', label: '#ff4d4d' };
+                    if (r > 0.4) return { dot: '#f97316', border: '#f97316', label: '#fb923c' };
+                    return { dot: '#eab308', border: '#eab308', label: '#facc15' };
                   };
                   const intensity = getIntensity(ratio);
                   const isActive = selectedDistrict?.district_id === district.district_id;
@@ -231,19 +239,47 @@ export default function CommandDashboardScreen() {
                     <button
                       key={district.district_id}
                       onClick={() => setSelectedDistrict(isActive ? null : district)}
-                      className="absolute group cursor-pointer"
+                      className={`map-marker ${isActive ? 'active' : ''}`}
                       style={{ left: `${pos.left}%`, top: `${pos.top}%` }}
                     >
-                      <span className={`absolute -translate-x-1/2 -translate-y-1/2 w-4 h-4 rounded-full border flex items-center justify-center ${intensity.dot}
-                        ${isActive ? 'scale-125 shadow-[0_0_12px_rgba(239,68,68,0.8)]' : 'hover:scale-110'}
-                        transition-transform`}>
-                        <span className="w-1.5 h-1.5 rounded-full bg-current animate-ping" />
+                      <span 
+                        className="map-marker-dot"
+                        style={{ 
+                          backgroundColor: intensity.dot,
+                          borderColor: intensity.border,
+                        }}
+                      >
+                        <span className="map-marker-ping" />
                       </span>
-                      <span className={`absolute left-3 -top-3 bg-black border border-white/10 text-[9px]
-                        font-mono font-bold px-1.5 py-0.5 whitespace-nowrap uppercase tracking-wider
-                        opacity-90 group-hover:opacity-100 transition-opacity ${intensity.label}`}>
-                        {district.district_name}
-                      </span>
+                      
+                      {/* Tooltip with district info */}
+                      <div className="map-marker-tooltip">
+                        <div style={{ 
+                          fontSize: '10px', 
+                          fontFamily: 'JetBrains Mono, monospace', 
+                          fontWeight: 'bold', 
+                          textTransform: 'uppercase',
+                          letterSpacing: '0.05em',
+                          marginBottom: '4px',
+                          color: intensity.label 
+                        }}>
+                          {district.district_name}
+                        </div>
+                        <div style={{ fontSize: '9px', color: '#d1d5db', display: 'flex', flexDirection: 'column', gap: '2px' }}>
+                          <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                            <span>FIRs:</span>
+                            <span style={{ color: '#ffffff', fontFamily: 'JetBrains Mono, monospace' }}>{district.total_firs}</span>
+                          </div>
+                          <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                            <span>Active:</span>
+                            <span style={{ color: '#ffffff', fontFamily: 'JetBrains Mono, monospace' }}>{district.active_cases}</span>
+                          </div>
+                          <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                            <span>Risk:</span>
+                            <span style={{ color: '#ffffff', fontFamily: 'JetBrains Mono, monospace' }}>{district.high_risk_count}</span>
+                          </div>
+                        </div>
+                      </div>
                     </button>
                   );
                 })}

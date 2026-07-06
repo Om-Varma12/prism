@@ -1,5 +1,6 @@
-first page: dashboard
-1. data is empty everywhere
-2. karnataka map on crime density should be properly shown
-3. marks / labels on map for cities with real time changes
-4. ek micro-service for real-time data change and dashboard value updates
+first page: dashboard 
+1. marks / labels on map for cities with real time changes
+2. active alerts display
+3. map changing w.r.t. time zone selected
+4. 3-days crime trend analysis
+5. ek micro-service for real-time data change and dashboard value updates
