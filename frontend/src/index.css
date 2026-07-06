@@ -135,8 +135,8 @@ html, body, #root {
 .map-marker-dot {
   position: absolute;
   transform: translate(-50%, -50%);
-  width: 16px;
-  height: 16px;
+  width: 7px;
+  height: 7px;
   border-radius: 50%;
   border: 2px solid;
   display: flex;

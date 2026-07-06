@@ -6,9 +6,9 @@
 
 export const districtCoordinates: Record<string, { cx: number; cy: number }> = {
   // Districts from backend analytics/trends.py
-  "Bengaluru Urban": { cx: 3.1, cy: 5 },
-  "Mysuru": { cx: 2.05, cy: 5.65 },
-  "Dakshina Kannada": { cx: 1.1, cy: 5.05 },
+  "Bengaluru Urban": { cx: 2.32, cy: 4.80 },
+  "Mysuru": { cx: 2.065, cy: 5.4 },
+  "Dakshina Kannada": { cx: 1.83, cy: 4.85 },
   "Belagavi": { cx: 0.85, cy: 2.2 },
   "Ballari": { cx: 2.3, cy: 3.05 }, // vijayanagara in SVG
   "Kalaburagi": { cx: 2.65, cy: 1.45 },
