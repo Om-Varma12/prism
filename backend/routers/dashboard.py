@@ -22,20 +22,20 @@ async def get_dashboard_stats(
     try:
         query = "SELECT * FROM dashboard_stats ORDER BY computed_at DESC LIMIT 1"
         result = zcql.execute_query(query)
-        print(f"Dashboard stats query result: {result}")
+        # print(f"Dashboard stats query result: {result}")
         if result and len(result) > 0:
             # ZCQL returns data nested under table name key
             row_data = result[0].get('dashboard_stats', result[0])
             return DashboardStatsResponse(**row_data)
     except Exception as e:
-        print(f"Dashboard stats query error: {e}")
+        # print(f"Dashboard stats query error: {e}")
         pass
     
     # Fallback: compute on-the-fly if table doesn't exist
     try:
         query = "SELECT COUNT(CaseMasterID) as total FROM CaseMaster"
         result = zcql.execute_query(query)
-        print(f"Total FIRs query result: {result}")
+        # print(f"Total FIRs query result: {result}")
         total_firs = result[0]["total"] if result else 0
         
         query = """
@@ -45,14 +45,14 @@ async def get_dashboard_stats(
             WHERE CaseStatusMaster.CaseStatusName = 'Under Investigation'
         """
         result = zcql.execute_query(query)
-        print(f"Active cases query result: {result}")
+        # print(f"Active cases query result: {result}")
         active_cases = result[0]["active"] if result else 0
     except Exception as e:
-        print(f"Fallback query error: {e}")
+        # print(f"Fallback query error: {e}")
         total_firs = 0
         active_cases = 0
     
-    print(f"Final stats - total_firs: {total_firs}, active_cases: {active_cases}")
+    # print(f"Final stats - total_firs: {total_firs}, active_cases: {active_cases}")
     return DashboardStatsResponse(
         total_firs=total_firs,
         active_cases=active_cases,
@@ -87,16 +87,16 @@ async def get_district_crimes(
         GROUP BY District.DistrictName, CrimeSubHead.CrimeHeadName
     """
     
-    print(f"\n=== DISTRICT CRIMES DEBUG ===")
-    print(f"Timeframe: {timeframe}, Since: {since_str}")
-    print(f"Query: {query}")
+    # print(f"\n=== DISTRICT CRIMES DEBUG ===")
+    # print(f"Timeframe: {timeframe}, Since: {since_str}")
+    # print(f"Query: {query}")
     
     try:
         result = zcql.execute_query(query)
-        print(f"Query result count: {len(result)}")
-        print(f"Query result: {result}")
+        # print(f"Query result count: {len(result)}")
+        # print(f"Query result: {result}")
     except Exception as e:
-        print(f"Query error: {e}")
+        # print(f"Query error: {e}")
         result = []
     
     district_stats = defaultdict(lambda: {"total_firs": 0, "crime_types": []})
@@ -111,8 +111,8 @@ async def get_district_crimes(
         if crime_type:
             district_stats[d_name]["crime_types"].append(crime_type)
     
-    print(f"District stats: {dict(district_stats)}")
-    print(f"=== END DEBUG ===\n")
+    # print(f"District stats: {dict(district_stats)}")
+    # print(f"=== END DEBUG ===\n")
     
     results = []
     for d_name, d_data in district_stats.items():

@@ -1,6 +1,5 @@
 first page: dashboard 
-1. more data for maps and other table foreign key issues
 2. active alerts display
 3. map changing w.r.t. time zone selected
-4. 3-days crime trend analysis
+4. 30-days crime trend analysis
 5. ek micro-service for real-time data change and dashboard value updates

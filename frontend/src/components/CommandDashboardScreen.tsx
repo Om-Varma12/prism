@@ -299,7 +299,8 @@ export default function CommandDashboardScreen() {
                   Intensity Legend
                 </span>
                 <div className="flex items-center gap-2">
-                  <div className="w-24 h-2 bg-gradient-to-r from-[#050608] to-red-500 rounded-sm"></div>
+                  <span className="font-label-mono text-[10px] text-primary">LOW</span>
+                  <div className="w-24 h-2 bg-gradient-to-r from-yellow-500 to-red-500 rounded-sm"></div>
                   <span className="font-label-mono text-[10px] text-primary">HIGH</span>
                 </div>
               </div>
