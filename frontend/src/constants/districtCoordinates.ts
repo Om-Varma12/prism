@@ -9,9 +9,9 @@ export const districtCoordinates: Record<string, { cx: number; cy: number }> = {
   "Bengaluru Urban": { cx: 2.32, cy: 4.80 },
   "Mysuru": { cx: 2.065, cy: 5.4 },
   "Dakshina Kannada": { cx: 1.83, cy: 4.85 },
-  "Belagavi": { cx: 0.85, cy: 2.2 },
+  "Belagavi": { cx: 1.77, cy: 2.26 },
   "Ballari": { cx: 2.3, cy: 3.05 }, // vijayanagara in SVG
-  "Kalaburagi": { cx: 2.65, cy: 1.45 },
+  "Kalaburagi": { cx: 2.21, cy: 1.6 },
   "Hubballi-Dharwad": { cx: 1.1, cy: 2.78 }, // dharwad in SVG
   "Shivamogga": { cx: 1.05, cy: 3.98 }, // shimoga in SVG
   "Tumakuru": { cx: 2.5, cy: 4.6 }, // tumkur in SVG

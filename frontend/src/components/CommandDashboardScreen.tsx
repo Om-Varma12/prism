@@ -42,7 +42,7 @@ export default function CommandDashboardScreen() {
     e.preventDefault();
     e.stopPropagation();
     const delta = e.deltaY > 0 ? -0.1 : 0.1;
-    setMapZoom(prev => Math.max(0.5, Math.min(5, prev + delta)));
+    setMapZoom(prev => Math.max(0.5, Math.min(10, prev + delta)));
   };
 
   const handleMouseDown = (e: React.MouseEvent) => {
@@ -235,6 +235,7 @@ export default function CommandDashboardScreen() {
                   };
                   const intensity = getIntensity(ratio);
                   const isActive = selectedDistrict?.district_id === district.district_id;
+                  const tooltipScale = 1 / mapZoom;
                   return (
                     <button
                       key={district.district_id}
@@ -253,9 +254,16 @@ export default function CommandDashboardScreen() {
                       </span>
                       
                       {/* Tooltip with district info */}
-                      <div className="map-marker-tooltip">
+                      <div 
+                        className="map-marker-tooltip"
+                        style={{
+                          transform: `scale(${tooltipScale})`,
+                          transformOrigin: 'left center',
+                          transition: 'transform 0.2s ease-out',
+                        }}
+                      >
                         <div style={{ 
-                          fontSize: '10px', 
+                          fontSize: '12px', 
                           fontFamily: 'JetBrains Mono, monospace', 
                           fontWeight: 'bold', 
                           textTransform: 'uppercase',
@@ -265,7 +273,7 @@ export default function CommandDashboardScreen() {
                         }}>
                           {district.district_name}
                         </div>
-                        <div style={{ fontSize: '9px', color: '#d1d5db', display: 'flex', flexDirection: 'column', gap: '2px' }}>
+                        <div style={{ fontSize: '10px', color: '#d1d5db', display: 'flex', flexDirection: 'column', gap: '2px' }}>
                           <div style={{ display: 'flex', justifyContent: 'space-between' }}>
                             <span>FIRs:</span>
                             <span style={{ color: '#ffffff', fontFamily: 'JetBrains Mono, monospace' }}>{district.total_firs}</span>
@@ -291,7 +299,7 @@ export default function CommandDashboardScreen() {
                   Intensity Legend
                 </span>
                 <div className="flex items-center gap-2">
-                  <div className="w-24 h-2 bg-gradient-to-r from-[#050608] to-primary-container rounded-sm"></div>
+                  <div className="w-24 h-2 bg-gradient-to-r from-[#050608] to-red-500 rounded-sm"></div>
                   <span className="font-label-mono text-[10px] text-primary">HIGH</span>
                 </div>
               </div>
