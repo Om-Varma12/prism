@@ -10,6 +10,7 @@
  */
 
 import React, { useState, useEffect } from 'react';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { Screen } from './types';
 import LoginScreen from './components/LoginScreen';
 import Sidebar from './components/Sidebar';
@@ -17,6 +18,18 @@ import CommandDashboardScreen from './components/CommandDashboardScreen';
 import ChatScreen from './components/ChatScreen';
 import NetworkExplorerScreen from './components/NetworkExplorerScreen';
 import AnalyticsScreen from './components/AnalyticsScreen';
+
+// Create QueryClient with default options
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      staleTime: 5 * 60 * 1000, // 5 minutes
+      gcTime: 10 * 60 * 1000, // 10 minutes (formerly cacheTime)
+      refetchOnWindowFocus: false,
+      retry: 1,
+    },
+  },
+});
 
 /**
  * Checks if the app is running in local development mode.
@@ -102,16 +115,18 @@ function App() {
 
   // Authenticated — show the full app shell
   return (
-    <div className="flex h-screen bg-[#0A0C10] overflow-hidden">
-      <Sidebar
-        currentScreen={currentScreen}
-        onNavigate={handleNavigate}
-        onLogout={handleLogout}
-      />
-      <div className="flex-1 flex flex-col overflow-hidden md:ml-64">
-        {renderScreen()}
+    <QueryClientProvider client={queryClient}>
+      <div className="flex h-screen bg-[#0A0C10] overflow-hidden">
+        <Sidebar
+          currentScreen={currentScreen}
+          onNavigate={handleNavigate}
+          onLogout={handleLogout}
+        />
+        <div className="flex-1 flex flex-col overflow-hidden md:ml-64">
+          {renderScreen()}
+        </div>
       </div>
-    </div>
+    </QueryClientProvider>
   );
 }
 
