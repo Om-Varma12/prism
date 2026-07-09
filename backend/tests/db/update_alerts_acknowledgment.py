@@ -31,8 +31,32 @@ def update_alerts_acknowledgment(request: Request):
         if not result:
             return {"status": "error", "message": "No alerts found in crime_alerts table"}
         
-        alerts = result[0].get('crime_alerts', result[0])
+        # Handle different result structures from ZCQL
+        if isinstance(result[0], str):
+            return {"status": "error", "message": f"Unexpected result format: {result[0]}"}
+        
+        alerts = result[0].get('crime_alerts', result[0]) if isinstance(result[0], dict) else result[0]
+        
+        # If alerts is still not a list, try to extract it differently
+        if not isinstance(alerts, list):
+            # Try to get the first key that might contain the alerts
+            if isinstance(alerts, dict):
+                for key, value in alerts.items():
+                    if isinstance(value, list):
+                        alerts = value
+                        break
+                else:
+                    alerts = [alerts] if isinstance(alerts, dict) else []
+            else:
+                alerts = []
+        
+        if not alerts or len(alerts) == 0:
+            return {"status": "error", "message": "No alerts found after parsing result"}
+        
         print(f"Found {len(alerts)} alerts to update")
+        print(f"Alerts structure: {type(alerts)}")
+        if len(alerts) > 0:
+            print(f"First alert: {alerts[0]}")
         
         # Step 2: Update each alert to is_acknowledged = false
         table = datastore.table('crime_alerts')

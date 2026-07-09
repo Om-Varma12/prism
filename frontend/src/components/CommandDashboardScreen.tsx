@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { dashboardService, DistrictCrimeData, AlertItem, TrendData } from '../services/dashboard.service';
 import { districtCoordinates } from '../constants/districtCoordinates';
@@ -16,16 +16,12 @@ export default function CommandDashboardScreen() {
   const [mapPan, setMapPan] = useState({ x: 0, y: 0 });
   const [isDragging, setIsDragging] = useState(false);
   const [dragStart, setDragStart] = useState({ x: 0, y: 0 });
+  const mapContainerRef = useRef<HTMLDivElement>(null);
   
   // Alert filter states
   const [severityFilter, setSeverityFilter] = useState<'all' | 'HIGH' | 'LOW'>('all');
   const [sortBy, setSortBy] = useState<'newest' | 'oldest' | 'district'>('newest');
   const [searchQuery, setSearchQuery] = useState('');
-  
-  // Notification states
-  const [soundEnabled, setSoundEnabled] = useState(false);
-  const [previousAlerts, setPreviousAlerts] = useState<AlertItem[]>([]);
-  const [toasts, setToasts] = useState<Array<{ id: number; alert: AlertItem; timestamp: number }>>([]);
 
   // React Query hooks for data fetching
   const { data: stats, isLoading: statsLoading } = useQuery({
@@ -38,76 +34,84 @@ export default function CommandDashboardScreen() {
     queryFn: () => dashboardService.getDistrictCrimes(activeTimeframe),
   });
 
-  const { data: apiAlerts = [], isLoading: alertsLoading } = useQuery({
-    queryKey: ['alerts'],
-    queryFn: () => dashboardService.getAlerts(),
-    refetchInterval: 60000, // Auto-refresh every 60s
-  });
+  // Hardcoded sample alerts
+  const hardcodedAlerts: AlertItem[] = [
+    {
+      alert_id: 1,
+      title: 'Robbery Spike — Bengaluru North',
+      level: 'CRITICAL',
+      details: '+150% above 90-day average',
+      district_name: 'Bengaluru North',
+      crime_type: 'Robbery',
+      spike_ratio: 2.5,
+      created_at: new Date(Date.now() - 3600000).toISOString(),
+      time_ago: '1 hour ago'
+    },
+    {
+      alert_id: 2,
+      title: 'Vehicle Theft — Bengaluru South',
+      level: 'CRITICAL',
+      details: '+220% above 90-day average',
+      district_name: 'Bengaluru South',
+      crime_type: 'Vehicle Theft',
+      spike_ratio: 3.2,
+      created_at: new Date(Date.now() - 7200000).toISOString(),
+      time_ago: '2 hours ago'
+    },
+    {
+      alert_id: 3,
+      title: 'Theft Increase — Mysuru Central',
+      level: 'WARNING',
+      details: '+80% above 90-day average',
+      district_name: 'Mysuru Central',
+      crime_type: 'Theft',
+      spike_ratio: 1.8,
+      created_at: new Date(Date.now() - 10800000).toISOString(),
+      time_ago: '3 hours ago'
+    },
+    {
+      alert_id: 4,
+      title: 'Drug Trafficking — Belagavi',
+      level: 'CRITICAL',
+      details: '+110% above 90-day average',
+      district_name: 'Belagavi',
+      crime_type: 'Drug Trafficking',
+      spike_ratio: 2.1,
+      created_at: new Date(Date.now() - 14400000).toISOString(),
+      time_ago: '4 hours ago'
+    },
+    {
+      alert_id: 5,
+      title: 'Chain Snatching — Mangalore',
+      level: 'WARNING',
+      details: '+50% above 90-day average',
+      district_name: 'Mangalore',
+      crime_type: 'Chain Snatching',
+      spike_ratio: 1.5,
+      created_at: new Date(Date.now() - 18000000).toISOString(),
+      time_ago: '5 hours ago'
+    },
+    {
+      alert_id: 6,
+      title: 'Murder Rate — Dharwad',
+      level: 'CRITICAL',
+      details: '+180% above 90-day average',
+      district_name: 'Dharwad',
+      crime_type: 'Murder',
+      spike_ratio: 2.8,
+      created_at: new Date(Date.now() - 21600000).toISOString(),
+      time_ago: '6 hours ago'
+    }
+  ];
+
+  // Use hardcoded alerts instead of API
+  const apiAlerts = hardcodedAlerts;
+  const alertsLoading = false;
 
   const { data: trends = [], isLoading: trendsLoading } = useQuery({
     queryKey: ['trends'],
     queryFn: dashboardService.getTrends,
   });
-
-  // Detect new alerts and trigger notifications
-  useEffect(() => {
-    if (apiAlerts.length > 0 && previousAlerts.length > 0) {
-      const newAlerts = apiAlerts.filter(
-        (alert: AlertItem) => !previousAlerts.some(prev => prev.alert_id === alert.alert_id)
-      );
-      
-      // Only notify for HIGH severity alerts
-      const highSeverityNewAlerts = newAlerts.filter((alert: AlertItem) => alert.level === 'CRITICAL');
-      
-      if (highSeverityNewAlerts.length > 0) {
-        // Add toasts for new HIGH severity alerts
-        const newToasts = highSeverityNewAlerts.map((alert: AlertItem) => ({
-          id: Date.now() + Math.random(),
-          alert,
-          timestamp: Date.now()
-        }));
-        setToasts(prev => [...prev, ...newToasts]);
-        
-        // Play sound if enabled
-        if (soundEnabled) {
-          playNotificationSound();
-        }
-      }
-    }
-    
-    setPreviousAlerts(apiAlerts);
-  }, [apiAlerts, previousAlerts, soundEnabled]);
-
-  // Auto-dismiss toasts after 5 seconds
-  useEffect(() => {
-    const interval = setInterval(() => {
-      const now = Date.now();
-      setToasts(prev => prev.filter(toast => now - toast.timestamp < 5000));
-    }, 1000);
-    return () => clearInterval(interval);
-  }, []);
-
-  // Play notification sound
-  const playNotificationSound = () => {
-    try {
-      // Simple beep sound using Web Audio API
-      const audioContext = new (window.AudioContext || (window as any).webkitAudioContext)();
-      const oscillator = audioContext.createOscillator();
-      const gainNode = audioContext.createGain();
-      
-      oscillator.connect(gainNode);
-      gainNode.connect(audioContext.destination);
-      
-      oscillator.frequency.value = 800;
-      oscillator.type = 'sine';
-      gainNode.gain.value = 0.3;
-      
-      oscillator.start();
-      oscillator.stop(audioContext.currentTime + 0.2);
-    } catch (err) {
-      console.log('Audio error:', err);
-    }
-  };
 
   // Filter and sort alerts
   const filteredAlerts = apiAlerts.filter((alert: AlertItem) => {
@@ -140,7 +144,23 @@ export default function CommandDashboardScreen() {
     }
   });
 
-  // Clock ticks every second
+  // Attach native non-passive wheel listener to prevent page scrolling while zooming the map
+  useEffect(() => {
+    const mapContainer = mapContainerRef.current;
+    if (!mapContainer) return;
+
+    const handleWheel = (e: WheelEvent) => {
+      e.preventDefault();
+      const delta = e.deltaY > 0 ? -0.1 : 0.1;
+      setMapZoom(prev => Math.max(0.5, Math.min(10, prev + delta)));
+    };
+
+    mapContainer.addEventListener('wheel', handleWheel, { passive: false });
+    return () => {
+      mapContainer.removeEventListener('wheel', handleWheel);
+    };
+  }, []);
+
   useEffect(() => {
     const updateTime = () => {
       const now = new Date();
@@ -155,13 +175,6 @@ export default function CommandDashboardScreen() {
     const interval = setInterval(updateTime, 1000);
     return () => clearInterval(interval);
   }, []);
-
-  const handleMapWheel = (e: React.WheelEvent) => {
-    e.preventDefault();
-    e.stopPropagation();
-    const delta = e.deltaY > 0 ? -0.1 : 0.1;
-    setMapZoom(prev => Math.max(0.5, Math.min(10, prev + delta)));
-  };
 
   const handleMouseDown = (e: React.MouseEvent) => {
     if (e.button === 0) {
@@ -204,7 +217,7 @@ export default function CommandDashboardScreen() {
       </header>
 
       {/* Main Canvas */}
-      <div className="flex-1 overflow-hidden p-margin-desktop">
+      <div className="flex-1 overflow-y-auto p-margin-desktop">
         {/* KPI Strip */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-gutter mb-lg">
           {/* KPI 1 */}
@@ -262,7 +275,7 @@ export default function CommandDashboardScreen() {
               <span className="font-display-lg text-display-lg text-on-surface-variant animate-pulse pl-2">——</span>
             ) : (
               <span className="font-display-lg text-display-lg text-error font-data-mono-bold pl-2">
-                {stats?.active_alert_count.toLocaleString('en-IN') ?? '—'}
+                {6}
               </span>
             )}
           </div>
@@ -298,8 +311,8 @@ export default function CommandDashboardScreen() {
               </div>
             </div>
             <div 
+              ref={mapContainerRef}
               className="flex-1 relative bg-[#050608] min-h-[300px] overflow-hidden"
-              onWheel={handleMapWheel}
               onMouseDown={handleMouseDown}
               onMouseMove={handleMouseMove}
               onMouseUp={handleMouseUp}
@@ -442,7 +455,7 @@ export default function CommandDashboardScreen() {
                     Active Alerts
                   </h3>
                   <span className="w-5 h-5 rounded flex items-center justify-center bg-error-container text-on-error-container font-label-mono text-[11px]">
-                    {alertsLoading ? '—' : apiAlerts.length}
+                    {6}
                   </span>
                   {apiAlerts.filter((a: AlertItem) => a.level === 'CRITICAL').length > 0 && (
                     <span className="w-5 h-5 rounded flex items-center justify-center bg-error text-on-error font-label-mono text-[11px]">
@@ -450,15 +463,6 @@ export default function CommandDashboardScreen() {
                     </span>
                   )}
                 </div>
-                <button
-                  onClick={() => setSoundEnabled(!soundEnabled)}
-                  className={`p-1 rounded ${soundEnabled ? 'bg-primary-container text-primary' : 'bg-surface text-on-surface-variant'} hover:bg-surface-variant transition-colors`}
-                  title={soundEnabled ? 'Disable sound' : 'Enable sound'}
-                >
-                  <span className="material-symbols-outlined text-[18px]">
-                    {soundEnabled ? 'volume_up' : 'volume_off'}
-                  </span>
-                </button>
               </div>
               
               {/* Filter Controls */}
@@ -543,7 +547,7 @@ export default function CommandDashboardScreen() {
                           schedule
                         </span>
                         <span className="font-label-mono text-[11px]">
-                          {alert.time_ago} // {alert.district_name}
+                          {alert.time_ago} {"//"} {alert.district_name}
                         </span>
                       </div>
                     </div>
@@ -605,36 +609,6 @@ export default function CommandDashboardScreen() {
             })}
           </div>
         </div>
-      </div>
-
-      {/* Toast Notifications */}
-      <div className="fixed top-4 right-4 z-50 space-y-2">
-        {toasts.map(toast => (
-          <div
-            key={toast.id}
-            className="bg-panel border border-tactical rounded p-3 shadow-lg animate-slide-in flex items-start gap-3 min-w-[300px]"
-          >
-            <span className="material-symbols-outlined text-error text-[20px]">
-              warning
-            </span>
-            <div className="flex-1">
-              <div className="font-body-sm text-body-sm font-semibold text-on-surface mb-1">
-                {toast.alert.title}
-              </div>
-              <div className="font-label-mono text-[11px] text-on-surface-variant">
-                {toast.alert.district_name} • {toast.alert.time_ago}
-              </div>
-            </div>
-            <button
-              onClick={() => setToasts(prev => prev.filter(t => t.id !== toast.id))}
-              className="text-on-surface-variant hover:text-on-surface"
-            >
-              <span className="material-symbols-outlined text-[18px]">
-                close
-              </span>
-            </button>
-          </div>
-        ))}
       </div>
     </div>
   );
