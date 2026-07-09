@@ -1,482 +1,59 @@
-[debug] [2026-07-09T10:40:41.392Z] : 
-[debug] [2026-07-09T10:40:41.393Z] : ----------------------------------------------------------------------
-[debug] [2026-07-09T10:40:41.393Z] : Command:      C:\Program Files\nodejs\node.exe C:\Users\Acer\AppData\Roaming\npm\node_modules\zcatalyst-cli\lib\bin\catalyst.js serve
-[debug] [2026-07-09T10:40:41.393Z] : CLI Version:  1.26.1
-[debug] [2026-07-09T10:40:41.394Z] : Platform:     win32
-[debug] [2026-07-09T10:40:41.394Z] : Node Version: v22.20.0
-[debug] [2026-07-09T10:40:41.394Z] : Time:         Thu Jul 09 2026 16:10:41 GMT+0530 (India Standard Time)
-[debug] [2026-07-09T10:40:41.394Z] : ----------------------------------------------------------------------
-[debug] [2026-07-09T10:40:41.394Z] : 
-[debug] [2026-07-09T10:40:41.965Z] : > authorizing via signed-in user option
-[debug] [2026-07-09T10:40:41.965Z] : > command requires scopes: ["ZohoCatalyst.projects.ALL","ZohoCatalyst.apigateway.apis.READ","ZohoCatalyst.apigateway.READ","ZohoCatalyst.segments.ALL","ZohoCatalyst.cache.READ","ZohoCatalyst.cache.CREATE","ZohoCatalyst.cache.DELETE","ZohoCatalyst.projects.ALL","ZohoCatalyst.cron.ALL","ZohoCatalyst.zcql.CREATE","ZohoCatalyst.projects.users.READ","ZohoCatalyst.projects.users.CREATE","ZohoCatalyst.projects.users.DELETE","ZohoCatalyst.projects.users.UPDATE","ZohoCatalyst.authentication.CREATE","ZohoCatalyst.email.CREATE","ZohoCatalyst.tables.ALL","ZohoCatalyst.tables.rows.ALL","ZohoCatalyst.tables.columns.ALL","ZohoCatalyst.tables.bulk.CREATE","ZohoCatalyst.tables.bulk.READ","ZohoCatalyst.folders.ALL","ZohoCatalyst.files.CREATE","ZohoCatalyst.files.READ","ZohoCatalyst.files.DELETE","ZohoCatalyst.functions.ALL","ZohoCatalyst.functions.EXECUTE","ZohoCatalyst.eventlistners.ALL","ZohoCatalyst.eventlisteners.produce","ZohoCatalyst.security.rules.Read","ZohoCatalyst.security.rules.Update","ZohoCatalyst.notifications.mobile","ZohoCatalyst.notifications.web","ZohoCatalyst.search.READ","ZohoCatalyst.mlkit.READ","QuickML.deployment.READ","ZohoCatalyst.pdfshot.execute","ZohoCatalyst.grid.READ","ZohoCatalyst.grid.terminate","ZohoCatalyst.circuits.execution.DELETE","ZohoCatalyst.circuits.execution.READ","ZohoCatalyst.circuits.execute","ZohoCatalyst.appsail.Read","ZohoCatalyst.jobpool.READ","ZohoCatalyst.job.ALL","ZohoCatalyst.nosql.READ","ZohoCatalyst.nosql.rows.ALL"]
-[debug] [2026-07-09T10:40:41.977Z] : >>>> HTTP REQUEST : GET https://api.catalyst.zoho.in/baas/v1/project/46143000000022001 
+[debug] [2026-07-09T11:10:28.393Z] : 
+[debug] [2026-07-09T11:10:28.394Z] : ----------------------------------------------------------------------
+[debug] [2026-07-09T11:10:28.394Z] : Command:      C:\Program Files\nodejs\node.exe C:\Users\Acer\AppData\Roaming\npm\node_modules\zcatalyst-cli\lib\bin\catalyst.js serve
+[debug] [2026-07-09T11:10:28.394Z] : CLI Version:  1.26.1
+[debug] [2026-07-09T11:10:28.394Z] : Platform:     win32
+[debug] [2026-07-09T11:10:28.395Z] : Node Version: v22.20.0
+[debug] [2026-07-09T11:10:28.395Z] : Time:         Thu Jul 09 2026 16:40:28 GMT+0530 (India Standard Time)
+[debug] [2026-07-09T11:10:28.395Z] : ----------------------------------------------------------------------
+[debug] [2026-07-09T11:10:28.395Z] : 
+[debug] [2026-07-09T11:10:29.218Z] : > authorizing via signed-in user option
+[debug] [2026-07-09T11:10:29.219Z] : > command requires scopes: ["ZohoCatalyst.projects.ALL","ZohoCatalyst.apigateway.apis.READ","ZohoCatalyst.apigateway.READ","ZohoCatalyst.segments.ALL","ZohoCatalyst.cache.READ","ZohoCatalyst.cache.CREATE","ZohoCatalyst.cache.DELETE","ZohoCatalyst.projects.ALL","ZohoCatalyst.cron.ALL","ZohoCatalyst.zcql.CREATE","ZohoCatalyst.projects.users.READ","ZohoCatalyst.projects.users.CREATE","ZohoCatalyst.projects.users.DELETE","ZohoCatalyst.projects.users.UPDATE","ZohoCatalyst.authentication.CREATE","ZohoCatalyst.email.CREATE","ZohoCatalyst.tables.ALL","ZohoCatalyst.tables.rows.ALL","ZohoCatalyst.tables.columns.ALL","ZohoCatalyst.tables.bulk.CREATE","ZohoCatalyst.tables.bulk.READ","ZohoCatalyst.folders.ALL","ZohoCatalyst.files.CREATE","ZohoCatalyst.files.READ","ZohoCatalyst.files.DELETE","ZohoCatalyst.functions.ALL","ZohoCatalyst.functions.EXECUTE","ZohoCatalyst.eventlistners.ALL","ZohoCatalyst.eventlisteners.produce","ZohoCatalyst.security.rules.Read","ZohoCatalyst.security.rules.Update","ZohoCatalyst.notifications.mobile","ZohoCatalyst.notifications.web","ZohoCatalyst.search.READ","ZohoCatalyst.mlkit.READ","QuickML.deployment.READ","ZohoCatalyst.pdfshot.execute","ZohoCatalyst.grid.READ","ZohoCatalyst.grid.terminate","ZohoCatalyst.circuits.execution.DELETE","ZohoCatalyst.circuits.execution.READ","ZohoCatalyst.circuits.execute","ZohoCatalyst.appsail.Read","ZohoCatalyst.jobpool.READ","ZohoCatalyst.job.ALL","ZohoCatalyst.nosql.READ","ZohoCatalyst.nosql.rows.ALL"]
+[debug] [2026-07-09T11:10:29.232Z] : >>>> HTTP REQUEST : GET https://api.catalyst.zoho.in/baas/v1/project/46143000000022001 
 
-[debug] [2026-07-09T10:40:42.308Z] : <<<< HTTP RESPONSE : 200
-Response Headers: {"server":"ZGS","date":"Thu, 09 Jul 2026 10:40:43 GMT","content-type":"application/vnd.catalyst.v2+json","transfer-encoding":"chunked","connection":"keep-alive","x-content-type-options":"nosniff","cache-control":"private,no-cache,no-store,max-age=0,must-revalidate","pragma":"no-cache","expires":"Thu, 01 Jan 1970 00:00:00 GMT","x-frame-options":"DENY","strict-transport-security":"max-age=64072000; includeSubDomains; preload"}
+[debug] [2026-07-09T11:10:29.538Z] : <<<< HTTP RESPONSE : 200
+Response Headers: {"server":"ZGS","date":"Thu, 09 Jul 2026 11:10:31 GMT","content-type":"application/vnd.catalyst.v2+json","transfer-encoding":"chunked","connection":"keep-alive","x-content-type-options":"nosniff","cache-control":"private,no-cache,no-store,max-age=0,must-revalidate","pragma":"no-cache","expires":"Thu, 01 Jan 1970 00:00:00 GMT","x-frame-options":"DENY","strict-transport-security":"max-age=64072000; includeSubDomains; preload"}
 
-[debug] [2026-07-09T10:40:42.312Z] : >>>> HTTP REQUEST : GET https://api.catalyst.zoho.in/baas/v1/project/46143000000022001/environment 
+[debug] [2026-07-09T11:10:29.541Z] : >>>> HTTP REQUEST : GET https://api.catalyst.zoho.in/baas/v1/project/46143000000022001/environment 
 
-[debug] [2026-07-09T10:40:42.426Z] : <<<< HTTP RESPONSE : 200
-Response Headers: {"server":"ZGS","date":"Thu, 09 Jul 2026 10:40:43 GMT","content-type":"application/vnd.catalyst.v2+json","transfer-encoding":"chunked","connection":"keep-alive","x-content-type-options":"nosniff","cache-control":"private,no-cache,no-store,max-age=0,must-revalidate","pragma":"no-cache","expires":"Thu, 01 Jan 1970 00:00:00 GMT","x-frame-options":"DENY","strict-transport-security":"max-age=64072000; includeSubDomains; preload"}
+[debug] [2026-07-09T11:10:29.645Z] : <<<< HTTP RESPONSE : 200
+Response Headers: {"server":"ZGS","date":"Thu, 09 Jul 2026 11:10:31 GMT","content-type":"application/vnd.catalyst.v2+json","transfer-encoding":"chunked","connection":"keep-alive","x-content-type-options":"nosniff","cache-control":"private,no-cache,no-store,max-age=0,must-revalidate","pragma":"no-cache","expires":"Thu, 01 Jan 1970 00:00:00 GMT","x-frame-options":"DENY","strict-transport-security":"max-age=64072000; includeSubDomains; preload"}
 
-[debug] [2026-07-09T10:40:42.681Z] : http port : '3000' is not available. Hence port '3001' will be used instead.
-[debug] [2026-07-09T10:40:42.768Z] : No basic functions to add
-[info] [2026-07-09T10:40:45.254Z] : [react-plugin]: Starting the development server...
+[debug] [2026-07-09T11:10:29.960Z] : http port : '3000' is not available. Hence port '3001' will be used instead.
+[debug] [2026-07-09T11:10:30.088Z] : No basic functions to add
+[info] [2026-07-09T11:10:33.777Z] : [react-plugin]: Starting the development server...
 
-[info] [2026-07-09T10:40:45.256Z] : 
-[info] [2026-07-09T10:40:45.256Z] : i Client[frontend]: Plugin : "zcatalyst-cli-plugin-react" is used for client serve
-[info] [2026-07-09T10:40:45.256Z] : 
-[debug] [2026-07-09T10:40:46.481Z] : No API Gateway configuration found. Skipping API Gateway rules
-[debug] [2026-07-09T10:40:46.559Z] : No API Gateway configuration found. Skipping API Gateway rules
-[info] [2026-07-09T10:40:46.663Z] : 
-[info] [2026-07-09T10:40:46.664Z] :  >>>>>>>>>>>>>> AppSail <<<<<<<<<<<<<< 
-[info] [2026-07-09T10:40:46.664Z] : i backend: http://localhost:3001
-[info] [2026-07-09T10:40:46.664Z] : 
-[info] [2026-07-09T10:40:46.664Z] : 
-[info] [2026-07-09T10:40:46.665Z] :  >>>>>>>>>>>>> Web Client <<<<<<<<<<<<
-[info] [2026-07-09T10:40:46.665Z] : i client[frontend]: http://localhost:3000/app/
-[info] [2026-07-09T10:40:46.665Z] : 
-[info] [2026-07-09T10:40:47.306Z] : [1783593647306]  "GET"  "/app/"
-[info] [2026-07-09T10:40:47.321Z] : [react-plugin]: Compiled successfully!
-[info] [2026-07-09T10:40:47.321Z] : [react-plugin]: 
-[info] [2026-07-09T10:40:47.321Z] : [react-plugin]: You can now view fron in the browser.
-[info] [2026-07-09T10:40:47.321Z] : [react-plugin]: 
-[info] [2026-07-09T10:40:47.321Z] : [react-plugin]:   http://localhost:3000/app/
-[info] [2026-07-09T10:40:47.321Z] : [react-plugin]: 
-[info] [2026-07-09T10:40:47.322Z] : [react-plugin]: Note that the development build is not optimized.
-[info] [2026-07-09T10:40:47.322Z] : [react-plugin]: To create a production build, use npm run build.
-[info] [2026-07-09T10:40:47.322Z] : [react-plugin]: 
-[info] [2026-07-09T10:40:47.450Z] : [react-plugin]: Files successfully emitted, waiting for typecheck results...
-[info] [2026-07-09T10:40:47.518Z] : [1783593647518]  "GET"  "/app/static/js/bundle.js"
-[info] [2026-07-09T10:40:47.633Z] : [1783593647632]  "GET"  "/app/map.svg"
-[info] [2026-07-09T10:40:47.796Z] : [1783593647795]  "GET"  "/app/manifest.json"
-[info] [2026-07-09T10:40:47.984Z] : [1783593647984]  Appsail[backend]  "GET"  "/api/dashboard/stats"
-[info] [2026-07-09T10:40:47.987Z] : [1783593647987]  Appsail[backend]  "GET"  "/api/dashboard/district-crimes?timeframe=30d"
-[info] [2026-07-09T10:40:47.989Z] : [1783593647989]  Appsail[backend]  "GET"  "/api/dashboard/trends"
-[info] [2026-07-09T10:40:47.991Z] : [1783593647990]  Appsail[backend]  "GET"  "/api/dashboard/alerts?limit=10"
-[info] [2026-07-09T10:40:47.996Z] : [1783593647996]  "GET"  "/app/favicon.ico"
-[info] [2026-07-09T10:41:22.188Z] : [1783593682188]  Appsail[backend]  "GET"  "/db/test/auto-sync-alerts"
-[info] [2026-07-09T10:41:35.273Z] : [1783593695273]  Appsail[backend]  "GET"  "/db/test/update-alerts-acknowledgment"
-[info] [2026-07-09T10:41:41.032Z] : [1783593701032]  Appsail[backend]  "GET"  "/db/test/update-alerts-acknowledgment"
-[info] [2026-07-09T10:41:43.330Z] : [1783593703329]  Appsail[backend]  "GET"  "/db/test/auto-sync-alerts"
-[info] [2026-07-09T10:43:27.836Z] : [react-plugin]: Compiling...
-[info] [2026-07-09T10:43:32.940Z] : [react-plugin]: Compiled with warnings.
-
-[info] [2026-07-09T10:43:32.940Z] : [react-plugin]: [eslint] 
-src\components\CommandDashboardScreen.tsx
-  Line 614:43:  Comments inside children section of tag should be placed inside braces  react/jsx-no-comment-textnodes
-[info] [2026-07-09T10:43:32.940Z] : [react-plugin]: 
-Search for the keywords to learn more about each warning.
-[info] [2026-07-09T10:43:32.940Z] : [react-plugin]: To ignore, add // eslint-disable-next-line to the line before.
-
-[info] [2026-07-09T10:43:33.258Z] : [1783593813257]  "GET"  "/app/main.32f8667e980a7d14bf82.hot-update.json"
-[info] [2026-07-09T10:43:33.505Z] : [1783593813505]  "GET"  "/app/main.32f8667e980a7d14bf82.hot-update.js"
-[info] [2026-07-09T10:43:34.281Z] : [1783593814280]  Appsail[backend]  "GET"  "/api/dashboard/stats"
-[info] [2026-07-09T10:43:34.283Z] : [1783593814283]  Appsail[backend]  "GET"  "/api/dashboard/district-crimes?timeframe=30d"
-[info] [2026-07-09T10:43:34.285Z] : [1783593814285]  Appsail[backend]  "GET"  "/api/dashboard/trends"
-[info] [2026-07-09T10:43:50.048Z] : [react-plugin]: Compiling...
-[info] [2026-07-09T10:43:50.890Z] : [react-plugin]: Compiled with warnings.
-
-[info] [2026-07-09T10:43:50.890Z] : [react-plugin]: [eslint] 
-src\components\CommandDashboardScreen.tsx
-  Line 27:10:   'previousAlerts' is assigned a value but never used                     @typescript-eslint/no-unused-vars
-  Line 27:26:   'setPreviousAlerts' is assigned a value but never used                  @typescript-eslint/no-unused-vars
-  Line 554:43:  Comments inside children section of tag should be placed inside braces  react/jsx-no-comment-textnodes
-[info] [2026-07-09T10:43:50.891Z] : [react-plugin]: 
-Search for the keywords to learn more about each warning.
-[info] [2026-07-09T10:43:50.891Z] : [react-plugin]: To ignore, add // eslint-disable-next-line to the line before.
-
-[info] [2026-07-09T10:43:50.944Z] : [1783593830944]  "GET"  "/app/main.58fac843c9d83f9bbbb5.hot-update.json"
-[info] [2026-07-09T10:43:51.266Z] : [1783593831266]  "GET"  "/app/main.58fac843c9d83f9bbbb5.hot-update.js"
-[info] [2026-07-09T10:43:57.999Z] : [react-plugin]: Compiling...
-[info] [2026-07-09T10:43:58.721Z] : [react-plugin]: Compiled with warnings.
-
-[info] [2026-07-09T10:43:58.721Z] : [react-plugin]: [eslint] 
-src\components\CommandDashboardScreen.tsx
-  Line 549:43:  Comments inside children section of tag should be placed inside braces  react/jsx-no-comment-textnodes
-[info] [2026-07-09T10:43:58.721Z] : [react-plugin]: 
-Search for the keywords to learn more about each warning.
-[info] [2026-07-09T10:43:58.722Z] : [react-plugin]: To ignore, add // eslint-disable-next-line to the line before.
-
-[info] [2026-07-09T10:43:58.742Z] : [1783593838741]  "GET"  "/app/main.12f402841fab4a5d3c75.hot-update.json"
-[info] [2026-07-09T10:43:59.067Z] : [1783593839067]  "GET"  "/app/main.12f402841fab4a5d3c75.hot-update.js"
-[info] [2026-07-09T10:44:10.542Z] : [react-plugin]: Compiling...
-[info] [2026-07-09T10:44:11.237Z] : [react-plugin]: Compiled with warnings.
-
-[info] [2026-07-09T10:44:11.238Z] : [react-plugin]: [eslint] 
-src\components\CommandDashboardScreen.tsx
-  Line 540:43:  Comments inside children section of tag should be placed inside braces  react/jsx-no-comment-textnodes
-[info] [2026-07-09T10:44:11.238Z] : [react-plugin]: 
-Search for the keywords to learn more about each warning.
-[info] [2026-07-09T10:44:11.238Z] : [react-plugin]: To ignore, add // eslint-disable-next-line to the line before.
-
-[info] [2026-07-09T10:44:11.253Z] : [1783593851253]  "GET"  "/app/main.6fa7c585ea85e1085102.hot-update.json"
-[info] [2026-07-09T10:44:11.565Z] : [1783593851565]  "GET"  "/app/main.6fa7c585ea85e1085102.hot-update.js"
-[info] [2026-07-09T10:44:25.196Z] : [react-plugin]: Compiling...
-[info] [2026-07-09T10:44:25.822Z] : [react-plugin]: Compiled with warnings.
-
-[info] [2026-07-09T10:44:25.822Z] : [react-plugin]: [eslint] 
-src\components\CommandDashboardScreen.tsx
-  Line 540:43:  Comments inside children section of tag should be placed inside braces  react/jsx-no-comment-textnodes
-[info] [2026-07-09T10:44:25.822Z] : [react-plugin]: 
-Search for the keywords to learn more about each warning.
-[info] [2026-07-09T10:44:25.822Z] : [react-plugin]: To ignore, add // eslint-disable-next-line to the line before.
-
-[info] [2026-07-09T10:44:25.839Z] : [1783593865839]  "GET"  "/app/main.152858cb35bf144f12f0.hot-update.json"
-[info] [2026-07-09T10:44:26.156Z] : [1783593866156]  "GET"  "/app/main.152858cb35bf144f12f0.hot-update.js"
-[info] [2026-07-09T10:45:54.692Z] : [react-plugin]: Compiling...
-[info] [2026-07-09T10:45:55.576Z] : [react-plugin]: Compiled with warnings.
-
-[info] [2026-07-09T10:45:55.577Z] : [react-plugin]: [eslint] 
-src\components\CommandDashboardScreen.tsx
-  Line 540:43:  Comments inside children section of tag should be placed inside braces  react/jsx-no-comment-textnodes
-[info] [2026-07-09T10:45:55.577Z] : [react-plugin]: 
-Search for the keywords to learn more about each warning.
-[info] [2026-07-09T10:45:55.577Z] : [react-plugin]: To ignore, add // eslint-disable-next-line to the line before.
-
-[info] [2026-07-09T10:45:55.888Z] : [1783593955888]  "GET"  "/app/main.3568e7dd6be1504ee67d.hot-update.json"
-[info] [2026-07-09T10:45:56.140Z] : [1783593956140]  "GET"  "/app/main.3568e7dd6be1504ee67d.hot-update.js"
-[info] [2026-07-09T10:47:41.879Z] : [react-plugin]: Compiling...
-[info] [2026-07-09T10:47:42.687Z] : [react-plugin]: Compiled with warnings.
-
-[info] [2026-07-09T10:47:42.688Z] : [react-plugin]: [eslint] 
-src\components\CommandDashboardScreen.tsx
-  Line 19:10:   'isMapHovered' is assigned a value but never used                       @typescript-eslint/no-unused-vars
-  Line 19:24:   'setIsMapHovered' is assigned a value but never used                    @typescript-eslint/no-unused-vars
-  Line 541:43:  Comments inside children section of tag should be placed inside braces  react/jsx-no-comment-textnodes
-[info] [2026-07-09T10:47:42.688Z] : [react-plugin]: 
-Search for the keywords to learn more about each warning.
-[info] [2026-07-09T10:47:42.688Z] : [react-plugin]: To ignore, add // eslint-disable-next-line to the line before.
-
-[info] [2026-07-09T10:47:43.002Z] : [1783594063001]  "GET"  "/app/main.7d04da6e845f2c21523d.hot-update.json"
-[info] [2026-07-09T10:47:43.249Z] : [1783594063249]  "GET"  "/app/main.7d04da6e845f2c21523d.hot-update.js"
-[info] [2026-07-09T10:47:47.663Z] : [react-plugin]: Compiling...
-[info] [2026-07-09T10:47:48.288Z] : [react-plugin]: Compiled with warnings.
-
-[info] [2026-07-09T10:47:48.288Z] : [react-plugin]: [eslint] 
-src\components\CommandDashboardScreen.tsx
-  Line 19:24:   'setIsMapHovered' is assigned a value but never used                    @typescript-eslint/no-unused-vars
-  Line 551:43:  Comments inside children section of tag should be placed inside braces  react/jsx-no-comment-textnodes
-[info] [2026-07-09T10:47:48.288Z] : [react-plugin]: 
-Search for the keywords to learn more about each warning.
-[info] [2026-07-09T10:47:48.288Z] : [react-plugin]: To ignore, add // eslint-disable-next-line to the line before.
-
-[info] [2026-07-09T10:47:48.309Z] : [1783594068309]  "GET"  "/app/main.6ce5c29539e83a8f0f77.hot-update.json"
-[info] [2026-07-09T10:47:48.621Z] : [1783594068621]  "GET"  "/app/main.6ce5c29539e83a8f0f77.hot-update.js"
-[info] [2026-07-09T10:47:50.479Z] : [1783594070479]  Appsail[backend]  "GET"  "/api/dashboard/district-crimes?timeframe=7d"
-[info] [2026-07-09T10:47:53.408Z] : [react-plugin]: Compiling...
-[info] [2026-07-09T10:47:53.970Z] : [react-plugin]: Compiled with warnings.
-
-[info] [2026-07-09T10:47:53.970Z] : [react-plugin]: [eslint] 
-src\components\CommandDashboardScreen.tsx
-  Line 322:15:  No duplicate props allowed                                              react/jsx-no-duplicate-props
-  Line 553:43:  Comments inside children section of tag should be placed inside braces  react/jsx-no-comment-textnodes
-[info] [2026-07-09T10:47:53.970Z] : [react-plugin]: 
-Search for the keywords to learn more about each warning.
-[info] [2026-07-09T10:47:53.970Z] : [react-plugin]: To ignore, add // eslint-disable-next-line to the line before.
-
-[info] [2026-07-09T10:47:53.983Z] : [1783594073983]  "GET"  "/app/main.a85ef3b767f234e400eb.hot-update.json"
-[info] [2026-07-09T10:47:54.295Z] : [1783594074295]  "GET"  "/app/main.a85ef3b767f234e400eb.hot-update.js"
-[info] [2026-07-09T10:47:59.220Z] : [react-plugin]: Compiling...
-[info] [2026-07-09T10:47:59.836Z] : [react-plugin]: Compiled with warnings.
-
-[info] [2026-07-09T10:47:59.837Z] : [react-plugin]: [eslint] 
-src\components\CommandDashboardScreen.tsx
-  Line 555:43:  Comments inside children section of tag should be placed inside braces  react/jsx-no-comment-textnodes
-[info] [2026-07-09T10:47:59.837Z] : [react-plugin]: 
-Search for the keywords to learn more about each warning.
-[info] [2026-07-09T10:47:59.837Z] : [react-plugin]: To ignore, add // eslint-disable-next-line to the line before.
-
-[info] [2026-07-09T10:47:59.861Z] : [1783594079860]  "GET"  "/app/main.4e3535b12dab294c7ea9.hot-update.json"
-[info] [2026-07-09T10:48:00.173Z] : [1783594080173]  "GET"  "/app/main.4e3535b12dab294c7ea9.hot-update.js"
-[info] [2026-07-09T10:51:08.358Z] : [react-plugin]: Compiling...
-[info] [2026-07-09T10:51:09.105Z] : [react-plugin]: Compiled with warnings.
-
-[info] [2026-07-09T10:51:09.105Z] : [react-plugin]: [eslint] 
-src\components\CommandDashboardScreen.tsx
-  Line 550:43:  Comments inside children section of tag should be placed inside braces  react/jsx-no-comment-textnodes
-[info] [2026-07-09T10:51:09.105Z] : [react-plugin]: 
-Search for the keywords to learn more about each warning.
-[info] [2026-07-09T10:51:09.105Z] : [react-plugin]: To ignore, add // eslint-disable-next-line to the line before.
-
-[info] [2026-07-09T10:51:09.415Z] : [1783594269414]  "GET"  "/app/main.51a3cf95a9bfeb6f28f3.hot-update.json"
-[info] [2026-07-09T10:51:09.669Z] : [1783594269668]  "GET"  "/app/main.51a3cf95a9bfeb6f28f3.hot-update.js"
-[info] [2026-07-09T10:51:10.271Z] : [1783594270271]  Appsail[backend]  "GET"  "/api/dashboard/stats"
-[info] [2026-07-09T10:51:10.274Z] : [1783594270273]  Appsail[backend]  "GET"  "/api/dashboard/district-crimes?timeframe=30d"
-[info] [2026-07-09T10:51:10.275Z] : [1783594270275]  Appsail[backend]  "GET"  "/api/dashboard/trends"
-[info] [2026-07-09T10:51:40.590Z] : [react-plugin]: Compiling...
-[info] [2026-07-09T10:51:41.260Z] : [react-plugin]: Compiled successfully!
-[info] [2026-07-09T10:51:41.261Z] : [react-plugin]: 
-[info] [2026-07-09T10:51:41.261Z] : [react-plugin]: You can now view fron in the browser.
-[info] [2026-07-09T10:51:41.261Z] : [react-plugin]: 
-[info] [2026-07-09T10:51:41.261Z] : [react-plugin]:   http://localhost:3000/app/
-[info] [2026-07-09T10:51:41.261Z] : [react-plugin]: 
-[info] [2026-07-09T10:51:41.261Z] : [react-plugin]: Note that the development build is not optimized.
-[info] [2026-07-09T10:51:41.262Z] : [react-plugin]: To create a production build, use npm run build.
-[info] [2026-07-09T10:51:41.262Z] : [react-plugin]: 
-[info] [2026-07-09T10:51:41.278Z] : [1783594301278]  "GET"  "/app/main.724d6c2cdfd5c0f521b6.hot-update.json"
-[info] [2026-07-09T10:51:41.601Z] : [1783594301601]  "GET"  "/app/main.724d6c2cdfd5c0f521b6.hot-update.js"
-[info] [2026-07-09T10:52:20.917Z] : [react-plugin]: Compiling...
-[info] [2026-07-09T10:52:21.252Z] : [react-plugin]: Compiled successfully!
-[info] [2026-07-09T10:52:21.253Z] : [react-plugin]: 
-[info] [2026-07-09T10:52:21.253Z] : [react-plugin]: You can now view fron in the browser.
-[info] [2026-07-09T10:52:21.253Z] : [react-plugin]: 
-[info] [2026-07-09T10:52:21.253Z] : [react-plugin]:   http://localhost:3000/app/
-[info] [2026-07-09T10:52:21.253Z] : [react-plugin]: 
-[info] [2026-07-09T10:52:21.253Z] : [react-plugin]: Note that the development build is not optimized.
-[info] [2026-07-09T10:52:21.253Z] : [react-plugin]: To create a production build, use npm run build.
-[info] [2026-07-09T10:52:21.253Z] : [react-plugin]: 
-[info] [2026-07-09T10:52:21.264Z] : [1783594341264]  "GET"  "/app/main.0f83babeaab156a49306.hot-update.json"
-[info] [2026-07-09T10:52:21.574Z] : [1783594341574]  "GET"  "/app/main.0f83babeaab156a49306.hot-update.js"
-[info] [2026-07-09T10:52:23.539Z] : [react-plugin]: Compiling...
-[info] [2026-07-09T10:52:23.763Z] : [react-plugin]: Compiled successfully!
-[info] [2026-07-09T10:52:23.763Z] : [react-plugin]: 
-[info] [2026-07-09T10:52:23.763Z] : [react-plugin]: You can now view fron in the browser.
-[info] [2026-07-09T10:52:23.763Z] : [react-plugin]: 
-[info] [2026-07-09T10:52:23.763Z] : [react-plugin]:   http://localhost:3000/app/
-[info] [2026-07-09T10:52:23.763Z] : [react-plugin]: 
-[info] [2026-07-09T10:52:23.764Z] : [react-plugin]: Note that the development build is not optimized.
-[info] [2026-07-09T10:52:23.764Z] : [react-plugin]: To create a production build, use npm run build.
-[info] [2026-07-09T10:52:23.764Z] : [react-plugin]: 
-[info] [2026-07-09T10:52:23.778Z] : [1783594343778]  "GET"  "/app/main.9652c980de1dd1acda5f.hot-update.json"
-[info] [2026-07-09T10:52:24.102Z] : [1783594344102]  "GET"  "/app/main.9652c980de1dd1acda5f.hot-update.js"
-[info] [2026-07-09T10:52:26.928Z] : [react-plugin]: Compiling...
-[info] [2026-07-09T10:52:27.148Z] : [react-plugin]: Compiled successfully!
-[info] [2026-07-09T10:52:27.148Z] : [react-plugin]: 
-[info] [2026-07-09T10:52:27.148Z] : [react-plugin]: You can now view fron in the browser.
-[info] [2026-07-09T10:52:27.148Z] : [react-plugin]: 
-[info] [2026-07-09T10:52:27.148Z] : [react-plugin]:   http://localhost:3000/app/
-[info] [2026-07-09T10:52:27.148Z] : [react-plugin]: 
-[info] [2026-07-09T10:52:27.148Z] : [react-plugin]: Note that the development build is not optimized.
-[info] [2026-07-09T10:52:27.148Z] : [react-plugin]: To create a production build, use npm run build.
-[info] [2026-07-09T10:52:27.148Z] : [react-plugin]: 
-[info] [2026-07-09T10:52:27.156Z] : [1783594347156]  "GET"  "/app/main.9362d58837a9592b914f.hot-update.json"
-[info] [2026-07-09T10:52:27.472Z] : [1783594347472]  "GET"  "/app/main.9362d58837a9592b914f.hot-update.js"
-[info] [2026-07-09T10:52:28.843Z] : [react-plugin]: Compiling...
-[info] [2026-07-09T10:52:29.083Z] : [react-plugin]: Compiled successfully!
-[info] [2026-07-09T10:52:29.083Z] : [react-plugin]: 
-[info] [2026-07-09T10:52:29.083Z] : [react-plugin]: You can now view fron in the browser.
-[info] [2026-07-09T10:52:29.083Z] : [react-plugin]: 
-[info] [2026-07-09T10:52:29.083Z] : [react-plugin]:   http://localhost:3000/app/
-[info] [2026-07-09T10:52:29.083Z] : [react-plugin]: 
-[info] [2026-07-09T10:52:29.083Z] : [react-plugin]: Note that the development build is not optimized.
-[info] [2026-07-09T10:52:29.084Z] : [react-plugin]: To create a production build, use npm run build.
-[info] [2026-07-09T10:52:29.084Z] : [react-plugin]: 
-[info] [2026-07-09T10:52:29.092Z] : [1783594349092]  "GET"  "/app/main.b465e29d04bb00c37201.hot-update.json"
-[info] [2026-07-09T10:52:29.406Z] : [1783594349406]  "GET"  "/app/main.b465e29d04bb00c37201.hot-update.js"
-[info] [2026-07-09T10:52:35.682Z] : [react-plugin]: Compiling...
-[info] [2026-07-09T10:52:35.882Z] : [react-plugin]: Compiled successfully!
-[info] [2026-07-09T10:52:35.882Z] : [react-plugin]: 
-[info] [2026-07-09T10:52:35.882Z] : [react-plugin]: You can now view fron in the browser.
-[info] [2026-07-09T10:52:35.882Z] : [react-plugin]: 
-[info] [2026-07-09T10:52:35.882Z] : [react-plugin]:   http://localhost:3000/app/
-[info] [2026-07-09T10:52:35.882Z] : [react-plugin]: 
-[info] [2026-07-09T10:52:35.882Z] : [react-plugin]: Note that the development build is not optimized.
-[info] [2026-07-09T10:52:35.882Z] : [react-plugin]: To create a production build, use npm run build.
-[info] [2026-07-09T10:52:35.882Z] : [react-plugin]: 
-[info] [2026-07-09T10:52:35.907Z] : [1783594355907]  "GET"  "/app/main.616bf86549dcbbe5ae7a.hot-update.json"
-[info] [2026-07-09T10:52:36.233Z] : [1783594356232]  "GET"  "/app/main.616bf86549dcbbe5ae7a.hot-update.js"
-[info] [2026-07-09T10:52:38.861Z] : [react-plugin]: Compiling...
-[info] [2026-07-09T10:52:39.066Z] : [react-plugin]: Compiled successfully!
-[info] [2026-07-09T10:52:39.067Z] : [react-plugin]: 
-[info] [2026-07-09T10:52:39.067Z] : [react-plugin]: You can now view fron in the browser.
-[info] [2026-07-09T10:52:39.067Z] : [react-plugin]: 
-[info] [2026-07-09T10:52:39.067Z] : [react-plugin]:   http://localhost:3000/app/
-[info] [2026-07-09T10:52:39.067Z] : [react-plugin]: 
-[info] [2026-07-09T10:52:39.067Z] : [react-plugin]: Note that the development build is not optimized.
-[info] [2026-07-09T10:52:39.067Z] : [react-plugin]: To create a production build, use npm run build.
-[info] [2026-07-09T10:52:39.067Z] : [react-plugin]: 
-[info] [2026-07-09T10:52:39.074Z] : [1783594359074]  "GET"  "/app/main.543e76d7013f1b6c7bc9.hot-update.json"
-[info] [2026-07-09T10:52:39.385Z] : [1783594359384]  "GET"  "/app/main.543e76d7013f1b6c7bc9.hot-update.js"
-[info] [2026-07-09T10:52:40.865Z] : [react-plugin]: Compiling...
-[info] [2026-07-09T10:52:41.055Z] : [react-plugin]: Compiled successfully!
-[info] [2026-07-09T10:52:41.055Z] : [react-plugin]: 
-[info] [2026-07-09T10:52:41.055Z] : [react-plugin]: You can now view fron in the browser.
-[info] [2026-07-09T10:52:41.055Z] : [react-plugin]: 
-[info] [2026-07-09T10:52:41.055Z] : [react-plugin]:   http://localhost:3000/app/
-[info] [2026-07-09T10:52:41.055Z] : [react-plugin]: 
-[info] [2026-07-09T10:52:41.055Z] : [react-plugin]: Note that the development build is not optimized.
-[info] [2026-07-09T10:52:41.055Z] : [react-plugin]: To create a production build, use npm run build.
-[info] [2026-07-09T10:52:41.055Z] : [react-plugin]: 
-[info] [2026-07-09T10:52:41.063Z] : [1783594361062]  "GET"  "/app/main.9488bbaedb8b67d037b7.hot-update.json"
-[info] [2026-07-09T10:52:41.371Z] : [1783594361371]  "GET"  "/app/main.9488bbaedb8b67d037b7.hot-update.js"
-[info] [2026-07-09T10:52:43.343Z] : [react-plugin]: Compiling...
-[info] [2026-07-09T10:52:43.570Z] : [react-plugin]: Compiled successfully!
-[info] [2026-07-09T10:52:43.570Z] : [react-plugin]: 
-[info] [2026-07-09T10:52:43.570Z] : [react-plugin]: You can now view fron in the browser.
-[info] [2026-07-09T10:52:43.570Z] : [react-plugin]: 
-[info] [2026-07-09T10:52:43.570Z] : [react-plugin]:   http://localhost:3000/app/
-[info] [2026-07-09T10:52:43.570Z] : [react-plugin]: 
-[info] [2026-07-09T10:52:43.570Z] : [react-plugin]: Note that the development build is not optimized.
-[info] [2026-07-09T10:52:43.570Z] : [react-plugin]: To create a production build, use npm run build.
-[info] [2026-07-09T10:52:43.571Z] : [react-plugin]: 
-[info] [2026-07-09T10:52:43.581Z] : [1783594363581]  "GET"  "/app/main.3559cbd977bf7e1ad5c4.hot-update.json"
-[info] [2026-07-09T10:52:43.891Z] : [1783594363891]  "GET"  "/app/main.3559cbd977bf7e1ad5c4.hot-update.js"
-[info] [2026-07-09T10:52:57.951Z] : [react-plugin]: Compiling...
-[info] [2026-07-09T10:52:58.240Z] : [react-plugin]: Compiled successfully!
-[info] [2026-07-09T10:52:58.241Z] : [react-plugin]: 
-[info] [2026-07-09T10:52:58.241Z] : [react-plugin]: You can now view fron in the browser.
-[info] [2026-07-09T10:52:58.241Z] : [react-plugin]: 
-[info] [2026-07-09T10:52:58.241Z] : [react-plugin]:   http://localhost:3000/app/
-[info] [2026-07-09T10:52:58.241Z] : [react-plugin]: 
-[info] [2026-07-09T10:52:58.242Z] : [react-plugin]: Note that the development build is not optimized.
-[info] [2026-07-09T10:52:58.242Z] : [react-plugin]: To create a production build, use npm run build.
-[info] [2026-07-09T10:52:58.242Z] : [react-plugin]: 
-[info] [2026-07-09T10:52:58.258Z] : [1783594378257]  "GET"  "/app/main.3b07e1324be7a86bd316.hot-update.json"
-[info] [2026-07-09T10:52:58.575Z] : [1783594378575]  "GET"  "/app/main.3b07e1324be7a86bd316.hot-update.js"
-[info] [2026-07-09T10:53:00.570Z] : [react-plugin]: Compiling...
-[info] [2026-07-09T10:53:00.800Z] : [react-plugin]: Compiled successfully!
-[info] [2026-07-09T10:53:00.801Z] : [react-plugin]: 
-[info] [2026-07-09T10:53:00.801Z] : [react-plugin]: You can now view fron in the browser.
-[info] [2026-07-09T10:53:00.801Z] : [react-plugin]: 
-[info] [2026-07-09T10:53:00.801Z] : [react-plugin]:   http://localhost:3000/app/
-[info] [2026-07-09T10:53:00.801Z] : [react-plugin]: 
-[info] [2026-07-09T10:53:00.801Z] : [react-plugin]: Note that the development build is not optimized.
-[info] [2026-07-09T10:53:00.801Z] : [react-plugin]: To create a production build, use npm run build.
-[info] [2026-07-09T10:53:00.801Z] : [react-plugin]: 
-[info] [2026-07-09T10:53:00.810Z] : [1783594380810]  "GET"  "/app/main.a30a173c246675beea8d.hot-update.json"
-[info] [2026-07-09T10:53:01.129Z] : [1783594381129]  "GET"  "/app/main.a30a173c246675beea8d.hot-update.js"
-[info] [2026-07-09T10:53:03.161Z] : [react-plugin]: Compiling...
-[info] [2026-07-09T10:53:03.402Z] : [react-plugin]: Compiled successfully!
-[info] [2026-07-09T10:53:03.402Z] : [react-plugin]: 
-[info] [2026-07-09T10:53:03.402Z] : [react-plugin]: You can now view fron in the browser.
-[info] [2026-07-09T10:53:03.402Z] : [react-plugin]: 
-[info] [2026-07-09T10:53:03.402Z] : [react-plugin]:   http://localhost:3000/app/
-[info] [2026-07-09T10:53:03.402Z] : [react-plugin]: 
-[info] [2026-07-09T10:53:03.402Z] : [react-plugin]: Note that the development build is not optimized.
-[info] [2026-07-09T10:53:03.402Z] : [react-plugin]: To create a production build, use npm run build.
-[info] [2026-07-09T10:53:03.402Z] : [react-plugin]: 
-[info] [2026-07-09T10:53:03.411Z] : [1783594383411]  "GET"  "/app/main.5a8c801f0afbb5b40e08.hot-update.json"
-[info] [2026-07-09T10:53:03.724Z] : [1783594383724]  "GET"  "/app/main.5a8c801f0afbb5b40e08.hot-update.js"
-[info] [2026-07-09T10:53:07.781Z] : [react-plugin]: Compiling...
-[info] [2026-07-09T10:53:07.979Z] : [react-plugin]: Compiled successfully!
-[info] [2026-07-09T10:53:07.980Z] : [react-plugin]: 
-[info] [2026-07-09T10:53:07.980Z] : [react-plugin]: You can now view fron in the browser.
-[info] [2026-07-09T10:53:07.980Z] : [react-plugin]: 
-[info] [2026-07-09T10:53:07.980Z] : [react-plugin]:   http://localhost:3000/app/
-[info] [2026-07-09T10:53:07.980Z] : [react-plugin]: 
-[info] [2026-07-09T10:53:07.980Z] : [react-plugin]: Note that the development build is not optimized.
-[info] [2026-07-09T10:53:07.980Z] : [react-plugin]: To create a production build, use npm run build.
-[info] [2026-07-09T10:53:07.980Z] : [react-plugin]: 
-[info] [2026-07-09T10:53:07.990Z] : [1783594387990]  "GET"  "/app/main.f1bdb777eb298370d510.hot-update.json"
-[info] [2026-07-09T10:53:08.304Z] : [1783594388304]  "GET"  "/app/main.f1bdb777eb298370d510.hot-update.js"
-[info] [2026-07-09T10:53:09.785Z] : [react-plugin]: Compiling...
-[info] [2026-07-09T10:53:10.003Z] : [react-plugin]: Compiled successfully!
-[info] [2026-07-09T10:53:10.003Z] : [react-plugin]: 
-[info] [2026-07-09T10:53:10.004Z] : [react-plugin]: You can now view fron in the browser.
-[info] [2026-07-09T10:53:10.004Z] : [react-plugin]: 
-[info] [2026-07-09T10:53:10.004Z] : [react-plugin]:   http://localhost:3000/app/
-[info] [2026-07-09T10:53:10.004Z] : [react-plugin]: 
-[info] [2026-07-09T10:53:10.004Z] : [react-plugin]: Note that the development build is not optimized.
-[info] [2026-07-09T10:53:10.004Z] : [react-plugin]: To create a production build, use npm run build.
-[info] [2026-07-09T10:53:10.004Z] : [react-plugin]: 
-[info] [2026-07-09T10:53:10.012Z] : [1783594390011]  "GET"  "/app/main.548e9e395371c41ea7bb.hot-update.json"
-[info] [2026-07-09T10:53:10.322Z] : [1783594390322]  "GET"  "/app/main.548e9e395371c41ea7bb.hot-update.js"
-[info] [2026-07-09T10:53:12.056Z] : [react-plugin]: Compiling...
-[info] [2026-07-09T10:53:12.248Z] : [react-plugin]: Compiled successfully!
-[info] [2026-07-09T10:53:12.248Z] : [react-plugin]: 
-[info] [2026-07-09T10:53:12.248Z] : [react-plugin]: You can now view fron in the browser.
-[info] [2026-07-09T10:53:12.249Z] : [react-plugin]: 
-[info] [2026-07-09T10:53:12.249Z] : [react-plugin]:   http://localhost:3000/app/
-[info] [2026-07-09T10:53:12.249Z] : [react-plugin]: 
-[info] [2026-07-09T10:53:12.249Z] : [react-plugin]: Note that the development build is not optimized.
-[info] [2026-07-09T10:53:12.249Z] : [react-plugin]: To create a production build, use npm run build.
-[info] [2026-07-09T10:53:12.249Z] : [react-plugin]: 
-[info] [2026-07-09T10:53:12.255Z] : [1783594392255]  "GET"  "/app/main.50219bbc599fb66924b5.hot-update.json"
-[info] [2026-07-09T10:53:12.572Z] : [1783594392572]  "GET"  "/app/main.50219bbc599fb66924b5.hot-update.js"
-[info] [2026-07-09T10:53:15.382Z] : [react-plugin]: Compiling...
-[info] [2026-07-09T10:53:15.597Z] : [react-plugin]: Compiled successfully!
-[info] [2026-07-09T10:53:15.597Z] : [react-plugin]: 
-[info] [2026-07-09T10:53:15.598Z] : [react-plugin]: You can now view fron in the browser.
-[info] [2026-07-09T10:53:15.598Z] : [react-plugin]: 
-[info] [2026-07-09T10:53:15.598Z] : [react-plugin]:   http://localhost:3000/app/
-[info] [2026-07-09T10:53:15.598Z] : [react-plugin]: 
-[info] [2026-07-09T10:53:15.598Z] : [react-plugin]: Note that the development build is not optimized.
-[info] [2026-07-09T10:53:15.598Z] : [react-plugin]: To create a production build, use npm run build.
-[info] [2026-07-09T10:53:15.598Z] : [react-plugin]: 
-[info] [2026-07-09T10:53:15.607Z] : [1783594395607]  "GET"  "/app/main.e0f384e4b92f1007555c.hot-update.json"
-[info] [2026-07-09T10:53:15.920Z] : [1783594395919]  "GET"  "/app/main.e0f384e4b92f1007555c.hot-update.js"
-[info] [2026-07-09T10:53:41.059Z] : [react-plugin]: Compiling...
-[info] [2026-07-09T10:53:41.381Z] : [react-plugin]: Compiled successfully!
-[info] [2026-07-09T10:53:41.381Z] : [react-plugin]: 
-[info] [2026-07-09T10:53:41.382Z] : [react-plugin]: You can now view fron in the browser.
-[info] [2026-07-09T10:53:41.382Z] : [react-plugin]: 
-[info] [2026-07-09T10:53:41.382Z] : [react-plugin]:   http://localhost:3000/app/
-[info] [2026-07-09T10:53:41.382Z] : [react-plugin]: 
-[info] [2026-07-09T10:53:41.382Z] : [react-plugin]: Note that the development build is not optimized.
-[info] [2026-07-09T10:53:41.382Z] : [react-plugin]: To create a production build, use npm run build.
-[info] [2026-07-09T10:53:41.382Z] : [react-plugin]: 
-[info] [2026-07-09T10:53:41.418Z] : [1783594421418]  "GET"  "/app/main.0bd4ce950d40c7ac0ce4.hot-update.json"
-[info] [2026-07-09T10:53:41.739Z] : [1783594421739]  "GET"  "/app/main.0bd4ce950d40c7ac0ce4.hot-update.js"
-[info] [2026-07-09T10:53:49.713Z] : [react-plugin]: Compiling...
-[info] [2026-07-09T10:53:50.001Z] : [react-plugin]: Compiled successfully!
-[info] [2026-07-09T10:53:50.001Z] : [react-plugin]: 
-[info] [2026-07-09T10:53:50.001Z] : [react-plugin]: You can now view fron in the browser.
-[info] [2026-07-09T10:53:50.001Z] : [react-plugin]: 
-[info] [2026-07-09T10:53:50.002Z] : [react-plugin]:   http://localhost:3000/app/
-[info] [2026-07-09T10:53:50.002Z] : [react-plugin]: 
-[info] [2026-07-09T10:53:50.002Z] : [react-plugin]: Note that the development build is not optimized.
-[info] [2026-07-09T10:53:50.002Z] : [react-plugin]: To create a production build, use npm run build.
-[info] [2026-07-09T10:53:50.002Z] : [react-plugin]: 
-[info] [2026-07-09T10:53:50.030Z] : [1783594430030]  "GET"  "/app/main.aadbe15cdfa660367c50.hot-update.json"
-[info] [2026-07-09T10:53:50.350Z] : [1783594430349]  "GET"  "/app/main.aadbe15cdfa660367c50.hot-update.js"
-[info] [2026-07-09T10:53:52.870Z] : [react-plugin]: Compiling...
-[info] [2026-07-09T10:53:53.108Z] : [react-plugin]: Compiled successfully!
-[info] [2026-07-09T10:53:53.108Z] : [react-plugin]: 
-[info] [2026-07-09T10:53:53.108Z] : [react-plugin]: You can now view fron in the browser.
-[info] [2026-07-09T10:53:53.108Z] : [react-plugin]: 
-[info] [2026-07-09T10:53:53.109Z] : [react-plugin]:   http://localhost:3000/app/
-[info] [2026-07-09T10:53:53.109Z] : [react-plugin]: 
-[info] [2026-07-09T10:53:53.109Z] : [react-plugin]: Note that the development build is not optimized.
-[info] [2026-07-09T10:53:53.109Z] : [react-plugin]: To create a production build, use npm run build.
-[info] [2026-07-09T10:53:53.109Z] : [react-plugin]: 
-[info] [2026-07-09T10:53:53.118Z] : [1783594433118]  "GET"  "/app/main.ab2138a6117054ff194f.hot-update.json"
-[info] [2026-07-09T10:53:53.428Z] : [1783594433427]  "GET"  "/app/main.ab2138a6117054ff194f.hot-update.js"
-[info] [2026-07-09T10:53:55.349Z] : [react-plugin]: Compiling...
-[info] [2026-07-09T10:53:55.542Z] : [react-plugin]: Compiled successfully!
-[info] [2026-07-09T10:53:55.542Z] : [react-plugin]: 
-[info] [2026-07-09T10:53:55.542Z] : [react-plugin]: You can now view fron in the browser.
-[info] [2026-07-09T10:53:55.542Z] : [react-plugin]: 
-[info] [2026-07-09T10:53:55.542Z] : [react-plugin]:   http://localhost:3000/app/
-[info] [2026-07-09T10:53:55.542Z] : [react-plugin]: 
-[info] [2026-07-09T10:53:55.542Z] : [react-plugin]: Note that the development build is not optimized.
-[info] [2026-07-09T10:53:55.542Z] : [react-plugin]: To create a production build, use npm run build.
-[info] [2026-07-09T10:53:55.542Z] : [react-plugin]: 
-[info] [2026-07-09T10:53:55.550Z] : [1783594435550]  "GET"  "/app/main.ea7325d1e23e72dc0054.hot-update.json"
-[info] [2026-07-09T10:53:55.862Z] : [1783594435862]  "GET"  "/app/main.ea7325d1e23e72dc0054.hot-update.js"
-[info] [2026-07-09T10:53:58.740Z] : [react-plugin]: Compiling...
-[info] [2026-07-09T10:53:58.933Z] : [react-plugin]: Compiled successfully!
-[info] [2026-07-09T10:53:58.933Z] : [react-plugin]: 
-[info] [2026-07-09T10:53:58.933Z] : [react-plugin]: You can now view fron in the browser.
-[info] [2026-07-09T10:53:58.934Z] : [react-plugin]: 
-[info] [2026-07-09T10:53:58.934Z] : [react-plugin]:   http://localhost:3000/app/
-[info] [2026-07-09T10:53:58.934Z] : [react-plugin]: 
-[info] [2026-07-09T10:53:58.934Z] : [react-plugin]: Note that the development build is not optimized.
-[info] [2026-07-09T10:53:58.934Z] : [react-plugin]: To create a production build, use npm run build.
-[info] [2026-07-09T10:53:58.934Z] : [react-plugin]: 
-[info] [2026-07-09T10:53:58.941Z] : [1783594438941]  "GET"  "/app/main.436049d79daa2b4ce9f9.hot-update.json"
-[info] [2026-07-09T10:53:59.258Z] : [1783594439257]  "GET"  "/app/main.436049d79daa2b4ce9f9.hot-update.js"
-[info] [2026-07-09T10:54:00.560Z] : [react-plugin]: Compiling...
-[info] [2026-07-09T10:54:00.742Z] : [react-plugin]: Compiled successfully!
-[info] [2026-07-09T10:54:00.743Z] : [react-plugin]: 
-[info] [2026-07-09T10:54:00.743Z] : [react-plugin]: You can now view fron in the browser.
-[info] [2026-07-09T10:54:00.743Z] : [react-plugin]: 
-[info] [2026-07-09T10:54:00.743Z] : [react-plugin]:   http://localhost:3000/app/
-[info] [2026-07-09T10:54:00.743Z] : [react-plugin]: 
-[info] [2026-07-09T10:54:00.743Z] : [react-plugin]: Note that the development build is not optimized.
-[info] [2026-07-09T10:54:00.743Z] : [react-plugin]: To create a production build, use npm run build.
-[info] [2026-07-09T10:54:00.743Z] : [react-plugin]: 
-[info] [2026-07-09T10:54:00.750Z] : [1783594440750]  "GET"  "/app/main.f9e6983a8140a12093f6.hot-update.json"
-[info] [2026-07-09T10:54:01.058Z] : [1783594441058]  "GET"  "/app/main.f9e6983a8140a12093f6.hot-update.js"
-[info] [2026-07-09T10:54:03.150Z] : [react-plugin]: Compiling...
-[info] [2026-07-09T10:54:03.388Z] : [react-plugin]: Compiled successfully!
-[info] [2026-07-09T10:54:03.388Z] : [react-plugin]: 
-[info] [2026-07-09T10:54:03.388Z] : [react-plugin]: You can now view fron in the browser.
-[info] [2026-07-09T10:54:03.388Z] : [react-plugin]: 
-[info] [2026-07-09T10:54:03.388Z] : [react-plugin]:   http://localhost:3000/app/
-[info] [2026-07-09T10:54:03.388Z] : [react-plugin]: 
-[info] [2026-07-09T10:54:03.388Z] : [react-plugin]: Note that the development build is not optimized.
-[info] [2026-07-09T10:54:03.388Z] : [react-plugin]: To create a production build, use npm run build.
-[info] [2026-07-09T10:54:03.389Z] : [react-plugin]: 
-[info] [2026-07-09T10:54:03.397Z] : [1783594443397]  "GET"  "/app/main.2c8768df1da2226deeb3.hot-update.json"
-[info] [2026-07-09T10:54:03.714Z] : [1783594443714]  "GET"  "/app/main.2c8768df1da2226deeb3.hot-update.js"
+[info] [2026-07-09T11:10:33.778Z] : 
+[info] [2026-07-09T11:10:33.779Z] : i Client[frontend]: Plugin : "zcatalyst-cli-plugin-react" is used for client serve
+[info] [2026-07-09T11:10:33.779Z] : 
+[debug] [2026-07-09T11:10:35.368Z] : No API Gateway configuration found. Skipping API Gateway rules
+[debug] [2026-07-09T11:10:35.452Z] : No API Gateway configuration found. Skipping API Gateway rules
+[info] [2026-07-09T11:10:35.661Z] : 
+[info] [2026-07-09T11:10:35.661Z] :  >>>>>>>>>>>>>> AppSail <<<<<<<<<<<<<< 
+[info] [2026-07-09T11:10:35.662Z] : i backend: http://localhost:3001
+[info] [2026-07-09T11:10:35.662Z] : 
+[info] [2026-07-09T11:10:35.662Z] : 
+[info] [2026-07-09T11:10:35.662Z] :  >>>>>>>>>>>>> Web Client <<<<<<<<<<<<
+[info] [2026-07-09T11:10:35.662Z] : i client[frontend]: http://localhost:3000/app/
+[info] [2026-07-09T11:10:35.662Z] : 
+[info] [2026-07-09T11:10:36.097Z] : [1783595436097]  "GET"  "/app/"
+[info] [2026-07-09T11:10:37.861Z] : [react-plugin]: Compiled successfully!
+[info] [2026-07-09T11:10:37.861Z] : [react-plugin]: 
+[info] [2026-07-09T11:10:37.861Z] : [react-plugin]: You can now view fron in the browser.
+[info] [2026-07-09T11:10:37.862Z] : [react-plugin]: 
+[info] [2026-07-09T11:10:37.862Z] : [react-plugin]:   http://localhost:3000/app/
+[info] [2026-07-09T11:10:37.862Z] : [react-plugin]: 
+[info] [2026-07-09T11:10:37.862Z] : [react-plugin]: Note that the development build is not optimized.
+[info] [2026-07-09T11:10:37.862Z] : [react-plugin]: To create a production build, use npm run build.
+[info] [2026-07-09T11:10:37.862Z] : [react-plugin]: 
+[info] [2026-07-09T11:10:38.511Z] : [1783595438511]  "GET"  "/app/main.b8328c64f0335e68cb87.hot-update.json"
+[info] [2026-07-09T11:10:38.523Z] : [1783595438523]  Appsail[backend]  "GET"  "/app/main.b8328c64f0335e68cb87.hot-update.json"
+[info] [2026-07-09T11:10:38.754Z] : [1783595438754]  "GET"  "/app/"
+[info] [2026-07-09T11:10:38.857Z] : [1783595438857]  "GET"  "/app/static/js/bundle.js"
+[info] [2026-07-09T11:10:39.293Z] : [1783595439293]  "GET"  "/app/manifest.json"
+[info] [2026-07-09T11:10:39.431Z] : [1783595439431]  "GET"  "/app/map.svg"
+[info] [2026-07-09T11:10:39.743Z] : [1783595439743]  Appsail[backend]  "GET"  "/api/dashboard/stats"
+[info] [2026-07-09T11:10:39.761Z] : [1783595439761]  Appsail[backend]  "GET"  "/api/dashboard/district-crimes?timeframe=30d"
+[info] [2026-07-09T11:10:39.763Z] : [1783595439763]  Appsail[backend]  "GET"  "/api/dashboard/trends"
+[info] [2026-07-09T11:10:39.899Z] : [1783595439899]  "GET"  "/app/favicon.ico"
+[info] [2026-07-09T11:10:39.901Z] : [1783595439900]  "GET"  "/app/logo192.png"
