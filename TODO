@@ -1,5 +1,5 @@
 first page: dashboard 
-2. active alerts display
+2. active alerts display; dashboard stats and crime alert table alert count mismatch, see chat
 3. map changing w.r.t. time zone selected
 4. 30-days crime trend analysis
 5. ek micro-service for real-time data change and dashboard value updates
