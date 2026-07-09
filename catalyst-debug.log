@@ -1,239 +1,69 @@
-[debug] [2026-07-08T16:16:58.502Z] : 
-[debug] [2026-07-08T16:16:58.503Z] : ----------------------------------------------------------------------
-[debug] [2026-07-08T16:16:58.503Z] : Command:      C:\Program Files\nodejs\node.exe C:\Users\Acer\AppData\Roaming\npm\node_modules\zcatalyst-cli\lib\bin\catalyst.js serve
-[debug] [2026-07-08T16:16:58.503Z] : CLI Version:  1.26.1
-[debug] [2026-07-08T16:16:58.503Z] : Platform:     win32
-[debug] [2026-07-08T16:16:58.503Z] : Node Version: v22.20.0
-[debug] [2026-07-08T16:16:58.503Z] : Time:         Wed Jul 08 2026 21:46:58 GMT+0530 (India Standard Time)
-[debug] [2026-07-08T16:16:58.503Z] : ----------------------------------------------------------------------
-[debug] [2026-07-08T16:16:58.503Z] : 
-[debug] [2026-07-08T16:16:59.232Z] : > authorizing via signed-in user option
-[debug] [2026-07-08T16:16:59.232Z] : > command requires scopes: ["ZohoCatalyst.projects.ALL","ZohoCatalyst.apigateway.apis.READ","ZohoCatalyst.apigateway.READ","ZohoCatalyst.segments.ALL","ZohoCatalyst.cache.READ","ZohoCatalyst.cache.CREATE","ZohoCatalyst.cache.DELETE","ZohoCatalyst.projects.ALL","ZohoCatalyst.cron.ALL","ZohoCatalyst.zcql.CREATE","ZohoCatalyst.projects.users.READ","ZohoCatalyst.projects.users.CREATE","ZohoCatalyst.projects.users.DELETE","ZohoCatalyst.projects.users.UPDATE","ZohoCatalyst.authentication.CREATE","ZohoCatalyst.email.CREATE","ZohoCatalyst.tables.ALL","ZohoCatalyst.tables.rows.ALL","ZohoCatalyst.tables.columns.ALL","ZohoCatalyst.tables.bulk.CREATE","ZohoCatalyst.tables.bulk.READ","ZohoCatalyst.folders.ALL","ZohoCatalyst.files.CREATE","ZohoCatalyst.files.READ","ZohoCatalyst.files.DELETE","ZohoCatalyst.functions.ALL","ZohoCatalyst.functions.EXECUTE","ZohoCatalyst.eventlistners.ALL","ZohoCatalyst.eventlisteners.produce","ZohoCatalyst.security.rules.Read","ZohoCatalyst.security.rules.Update","ZohoCatalyst.notifications.mobile","ZohoCatalyst.notifications.web","ZohoCatalyst.search.READ","ZohoCatalyst.mlkit.READ","QuickML.deployment.READ","ZohoCatalyst.pdfshot.execute","ZohoCatalyst.grid.READ","ZohoCatalyst.grid.terminate","ZohoCatalyst.circuits.execution.DELETE","ZohoCatalyst.circuits.execution.READ","ZohoCatalyst.circuits.execute","ZohoCatalyst.appsail.Read","ZohoCatalyst.jobpool.READ","ZohoCatalyst.job.ALL","ZohoCatalyst.nosql.READ","ZohoCatalyst.nosql.rows.ALL"]
-[debug] [2026-07-08T16:16:59.246Z] : >>>> HTTP REQUEST : GET https://api.catalyst.zoho.in/baas/v1/project/46143000000022001 
+[debug] [2026-07-09T10:11:48.904Z] : 
+[debug] [2026-07-09T10:11:48.904Z] : ----------------------------------------------------------------------
+[debug] [2026-07-09T10:11:48.905Z] : Command:      C:\Program Files\nodejs\node.exe C:\Users\Acer\AppData\Roaming\npm\node_modules\zcatalyst-cli\lib\bin\catalyst.js serve
+[debug] [2026-07-09T10:11:48.905Z] : CLI Version:  1.26.1
+[debug] [2026-07-09T10:11:48.905Z] : Platform:     win32
+[debug] [2026-07-09T10:11:48.905Z] : Node Version: v22.20.0
+[debug] [2026-07-09T10:11:48.905Z] : Time:         Thu Jul 09 2026 15:41:48 GMT+0530 (India Standard Time)
+[debug] [2026-07-09T10:11:48.905Z] : ----------------------------------------------------------------------
+[debug] [2026-07-09T10:11:48.905Z] : 
+[debug] [2026-07-09T10:11:49.496Z] : > authorizing via signed-in user option
+[debug] [2026-07-09T10:11:49.496Z] : > command requires scopes: ["ZohoCatalyst.projects.ALL","ZohoCatalyst.apigateway.apis.READ","ZohoCatalyst.apigateway.READ","ZohoCatalyst.segments.ALL","ZohoCatalyst.cache.READ","ZohoCatalyst.cache.CREATE","ZohoCatalyst.cache.DELETE","ZohoCatalyst.projects.ALL","ZohoCatalyst.cron.ALL","ZohoCatalyst.zcql.CREATE","ZohoCatalyst.projects.users.READ","ZohoCatalyst.projects.users.CREATE","ZohoCatalyst.projects.users.DELETE","ZohoCatalyst.projects.users.UPDATE","ZohoCatalyst.authentication.CREATE","ZohoCatalyst.email.CREATE","ZohoCatalyst.tables.ALL","ZohoCatalyst.tables.rows.ALL","ZohoCatalyst.tables.columns.ALL","ZohoCatalyst.tables.bulk.CREATE","ZohoCatalyst.tables.bulk.READ","ZohoCatalyst.folders.ALL","ZohoCatalyst.files.CREATE","ZohoCatalyst.files.READ","ZohoCatalyst.files.DELETE","ZohoCatalyst.functions.ALL","ZohoCatalyst.functions.EXECUTE","ZohoCatalyst.eventlistners.ALL","ZohoCatalyst.eventlisteners.produce","ZohoCatalyst.security.rules.Read","ZohoCatalyst.security.rules.Update","ZohoCatalyst.notifications.mobile","ZohoCatalyst.notifications.web","ZohoCatalyst.search.READ","ZohoCatalyst.mlkit.READ","QuickML.deployment.READ","ZohoCatalyst.pdfshot.execute","ZohoCatalyst.grid.READ","ZohoCatalyst.grid.terminate","ZohoCatalyst.circuits.execution.DELETE","ZohoCatalyst.circuits.execution.READ","ZohoCatalyst.circuits.execute","ZohoCatalyst.appsail.Read","ZohoCatalyst.jobpool.READ","ZohoCatalyst.job.ALL","ZohoCatalyst.nosql.READ","ZohoCatalyst.nosql.rows.ALL"]
+[debug] [2026-07-09T10:11:49.507Z] : >>>> HTTP REQUEST : GET https://api.catalyst.zoho.in/baas/v1/project/46143000000022001 
 
-[debug] [2026-07-08T16:16:59.610Z] : <<<< HTTP RESPONSE : 200
-Response Headers: {"server":"ZGS","date":"Wed, 08 Jul 2026 16:16:59 GMT","content-type":"application/vnd.catalyst.v2+json","transfer-encoding":"chunked","connection":"keep-alive","x-content-type-options":"nosniff","cache-control":"private,no-cache,no-store,max-age=0,must-revalidate","pragma":"no-cache","expires":"Thu, 01 Jan 1970 00:00:00 GMT","x-frame-options":"DENY","strict-transport-security":"max-age=64072000; includeSubDomains; preload"}
+[debug] [2026-07-09T10:11:49.802Z] : <<<< HTTP RESPONSE : 200
+Response Headers: {"server":"ZGS","date":"Thu, 09 Jul 2026 10:11:51 GMT","content-type":"application/vnd.catalyst.v2+json","transfer-encoding":"chunked","connection":"keep-alive","x-content-type-options":"nosniff","cache-control":"private,no-cache,no-store,max-age=0,must-revalidate","pragma":"no-cache","expires":"Thu, 01 Jan 1970 00:00:00 GMT","x-frame-options":"DENY","strict-transport-security":"max-age=64072000; includeSubDomains; preload"}
 
-[debug] [2026-07-08T16:16:59.612Z] : >>>> HTTP REQUEST : GET https://api.catalyst.zoho.in/baas/v1/project/46143000000022001/environment 
+[debug] [2026-07-09T10:11:49.804Z] : >>>> HTTP REQUEST : GET https://api.catalyst.zoho.in/baas/v1/project/46143000000022001/environment 
 
-[debug] [2026-07-08T16:16:59.697Z] : <<<< HTTP RESPONSE : 200
-Response Headers: {"server":"ZGS","date":"Wed, 08 Jul 2026 16:16:59 GMT","content-type":"application/vnd.catalyst.v2+json","transfer-encoding":"chunked","connection":"keep-alive","x-content-type-options":"nosniff","cache-control":"private,no-cache,no-store,max-age=0,must-revalidate","pragma":"no-cache","expires":"Thu, 01 Jan 1970 00:00:00 GMT","x-frame-options":"DENY","strict-transport-security":"max-age=64072000; includeSubDomains; preload"}
+[debug] [2026-07-09T10:11:49.899Z] : <<<< HTTP RESPONSE : 200
+Response Headers: {"server":"ZGS","date":"Thu, 09 Jul 2026 10:11:51 GMT","content-type":"application/vnd.catalyst.v2+json","transfer-encoding":"chunked","connection":"keep-alive","x-content-type-options":"nosniff","cache-control":"private,no-cache,no-store,max-age=0,must-revalidate","pragma":"no-cache","expires":"Thu, 01 Jan 1970 00:00:00 GMT","x-frame-options":"DENY","strict-transport-security":"max-age=64072000; includeSubDomains; preload"}
 
-[debug] [2026-07-08T16:17:00.079Z] : http port : '3000' is not available. Hence port '3001' will be used instead.
-[debug] [2026-07-08T16:17:00.195Z] : No basic functions to add
-[info] [2026-07-08T16:17:02.110Z] : [react-plugin]: Starting the development server...
+[debug] [2026-07-09T10:11:50.131Z] : http port : '3000' is not available. Hence port '3001' will be used instead.
+[debug] [2026-07-09T10:11:50.210Z] : No basic functions to add
+[info] [2026-07-09T10:11:51.719Z] : [react-plugin]: Starting the development server...
 
-[info] [2026-07-08T16:17:02.111Z] : 
-[info] [2026-07-08T16:17:02.111Z] : i Client[frontend]: Plugin : "zcatalyst-cli-plugin-react" is used for client serve
-[info] [2026-07-08T16:17:02.111Z] : 
-[debug] [2026-07-08T16:17:02.929Z] : No API Gateway configuration found. Skipping API Gateway rules
-[debug] [2026-07-08T16:17:02.989Z] : No API Gateway configuration found. Skipping API Gateway rules
-[info] [2026-07-08T16:17:03.108Z] : 
-[info] [2026-07-08T16:17:03.108Z] :  >>>>>>>>>>>>>> AppSail <<<<<<<<<<<<<< 
-[info] [2026-07-08T16:17:03.109Z] : i backend: http://localhost:3001
-[info] [2026-07-08T16:17:03.109Z] : 
-[info] [2026-07-08T16:17:03.109Z] : 
-[info] [2026-07-08T16:17:03.109Z] :  >>>>>>>>>>>>> Web Client <<<<<<<<<<<<
-[info] [2026-07-08T16:17:03.110Z] : i client[frontend]: http://localhost:3000/app/
-[info] [2026-07-08T16:17:03.110Z] : 
-[info] [2026-07-08T16:17:04.062Z] : [1783527424062]  "GET"  "/app/"
-[info] [2026-07-08T16:17:04.879Z] : [react-plugin]: Compiled successfully!
-[info] [2026-07-08T16:17:04.879Z] : [react-plugin]: 
-[info] [2026-07-08T16:17:04.880Z] : [react-plugin]: You can now view fron in the browser.
-[info] [2026-07-08T16:17:04.880Z] : [react-plugin]: 
-[info] [2026-07-08T16:17:04.880Z] : [react-plugin]:   http://localhost:3000/app/
-[info] [2026-07-08T16:17:04.880Z] : [react-plugin]: 
-[info] [2026-07-08T16:17:04.880Z] : [react-plugin]: Note that the development build is not optimized.
-[info] [2026-07-08T16:17:04.881Z] : [react-plugin]: To create a production build, use npm run build.
-[info] [2026-07-08T16:17:04.881Z] : [react-plugin]: 
-[info] [2026-07-08T16:17:05.109Z] : [1783527425109]  "GET"  "/app/static/js/bundle.js"
-[info] [2026-07-08T16:17:05.419Z] : [1783527425419]  "GET"  "/app/map.svg"
-[info] [2026-07-08T16:17:05.719Z] : [1783527425719]  "GET"  "/app/manifest.json"
-[info] [2026-07-08T16:17:05.812Z] : [1783527425812]  "GET"  "/app/favicon.ico"
-[info] [2026-07-08T16:17:06.092Z] : [1783527426092]  "GET"  "/app/logo192.png"
-[info] [2026-07-08T16:17:09.776Z] : [1783527429775]  Appsail[backend]  "GET"  "/api/dashboard/stats"
-[info] [2026-07-08T16:17:09.779Z] : [1783527429779]  Appsail[backend]  "GET"  "/api/dashboard/district-crimes?timeframe=30d"
-[info] [2026-07-08T16:17:09.781Z] : [1783527429780]  Appsail[backend]  "GET"  "/api/dashboard/alerts?limit=10"
-[info] [2026-07-08T16:17:09.781Z] : [1783527429781]  Appsail[backend]  "GET"  "/api/dashboard/trends"
-[info] [2026-07-08T16:17:18.074Z] : [1783527438074]  Appsail[backend]  "GET"  "/api/dashboard/district-crimes?timeframe=7d"
-[info] [2026-07-08T16:17:23.562Z] : [1783527443562]  Appsail[backend]  "GET"  "/api/dashboard/district-crimes?timeframe=24h"
-[info] [2026-07-08T16:17:42.496Z] : [1783527462496]  Appsail[backend]  "GET"  "/api/dashboard/alerts?limit=10"
-[info] [2026-07-08T16:18:10.772Z] : [1783527490772]  Appsail[backend]  "GET"  "/api/dashboard/alerts?limit=10"
-[info] [2026-07-08T16:18:43.465Z] : [1783527523465]  Appsail[backend]  "GET"  "/api/dashboard/alerts?limit=10"
-[info] [2026-07-08T16:19:10.768Z] : [1783527550768]  Appsail[backend]  "GET"  "/api/dashboard/alerts?limit=10"
-[info] [2026-07-08T16:19:43.471Z] : [1783527583470]  Appsail[backend]  "GET"  "/api/dashboard/alerts?limit=10"
-[info] [2026-07-08T16:20:10.764Z] : [1783527610764]  Appsail[backend]  "GET"  "/api/dashboard/alerts?limit=10"
-[info] [2026-07-08T16:20:43.458Z] : [1783527643457]  Appsail[backend]  "GET"  "/api/dashboard/alerts?limit=10"
-[info] [2026-07-08T16:21:10.769Z] : [1783527670768]  Appsail[backend]  "GET"  "/api/dashboard/alerts?limit=10"
-[info] [2026-07-08T16:21:26.546Z] : [react-plugin]: Compiling...
-[info] [2026-07-08T16:21:29.498Z] : [react-plugin]: Compiled successfully!
-[info] [2026-07-08T16:21:29.498Z] : [react-plugin]: 
-[info] [2026-07-08T16:21:29.498Z] : [react-plugin]: You can now view fron in the browser.
-[info] [2026-07-08T16:21:29.498Z] : [react-plugin]: 
-[info] [2026-07-08T16:21:29.498Z] : [react-plugin]:   http://localhost:3000/app/
-[info] [2026-07-08T16:21:29.498Z] : [react-plugin]: 
-[info] [2026-07-08T16:21:29.499Z] : [react-plugin]: Note that the development build is not optimized.
-[info] [2026-07-08T16:21:29.499Z] : [react-plugin]: To create a production build, use npm run build.
-[info] [2026-07-08T16:21:29.499Z] : [react-plugin]: 
-[info] [2026-07-08T16:21:29.815Z] : [1783527689815]  "GET"  "/app/main.2d8bf088e4746cae2cdd.hot-update.json"
-[info] [2026-07-08T16:21:30.076Z] : [1783527690076]  "GET"  "/app/main.2d8bf088e4746cae2cdd.hot-update.js"
-[info] [2026-07-08T16:21:43.463Z] : [1783527703462]  Appsail[backend]  "GET"  "/api/dashboard/alerts?limit=10"
-[info] [2026-07-08T16:21:50.080Z] : [react-plugin]: Compiling...
-[info] [2026-07-08T16:21:50.530Z] : [react-plugin]: Compiled with warnings.
-
-[info] [2026-07-08T16:21:50.530Z] : [react-plugin]: [eslint] 
-src\components\CommandDashboardScreen.tsx
-  Line 362:43:  Comments inside children section of tag should be placed inside braces  react/jsx-no-comment-textnodes
-[info] [2026-07-08T16:21:50.530Z] : [react-plugin]: 
-Search for the keywords to learn more about each warning.
-[info] [2026-07-08T16:21:50.531Z] : [react-plugin]: To ignore, add // eslint-disable-next-line to the line before.
-
-[info] [2026-07-08T16:21:50.545Z] : [1783527710544]  "GET"  "/app/main.4f80708a003bef6a6426.hot-update.json"
-[info] [2026-07-08T16:21:50.857Z] : [1783527710857]  "GET"  "/app/main.4f80708a003bef6a6426.hot-update.js"
-[info] [2026-07-08T16:22:09.788Z] : [1783527729788]  Appsail[backend]  "GET"  "/api/dashboard/alerts?limit=10"
-[info] [2026-07-08T16:22:14.550Z] : [react-plugin]: Compiling...
-[info] [2026-07-08T16:22:15.885Z] : [react-plugin]: Compiled with warnings.
-
-[info] [2026-07-08T16:22:15.885Z] : [react-plugin]: [eslint] 
-src\App.tsx
-  Line 13:23:  'QueryClientProvider' is defined but never used   @typescript-eslint/no-unused-vars
-  Line 23:7:   'queryClient' is assigned a value but never used  @typescript-eslint/no-unused-vars
-
-src\components\CommandDashboardScreen.tsx
-  Line 362:43:  Comments inside children section of tag should be placed inside braces  react/jsx-no-comment-textnodes
-[info] [2026-07-08T16:22:15.885Z] : [react-plugin]: 
-Search for the keywords to learn more about each warning.
-[info] [2026-07-08T16:22:15.886Z] : [react-plugin]: To ignore, add // eslint-disable-next-line to the line before.
-
-[info] [2026-07-08T16:22:15.918Z] : [1783527735917]  "GET"  "/app/main.241674253ece3aacfc5e.hot-update.json"
-[info] [2026-07-08T16:22:16.245Z] : [1783527736245]  "GET"  "/app/main.241674253ece3aacfc5e.hot-update.js"
-[info] [2026-07-08T16:22:19.004Z] : [react-plugin]: Compiling...
-[info] [2026-07-08T16:22:19.513Z] : [react-plugin]: Compiled with warnings.
-
-[info] [2026-07-08T16:22:19.513Z] : [react-plugin]: [eslint] 
-src\App.tsx
-  Line 13:23:  'QueryClientProvider' is defined but never used   @typescript-eslint/no-unused-vars
-  Line 23:7:   'queryClient' is assigned a value but never used  @typescript-eslint/no-unused-vars
-
-src\components\CommandDashboardScreen.tsx
-  Line 362:43:  Comments inside children section of tag should be placed inside braces  react/jsx-no-comment-textnodes
-[info] [2026-07-08T16:22:19.513Z] : [react-plugin]: 
-Search for the keywords to learn more about each warning.
-[info] [2026-07-08T16:22:19.514Z] : [react-plugin]: To ignore, add // eslint-disable-next-line to the line before.
-
-[info] [2026-07-08T16:22:19.532Z] : [1783527739531]  "GET"  "/app/main.02fc20de80546738cbe0.hot-update.json"
-[info] [2026-07-08T16:22:19.850Z] : [1783527739850]  "GET"  "/app/main.02fc20de80546738cbe0.hot-update.js"
-[info] [2026-07-08T16:22:25.478Z] : [react-plugin]: Compiling...
-[info] [2026-07-08T16:22:25.863Z] : [react-plugin]: Compiled with warnings.
-
-[info] [2026-07-08T16:22:25.863Z] : [react-plugin]: [eslint] 
-src\components\CommandDashboardScreen.tsx
-  Line 362:43:  Comments inside children section of tag should be placed inside braces  react/jsx-no-comment-textnodes
-[info] [2026-07-08T16:22:25.863Z] : [react-plugin]: 
-Search for the keywords to learn more about each warning.
-[info] [2026-07-08T16:22:25.863Z] : [react-plugin]: To ignore, add // eslint-disable-next-line to the line before.
-
-[info] [2026-07-08T16:22:25.886Z] : [1783527745886]  "GET"  "/app/main.96c0e7ec71e65da5e5a0.hot-update.json"
-[info] [2026-07-08T16:22:26.209Z] : [1783527746208]  "GET"  "/app/main.96c0e7ec71e65da5e5a0.hot-update.js"
-[info] [2026-07-08T16:22:30.454Z] : [1783527750453]  Appsail[backend]  "GET"  "/api/dashboard/stats"
-[info] [2026-07-08T16:22:30.765Z] : [1783527750765]  Appsail[backend]  "GET"  "/api/dashboard/district-crimes?timeframe=30d"
-[info] [2026-07-08T16:22:30.766Z] : [1783527750766]  Appsail[backend]  "GET"  "/api/dashboard/alerts?limit=10"
-[info] [2026-07-08T16:22:30.767Z] : [1783527750767]  Appsail[backend]  "GET"  "/api/dashboard/trends"
-[info] [2026-07-08T16:22:37.281Z] : [react-plugin]: Compiling...
-[info] [2026-07-08T16:22:38.044Z] : [react-plugin]: Compiled with warnings.
-
-[info] [2026-07-08T16:22:38.044Z] : [react-plugin]: [eslint] 
-src\components\CommandDashboardScreen.tsx
-  Line 7:10:    'useQuery' is defined but never used                                    @typescript-eslint/no-unused-vars
-  Line 8:10:    'dashboardService' is defined but never used                            @typescript-eslint/no-unused-vars
-  Line 362:43:  Comments inside children section of tag should be placed inside braces  react/jsx-no-comment-textnodes
-[info] [2026-07-08T16:22:38.045Z] : [react-plugin]: 
-Search for the keywords to learn more about each warning.
-[info] [2026-07-08T16:22:38.045Z] : [react-plugin]: To ignore, add // eslint-disable-next-line to the line before.
-
-[info] [2026-07-08T16:22:38.061Z] : [1783527758061]  "GET"  "/app/main.afd69cf2ddf7a330481c.hot-update.json"
-[info] [2026-07-08T16:22:38.380Z] : [1783527758379]  "GET"  "/app/main.afd69cf2ddf7a330481c.hot-update.js"
-[info] [2026-07-08T16:22:43.764Z] : [1783527763764]  Appsail[backend]  "GET"  "/api/dashboard/alerts?limit=10"
-[info] [2026-07-08T16:22:49.643Z] : [react-plugin]: Compiling...
-[info] [2026-07-08T16:22:50.289Z] : [react-plugin]: Compiled with warnings.
-
-[info] [2026-07-08T16:22:50.289Z] : [react-plugin]: [eslint] 
-src\components\CommandDashboardScreen.tsx
-  Line 379:43:  Comments inside children section of tag should be placed inside braces  react/jsx-no-comment-textnodes
-[info] [2026-07-08T16:22:50.289Z] : [react-plugin]: 
-Search for the keywords to learn more about each warning.
-[info] [2026-07-08T16:22:50.289Z] : [react-plugin]: To ignore, add // eslint-disable-next-line to the line before.
-
-[info] [2026-07-08T16:22:50.318Z] : [1783527770318]  "GET"  "/app/main.f58c13ef0fc7601d8af2.hot-update.json"
-[info] [2026-07-08T16:22:50.636Z] : [1783527770636]  "GET"  "/app/main.f58c13ef0fc7601d8af2.hot-update.js"
-[info] [2026-07-08T16:22:51.505Z] : [1783527771505]  Appsail[backend]  "GET"  "/api/dashboard/stats"
-[info] [2026-07-08T16:22:51.800Z] : [1783527771800]  Appsail[backend]  "GET"  "/api/dashboard/district-crimes?timeframe=30d"
-[info] [2026-07-08T16:22:51.802Z] : [1783527771802]  Appsail[backend]  "GET"  "/api/dashboard/alerts?limit=10"
-[info] [2026-07-08T16:22:51.803Z] : [1783527771803]  Appsail[backend]  "GET"  "/api/dashboard/trends"
-[info] [2026-07-08T16:22:57.618Z] : [react-plugin]: Compiling...
-[info] [2026-07-08T16:22:58.104Z] : [react-plugin]: Compiled with warnings.
-
-[info] [2026-07-08T16:22:58.105Z] : [react-plugin]: [eslint] 
-src\components\CommandDashboardScreen.tsx
-  Line 379:43:  Comments inside children section of tag should be placed inside braces  react/jsx-no-comment-textnodes
-[info] [2026-07-08T16:22:58.105Z] : [react-plugin]: 
-Search for the keywords to learn more about each warning.
-[info] [2026-07-08T16:22:58.105Z] : [react-plugin]: To ignore, add // eslint-disable-next-line to the line before.
-
-[info] [2026-07-08T16:22:58.125Z] : [1783527778124]  "GET"  "/app/main.9e8af91a12d75ceeb854.hot-update.json"
-[info] [2026-07-08T16:22:58.446Z] : [1783527778446]  "GET"  "/app/main.9e8af91a12d75ceeb854.hot-update.js"
-[info] [2026-07-08T16:23:10.775Z] : [1783527790774]  Appsail[backend]  "GET"  "/api/dashboard/alerts?limit=10"
-[info] [2026-07-08T16:23:12.824Z] : [1783527792823]  "GET"  "/app/map.svg"
-[info] [2026-07-08T16:23:14.999Z] : [1783527794998]  Appsail[backend]  "GET"  "/api/dashboard/district-crimes?timeframe=7d"
-[info] [2026-07-08T16:23:17.082Z] : [1783527797082]  Appsail[backend]  "GET"  "/api/dashboard/district-crimes?timeframe=24h"
-[info] [2026-07-08T16:23:31.460Z] : [1783527811460]  Appsail[backend]  "GET"  "/api/dashboard/alerts?limit=10"
-[info] [2026-07-08T16:23:43.763Z] : [1783527823763]  Appsail[backend]  "GET"  "/api/dashboard/alerts?limit=10"
-[info] [2026-07-08T16:24:10.457Z] : [1783527850456]  Appsail[backend]  "GET"  "/api/dashboard/alerts?limit=10"
-[info] [2026-07-08T16:24:31.776Z] : [1783527871776]  Appsail[backend]  "GET"  "/api/dashboard/alerts?limit=10"
-[info] [2026-07-08T16:24:43.451Z] : [1783527883451]  Appsail[backend]  "GET"  "/api/dashboard/alerts?limit=10"
-[info] [2026-07-08T16:25:10.693Z] : [1783527910692]  Appsail[backend]  "GET"  "/api/dashboard/alerts?limit=10"
-[info] [2026-07-08T16:25:31.457Z] : [1783527931457]  Appsail[backend]  "GET"  "/api/dashboard/alerts?limit=10"
-[info] [2026-07-08T16:25:43.762Z] : [1783527943762]  Appsail[backend]  "GET"  "/api/dashboard/alerts?limit=10"
-[info] [2026-07-08T16:26:10.460Z] : [1783527970460]  Appsail[backend]  "GET"  "/api/dashboard/alerts?limit=10"
-[info] [2026-07-08T16:26:31.767Z] : [1783527991767]  Appsail[backend]  "GET"  "/api/dashboard/alerts?limit=10"
-[info] [2026-07-08T16:26:43.456Z] : [1783528003456]  Appsail[backend]  "GET"  "/api/dashboard/alerts?limit=10"
-[info] [2026-07-08T16:27:55.773Z] : [1783528075773]  Appsail[backend]  "GET"  "/api/dashboard/alerts?limit=10"
-[info] [2026-07-08T16:28:15.477Z] : [1783528095477]  Appsail[backend]  "GET"  "/api/dashboard/alerts?limit=10"
-[info] [2026-07-08T16:28:15.788Z] : [1783528095788]  Appsail[backend]  "GET"  "/api/dashboard/alerts?limit=10"
-[info] [2026-07-08T16:28:30.764Z] : [1783528110763]  Appsail[backend]  "GET"  "/api/dashboard/alerts?limit=10"
-[info] [2026-07-08T16:28:50.788Z] : [1783528130788]  Appsail[backend]  "GET"  "/api/dashboard/alerts?limit=10"
-[info] [2026-07-08T16:28:54.095Z] : [1783528134094]  Appsail[backend]  "GET"  "/api/dashboard/alerts?limit=10"
-[info] [2026-07-08T16:29:20.247Z] : [1783528160247]  Appsail[backend]  "GET"  "/api/dashboard/alerts?limit=10"
-[info] [2026-07-08T16:29:33.389Z] : [1783528173389]  Appsail[backend]  "GET"  "/api/dashboard/alerts?limit=10"
-[info] [2026-07-08T16:29:43.774Z] : [1783528183773]  Appsail[backend]  "GET"  "/api/dashboard/alerts?limit=10"
-[info] [2026-07-08T16:30:10.457Z] : [1783528210457]  Appsail[backend]  "GET"  "/api/dashboard/alerts?limit=10"
-[info] [2026-07-08T16:30:13.176Z] : [1783528213176]  "GET"  "/app/"
-[info] [2026-07-08T16:30:13.200Z] : [1783528213200]  "GET"  "/app/static/js/bundle.js"
-[info] [2026-07-08T16:30:14.143Z] : [1783528214142]  "GET"  "/app/map.svg"
-[info] [2026-07-08T16:30:14.406Z] : [1783528214405]  "GET"  "/app/manifest.json"
-[info] [2026-07-08T16:30:14.479Z] : [1783528214478]  Appsail[backend]  "GET"  "/api/dashboard/stats"
-[info] [2026-07-08T16:30:14.481Z] : [1783528214481]  Appsail[backend]  "GET"  "/api/dashboard/district-crimes?timeframe=30d"
-[info] [2026-07-08T16:30:14.483Z] : [1783528214483]  Appsail[backend]  "GET"  "/api/dashboard/alerts?limit=10"
-[info] [2026-07-08T16:30:14.485Z] : [1783528214485]  Appsail[backend]  "GET"  "/api/dashboard/trends"
-[info] [2026-07-08T16:30:14.595Z] : [1783528214595]  "GET"  "/app/favicon.ico"
-[info] [2026-07-08T16:30:14.718Z] : [1783528214718]  "GET"  "/app/logo192.png"
-[info] [2026-07-08T16:30:58.551Z] : [1783528258551]  "GET"  "/app/"
-[info] [2026-07-08T16:30:58.615Z] : [1783528258615]  "GET"  "/app/manifest.json"
-[info] [2026-07-08T16:30:58.865Z] : [1783528258865]  "GET"  "/app/static/js/bundle.js"
-[info] [2026-07-08T16:30:58.908Z] : [1783528258908]  Appsail[backend]  "GET"  "/api/dashboard/stats"
-[info] [2026-07-08T16:30:59.209Z] : [1783528259208]  "GET"  "/app/map.svg"
-[info] [2026-07-08T16:30:59.213Z] : [1783528259212]  Appsail[backend]  "GET"  "/api/dashboard/district-crimes?timeframe=30d"
-[info] [2026-07-08T16:30:59.214Z] : [1783528259214]  Appsail[backend]  "GET"  "/api/dashboard/alerts?limit=10"
-[info] [2026-07-08T16:30:59.215Z] : [1783528259215]  Appsail[backend]  "GET"  "/api/dashboard/trends"
-[info] [2026-07-08T16:30:59.475Z] : [1783528259475]  "GET"  "/app/favicon.ico"
-[info] [2026-07-08T16:30:59.522Z] : [1783528259522]  "GET"  "/app/logo192.png"
-[info] [2026-07-08T16:31:07.438Z] : [1783528267437]  "GET"  "/app/"
-[info] [2026-07-08T16:31:07.738Z] : [1783528267737]  "GET"  "/app/static/js/bundle.js"
-[info] [2026-07-08T16:31:07.809Z] : [1783528267809]  "GET"  "/app/manifest.json"
-[info] [2026-07-08T16:31:08.127Z] : [1783528268126]  "GET"  "/app/map.svg"
-[info] [2026-07-08T16:31:08.131Z] : [1783528268130]  Appsail[backend]  "GET"  "/api/dashboard/stats"
-[info] [2026-07-08T16:31:08.133Z] : [1783528268132]  Appsail[backend]  "GET"  "/api/dashboard/district-crimes?timeframe=30d"
-[info] [2026-07-08T16:31:08.133Z] : [1783528268133]  Appsail[backend]  "GET"  "/api/dashboard/alerts?limit=10"
-[info] [2026-07-08T16:31:08.134Z] : [1783528268134]  Appsail[backend]  "GET"  "/api/dashboard/trends"
-[info] [2026-07-08T16:31:08.393Z] : [1783528268393]  "GET"  "/app/favicon.ico"
-[info] [2026-07-08T16:31:08.644Z] : [1783528268644]  "GET"  "/app/logo192.png"
+[info] [2026-07-09T10:11:51.720Z] : 
+[info] [2026-07-09T10:11:51.720Z] : i Client[frontend]: Plugin : "zcatalyst-cli-plugin-react" is used for client serve
+[info] [2026-07-09T10:11:51.720Z] : 
+[debug] [2026-07-09T10:11:52.344Z] : No API Gateway configuration found. Skipping API Gateway rules
+[debug] [2026-07-09T10:11:52.457Z] : No API Gateway configuration found. Skipping API Gateway rules
+[info] [2026-07-09T10:11:52.560Z] : 
+[info] [2026-07-09T10:11:52.560Z] :  >>>>>>>>>>>>>> AppSail <<<<<<<<<<<<<< 
+[info] [2026-07-09T10:11:52.561Z] : i backend: http://localhost:3001
+[info] [2026-07-09T10:11:52.561Z] : 
+[info] [2026-07-09T10:11:52.561Z] : 
+[info] [2026-07-09T10:11:52.561Z] :  >>>>>>>>>>>>> Web Client <<<<<<<<<<<<
+[info] [2026-07-09T10:11:52.562Z] : i client[frontend]: http://localhost:3000/app/
+[info] [2026-07-09T10:11:52.562Z] : 
+[info] [2026-07-09T10:11:53.453Z] : [1783591913453]  "GET"  "/app/"
+[info] [2026-07-09T10:11:54.323Z] : [react-plugin]: Compiled successfully!
+[info] [2026-07-09T10:11:54.323Z] : [react-plugin]: 
+[info] [2026-07-09T10:11:54.323Z] : [react-plugin]: You can now view fron in the browser.
+[info] [2026-07-09T10:11:54.323Z] : [react-plugin]: 
+[info] [2026-07-09T10:11:54.324Z] : [react-plugin]:   http://localhost:3000/app/
+[info] [2026-07-09T10:11:54.324Z] : [react-plugin]: 
+[info] [2026-07-09T10:11:54.324Z] : [react-plugin]: Note that the development build is not optimized.
+[info] [2026-07-09T10:11:54.324Z] : [react-plugin]: To create a production build, use npm run build.
+[info] [2026-07-09T10:11:54.324Z] : [react-plugin]: 
+[info] [2026-07-09T10:11:54.607Z] : [1783591914607]  "GET"  "/app/static/js/bundle.js"
+[info] [2026-07-09T10:11:54.636Z] : [1783591914636]  "GET"  "/app/main.05a2643ef0d8955a27ac.hot-update.json"
+[info] [2026-07-09T10:11:54.642Z] : [1783591914642]  Appsail[backend]  "GET"  "/app/main.05a2643ef0d8955a27ac.hot-update.json"
+[info] [2026-07-09T10:11:54.746Z] : [1783591914746]  "GET"  "/app/map.svg"
+[info] [2026-07-09T10:11:54.813Z] : [1783591914813]  "GET"  "/app/manifest.json"
+[info] [2026-07-09T10:11:54.887Z] : [1783591914887]  "GET"  "/app/"
+[info] [2026-07-09T10:11:54.968Z] : [1783591914968]  "GET"  "/app/static/js/bundle.js"
+[info] [2026-07-09T10:11:55.101Z] : [1783591915100]  Appsail[backend]  "GET"  "/api/dashboard/alerts?limit=10"
+[info] [2026-07-09T10:11:55.103Z] : [1783591915103]  Appsail[backend]  "GET"  "/api/dashboard/trends"
+[info] [2026-07-09T10:11:55.105Z] : [1783591915104]  Appsail[backend]  "GET"  "/api/dashboard/stats"
+[info] [2026-07-09T10:11:55.106Z] : [1783591915106]  Appsail[backend]  "GET"  "/api/dashboard/district-crimes?timeframe=30d"
+[info] [2026-07-09T10:11:55.108Z] : [1783591915108]  "GET"  "/app/favicon.ico"
+[info] [2026-07-09T10:11:55.139Z] : [1783591915139]  "GET"  "/app/logo192.png"
+[info] [2026-07-09T10:11:55.820Z] : [1783591915819]  "GET"  "/app/map.svg"
+[info] [2026-07-09T10:11:56.070Z] : [1783591916070]  "GET"  "/app/manifest.json"
+[info] [2026-07-09T10:11:56.164Z] : [1783591916164]  Appsail[backend]  "GET"  "/api/dashboard/stats"
+[info] [2026-07-09T10:11:56.166Z] : [1783591916166]  Appsail[backend]  "GET"  "/api/dashboard/district-crimes?timeframe=30d"
+[info] [2026-07-09T10:11:56.168Z] : [1783591916168]  Appsail[backend]  "GET"  "/api/dashboard/alerts?limit=10"
+[info] [2026-07-09T10:11:56.169Z] : [1783591916169]  Appsail[backend]  "GET"  "/api/dashboard/trends"
+[info] [2026-07-09T10:11:56.288Z] : [1783591916288]  "GET"  "/app/favicon.ico"
+[info] [2026-07-09T10:11:56.397Z] : [1783591916397]  "GET"  "/app/logo192.png"
