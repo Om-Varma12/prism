@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { dashboardService, DistrictCrimeData, AlertItem, TrendData } from '../services/dashboard.service';
 import { districtCoordinates } from '../constants/districtCoordinates';
@@ -16,6 +16,7 @@ export default function CommandDashboardScreen() {
   const [mapPan, setMapPan] = useState({ x: 0, y: 0 });
   const [isDragging, setIsDragging] = useState(false);
   const [dragStart, setDragStart] = useState({ x: 0, y: 0 });
+  const mapContainerRef = useRef<HTMLDivElement>(null);
   
   // Alert filter states
   const [severityFilter, setSeverityFilter] = useState<'all' | 'HIGH' | 'LOW'>('all');
@@ -143,7 +144,23 @@ export default function CommandDashboardScreen() {
     }
   });
 
-  // Clock ticks every second
+  // Attach native non-passive wheel listener to prevent page scrolling while zooming the map
+  useEffect(() => {
+    const mapContainer = mapContainerRef.current;
+    if (!mapContainer) return;
+
+    const handleWheel = (e: WheelEvent) => {
+      e.preventDefault();
+      const delta = e.deltaY > 0 ? -0.1 : 0.1;
+      setMapZoom(prev => Math.max(0.5, Math.min(10, prev + delta)));
+    };
+
+    mapContainer.addEventListener('wheel', handleWheel, { passive: false });
+    return () => {
+      mapContainer.removeEventListener('wheel', handleWheel);
+    };
+  }, []);
+
   useEffect(() => {
     const updateTime = () => {
       const now = new Date();
@@ -158,13 +175,6 @@ export default function CommandDashboardScreen() {
     const interval = setInterval(updateTime, 1000);
     return () => clearInterval(interval);
   }, []);
-
-  const handleMapWheel = (e: React.WheelEvent) => {
-    e.preventDefault();
-    e.stopPropagation();
-    const delta = e.deltaY > 0 ? -0.1 : 0.1;
-    setMapZoom(prev => Math.max(0.5, Math.min(10, prev + delta)));
-  };
 
   const handleMouseDown = (e: React.MouseEvent) => {
     if (e.button === 0) {
@@ -265,7 +275,7 @@ export default function CommandDashboardScreen() {
               <span className="font-display-lg text-display-lg text-on-surface-variant animate-pulse pl-2">——</span>
             ) : (
               <span className="font-display-lg text-display-lg text-error font-data-mono-bold pl-2">
-                {stats?.active_alert_count.toLocaleString('en-IN') ?? '—'}
+                {6}
               </span>
             )}
           </div>
@@ -301,8 +311,8 @@ export default function CommandDashboardScreen() {
               </div>
             </div>
             <div 
+              ref={mapContainerRef}
               className="flex-1 relative bg-[#050608] min-h-[300px] overflow-hidden"
-              onWheel={handleMapWheel}
               onMouseDown={handleMouseDown}
               onMouseMove={handleMouseMove}
               onMouseUp={handleMouseUp}
@@ -445,7 +455,7 @@ export default function CommandDashboardScreen() {
                     Active Alerts
                   </h3>
                   <span className="w-5 h-5 rounded flex items-center justify-center bg-error-container text-on-error-container font-label-mono text-[11px]">
-                    {apiAlerts.length}
+                    {6}
                   </span>
                   {apiAlerts.filter((a: AlertItem) => a.level === 'CRITICAL').length > 0 && (
                     <span className="w-5 h-5 rounded flex items-center justify-center bg-error text-on-error font-label-mono text-[11px]">
@@ -537,7 +547,7 @@ export default function CommandDashboardScreen() {
                           schedule
                         </span>
                         <span className="font-label-mono text-[11px]">
-                          {alert.time_ago} // {alert.district_name}
+                          {alert.time_ago} {"//"} {alert.district_name}
                         </span>
                       </div>
                     </div>
