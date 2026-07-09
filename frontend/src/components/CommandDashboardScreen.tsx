@@ -588,21 +588,63 @@ export default function CommandDashboardScreen() {
                       {changeStr}
                     </span>
                   </div>
-                  <div className="h-12 w-full flex items-end gap-1 opacity-80">
-                    {trend.bar_heights.map((height: number, bIdx: number) => {
-                      const isLast = bIdx === trend.bar_heights.length - 1;
-                      return (
-                        <div
-                          key={bIdx}
-                          className={`w-full rounded-t-sm ${
-                            isLast && isUp ? 'bg-error animate-pulse'
-                              : isUp ? 'bg-tertiary'
-                              : 'bg-primary-container'
-                          }`}
-                          style={{ height: `${height}%` }}
-                        ></div>
-                      );
-                    })}
+                  <div className="h-12 w-full opacity-90">
+                    <svg className="w-full h-full" viewBox="0 0 100 40" preserveAspectRatio="none">
+                      <defs>
+                        <linearGradient id={`gradient-${idx}`} x1="0" y1="0" x2="0" y2="1">
+                          <stop
+                            offset="0%"
+                            stopColor={isUp ? '#ef4444' : isDown ? '#3b82f6' : '#9ca3af'}
+                            stopOpacity="0.25"
+                          />
+                          <stop
+                            offset="100%"
+                            stopColor={isUp ? '#ef4444' : isDown ? '#3b82f6' : '#9ca3af'}
+                            stopOpacity="0.0"
+                          />
+                        </linearGradient>
+                      </defs>
+                      {/* Area Fill */}
+                      {trend.bar_heights.length > 0 && (
+                        <path
+                          d={`${trend.bar_heights.map((height: number, i: number) => {
+                            const x = 2 + (i / (trend.bar_heights.length - 1)) * 96;
+                            const y = 36 - (height / 100) * 32;
+                            return i === 0 ? `M ${x} ${y}` : `L ${x} ${y}`;
+                          }).join(' ')} L ${2 + 96} 40 L 2 40 Z`}
+                          fill={`url(#gradient-${idx})`}
+                        />
+                      )}
+                      {/* Stroke Line */}
+                      {trend.bar_heights.length > 0 && (
+                        <path
+                          d={trend.bar_heights.map((height: number, i: number) => {
+                            const x = 2 + (i / (trend.bar_heights.length - 1)) * 96;
+                            const y = 36 - (height / 100) * 32;
+                            return i === 0 ? `M ${x} ${y}` : `L ${x} ${y}`;
+                          }).join(' ')}
+                          fill="none"
+                          stroke={isUp ? '#ef4444' : isDown ? '#3b82f6' : '#9ca3af'}
+                          strokeWidth="2"
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                        />
+                      )}
+                      {/* Last point dot */}
+                      {trend.bar_heights.length > 0 && (() => {
+                        const lastHeight = trend.bar_heights[trend.bar_heights.length - 1];
+                        const x = 2 + 96;
+                        const y = 36 - (lastHeight / 100) * 32;
+                        return (
+                          <circle
+                            cx={x}
+                            cy={y}
+                            r="3"
+                            className={isUp ? 'fill-error animate-pulse' : isDown ? 'fill-primary' : 'fill-on-surface-variant'}
+                          />
+                        );
+                      })()}
+                    </svg>
                   </div>
                 </div>
               );

@@ -27,6 +27,8 @@ def normalize(counts: list[int]) -> list[int]:
 
 def compute_trend(current: int, prior: int) -> tuple[float, str]:
     if prior == 0:
+        if current > 0:
+            return (100.0, "up")
         return (0.0, "flat")
     change = ((current - prior) / prior) * 100
     trend = "up" if change > 2 else "down" if change < -2 else "flat"
