@@ -5,7 +5,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { dashboardService, DistrictCrimeData } from '../services/dashboard.service';
+import { dashboardService, DistrictCrimeData, AlertItem, TrendData } from '../services/dashboard.service';
 import { districtCoordinates } from '../constants/districtCoordinates';
 
 export default function CommandDashboardScreen() {
@@ -16,6 +16,16 @@ export default function CommandDashboardScreen() {
   const [mapPan, setMapPan] = useState({ x: 0, y: 0 });
   const [isDragging, setIsDragging] = useState(false);
   const [dragStart, setDragStart] = useState({ x: 0, y: 0 });
+  
+  // Alert filter states
+  const [severityFilter, setSeverityFilter] = useState<'all' | 'HIGH' | 'LOW'>('all');
+  const [sortBy, setSortBy] = useState<'newest' | 'oldest' | 'district'>('newest');
+  const [searchQuery, setSearchQuery] = useState('');
+  
+  // Notification states
+  const [soundEnabled, setSoundEnabled] = useState(false);
+  const [previousAlerts, setPreviousAlerts] = useState<AlertItem[]>([]);
+  const [toasts, setToasts] = useState<Array<{ id: number; alert: AlertItem; timestamp: number }>>([]);
 
   // React Query hooks for data fetching
   const { data: stats, isLoading: statsLoading } = useQuery({
@@ -37,6 +47,97 @@ export default function CommandDashboardScreen() {
   const { data: trends = [], isLoading: trendsLoading } = useQuery({
     queryKey: ['trends'],
     queryFn: dashboardService.getTrends,
+  });
+
+  // Detect new alerts and trigger notifications
+  useEffect(() => {
+    if (apiAlerts.length > 0 && previousAlerts.length > 0) {
+      const newAlerts = apiAlerts.filter(
+        (alert: AlertItem) => !previousAlerts.some(prev => prev.alert_id === alert.alert_id)
+      );
+      
+      // Only notify for HIGH severity alerts
+      const highSeverityNewAlerts = newAlerts.filter((alert: AlertItem) => alert.level === 'CRITICAL');
+      
+      if (highSeverityNewAlerts.length > 0) {
+        // Add toasts for new HIGH severity alerts
+        const newToasts = highSeverityNewAlerts.map((alert: AlertItem) => ({
+          id: Date.now() + Math.random(),
+          alert,
+          timestamp: Date.now()
+        }));
+        setToasts(prev => [...prev, ...newToasts]);
+        
+        // Play sound if enabled
+        if (soundEnabled) {
+          playNotificationSound();
+        }
+      }
+    }
+    
+    setPreviousAlerts(apiAlerts);
+  }, [apiAlerts, previousAlerts, soundEnabled]);
+
+  // Auto-dismiss toasts after 5 seconds
+  useEffect(() => {
+    const interval = setInterval(() => {
+      const now = Date.now();
+      setToasts(prev => prev.filter(toast => now - toast.timestamp < 5000));
+    }, 1000);
+    return () => clearInterval(interval);
+  }, []);
+
+  // Play notification sound
+  const playNotificationSound = () => {
+    try {
+      // Simple beep sound using Web Audio API
+      const audioContext = new (window.AudioContext || (window as any).webkitAudioContext)();
+      const oscillator = audioContext.createOscillator();
+      const gainNode = audioContext.createGain();
+      
+      oscillator.connect(gainNode);
+      gainNode.connect(audioContext.destination);
+      
+      oscillator.frequency.value = 800;
+      oscillator.type = 'sine';
+      gainNode.gain.value = 0.3;
+      
+      oscillator.start();
+      oscillator.stop(audioContext.currentTime + 0.2);
+    } catch (err) {
+      console.log('Audio error:', err);
+    }
+  };
+
+  // Filter and sort alerts
+  const filteredAlerts = apiAlerts.filter((alert: AlertItem) => {
+    // Severity filter
+    if (severityFilter === 'HIGH' && alert.level !== 'CRITICAL') return false;
+    if (severityFilter === 'LOW' && alert.level !== 'WARNING') return false;
+    
+    // Search filter
+    if (searchQuery) {
+      const query = searchQuery.toLowerCase();
+      return (
+        alert.district_name.toLowerCase().includes(query) ||
+        alert.crime_type.toLowerCase().includes(query) ||
+        alert.title.toLowerCase().includes(query)
+      );
+    }
+    
+    return true;
+  }).sort((a: AlertItem, b: AlertItem) => {
+    // Sort logic
+    switch (sortBy) {
+      case 'newest':
+        return new Date(b.created_at).getTime() - new Date(a.created_at).getTime();
+      case 'oldest':
+        return new Date(a.created_at).getTime() - new Date(b.created_at).getTime();
+      case 'district':
+        return a.district_name.localeCompare(b.district_name);
+      default:
+        return 0;
+    }
   });
 
   // Clock ticks every second
@@ -228,7 +329,7 @@ export default function CommandDashboardScreen() {
                 />
 
                 {/* Dynamic district markers from API */}
-                {!mapLoading && districts.map((district) => {
+                {!mapLoading && districts.map((district: DistrictCrimeData) => {
                   const coords = districtCoordinates[district.district_name];
                   
                   // Only show marker if district has SVG coordinates
@@ -243,7 +344,7 @@ export default function CommandDashboardScreen() {
                     top: (coords.cy / SVG_HEIGHT) * 100,
                   };
                   
-                  const maxFirs = Math.max(...districts.map(d => d.total_firs), 1);
+                  const maxFirs = Math.max(...districts.map((d: DistrictCrimeData) => d.total_firs), 1);
                   const ratio = district.total_firs / maxFirs;
                   const getIntensity = (r: number) => {
                     if (r > 0.7) return { dot: '#ef4444', border: '#ef4444', label: '#ff4d4d' };
@@ -331,25 +432,91 @@ export default function CommandDashboardScreen() {
 
           {/* Right: Active Alerts (4 cols) */}
           <div className="lg:col-span-4 bg-panel border border-tactical rounded flex flex-col overflow-hidden">
-            <div className="p-4 border-b border-tactical flex items-center justify-between">
-              <div className="flex items-center gap-2">
-                <span className="material-symbols-outlined text-error text-[20px]">
-                  warning
-                </span>
-                <h3 className="font-body-md text-body-md font-semibold text-on-surface uppercase tracking-wide">
-                  Active Alerts
-                </h3>
+            <div className="p-4 border-b border-tactical">
+              <div className="flex items-center justify-between mb-3">
+                <div className="flex items-center gap-2">
+                  <span className="material-symbols-outlined text-error text-[20px]">
+                    warning
+                  </span>
+                  <h3 className="font-body-md text-body-md font-semibold text-on-surface uppercase tracking-wide">
+                    Active Alerts
+                  </h3>
+                  <span className="w-5 h-5 rounded flex items-center justify-center bg-error-container text-on-error-container font-label-mono text-[11px]">
+                    {alertsLoading ? '—' : apiAlerts.length}
+                  </span>
+                  {apiAlerts.filter((a: AlertItem) => a.level === 'CRITICAL').length > 0 && (
+                    <span className="w-5 h-5 rounded flex items-center justify-center bg-error text-on-error font-label-mono text-[11px]">
+                      {apiAlerts.filter((a: AlertItem) => a.level === 'CRITICAL').length}
+                    </span>
+                  )}
+                </div>
+                <button
+                  onClick={() => setSoundEnabled(!soundEnabled)}
+                  className={`p-1 rounded ${soundEnabled ? 'bg-primary-container text-primary' : 'bg-surface text-on-surface-variant'} hover:bg-surface-variant transition-colors`}
+                  title={soundEnabled ? 'Disable sound' : 'Enable sound'}
+                >
+                  <span className="material-symbols-outlined text-[18px]">
+                    {soundEnabled ? 'volume_up' : 'volume_off'}
+                  </span>
+                </button>
               </div>
-              <span className="w-5 h-5 rounded flex items-center justify-center bg-error-container text-on-error-container font-label-mono text-[11px]">
-                {alertsLoading ? '—' : apiAlerts.length}
-              </span>
+              
+              {/* Filter Controls */}
+              <div className="flex flex-wrap gap-2">
+                <select
+                  value={severityFilter}
+                  onChange={(e) => setSeverityFilter(e.target.value as 'all' | 'HIGH' | 'LOW')}
+                  className="px-2 py-1 bg-surface border border-tactical rounded text-xs font-label-mono text-on-surface focus:outline-none focus:border-primary"
+                >
+                  <option value="all">All Severity</option>
+                  <option value="HIGH">HIGH Only</option>
+                  <option value="LOW">LOW Only</option>
+                </select>
+                
+                <select
+                  value={sortBy}
+                  onChange={(e) => setSortBy(e.target.value as 'newest' | 'oldest' | 'district')}
+                  className="px-2 py-1 bg-surface border border-tactical rounded text-xs font-label-mono text-on-surface focus:outline-none focus:border-primary"
+                >
+                  <option value="newest">Newest First</option>
+                  <option value="oldest">Oldest First</option>
+                  <option value="district">District A-Z</option>
+                </select>
+                
+                <input
+                  type="text"
+                  placeholder="Search district or crime..."
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  className="flex-1 min-w-[120px] px-2 py-1 bg-surface border border-tactical rounded text-xs font-label-mono text-on-surface focus:outline-none focus:border-primary placeholder:text-on-surface-variant"
+                />
+                
+                {(severityFilter !== 'all' || sortBy !== 'newest' || searchQuery) && (
+                  <button
+                    onClick={() => {
+                      setSeverityFilter('all');
+                      setSortBy('newest');
+                      setSearchQuery('');
+                    }}
+                    className="px-2 py-1 bg-tertiary-container text-tertiary border border-tactical rounded text-xs font-label-mono hover:bg-tertiary transition-colors"
+                  >
+                    Clear
+                  </button>
+                )}
+              </div>
+              
+              {filteredAlerts.length !== apiAlerts.length && (
+                <div className="mt-2 text-xs font-label-mono text-on-surface-variant">
+                  Showing {filteredAlerts.length} of {apiAlerts.length} alerts
+                </div>
+              )}
             </div>
             <div className="flex-1 overflow-y-auto p-2 space-y-2 max-h-[400px] custom-scrollbar">
               {alertsLoading
                 ? Array.from({ length: 3 }).map((_, i) => (
                     <div key={i} className="h-16 bg-surface animate-pulse rounded border border-tactical" />
                   ))
-                : apiAlerts.map((alert) => {
+                : filteredAlerts.map((alert: AlertItem) => {
                 const isCritical = alert.level === 'CRITICAL';
                 return (
                   <div
@@ -398,7 +565,7 @@ export default function CommandDashboardScreen() {
             </span>
           </div>
           <div className="p-md grid grid-cols-1 md:grid-cols-5 gap-4 divide-y md:divide-y-0 md:divide-x divide-tactical">
-            {(trendsLoading ? [] : trends).map((trend, idx) => {
+            {(trendsLoading ? [] : trends).map((trend: TrendData, idx: number) => {
               const isUp = trend.trend === 'up';
               const isDown = trend.trend === 'down';
               const changeStr = `${trend.change_pct > 0 ? '+' : ''}${trend.change_pct}%`;
@@ -418,7 +585,7 @@ export default function CommandDashboardScreen() {
                     </span>
                   </div>
                   <div className="h-12 w-full flex items-end gap-1 opacity-80">
-                    {trend.bar_heights.map((height, bIdx) => {
+                    {trend.bar_heights.map((height: number, bIdx: number) => {
                       const isLast = bIdx === trend.bar_heights.length - 1;
                       return (
                         <div
@@ -438,6 +605,36 @@ export default function CommandDashboardScreen() {
             })}
           </div>
         </div>
+      </div>
+
+      {/* Toast Notifications */}
+      <div className="fixed top-4 right-4 z-50 space-y-2">
+        {toasts.map(toast => (
+          <div
+            key={toast.id}
+            className="bg-panel border border-tactical rounded p-3 shadow-lg animate-slide-in flex items-start gap-3 min-w-[300px]"
+          >
+            <span className="material-symbols-outlined text-error text-[20px]">
+              warning
+            </span>
+            <div className="flex-1">
+              <div className="font-body-sm text-body-sm font-semibold text-on-surface mb-1">
+                {toast.alert.title}
+              </div>
+              <div className="font-label-mono text-[11px] text-on-surface-variant">
+                {toast.alert.district_name} • {toast.alert.time_ago}
+              </div>
+            </div>
+            <button
+              onClick={() => setToasts(prev => prev.filter(t => t.id !== toast.id))}
+              className="text-on-surface-variant hover:text-on-surface"
+            >
+              <span className="material-symbols-outlined text-[18px]">
+                close
+              </span>
+            </button>
+          </div>
+        ))}
       </div>
     </div>
   );
