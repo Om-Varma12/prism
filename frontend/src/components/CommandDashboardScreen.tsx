@@ -4,8 +4,8 @@
  */
 
 import React, { useState, useEffect } from 'react';
-import { useDashboardStats, useDistrictCrimes, useAlerts, useTrends } from '../hooks/useDashboardStats';
-import { DistrictCrimeData } from '../services/dashboard.service';
+import { useQuery } from '@tanstack/react-query';
+import { dashboardService, DistrictCrimeData } from '../services/dashboard.service';
 import { districtCoordinates } from '../constants/districtCoordinates';
 
 export default function CommandDashboardScreen() {
@@ -17,10 +17,27 @@ export default function CommandDashboardScreen() {
   const [isDragging, setIsDragging] = useState(false);
   const [dragStart, setDragStart] = useState({ x: 0, y: 0 });
 
-  const { stats, loading: statsLoading } = useDashboardStats();
-  const { data: districts, loading: mapLoading } = useDistrictCrimes(activeTimeframe);
-  const { alerts: apiAlerts, loading: alertsLoading } = useAlerts();
-  const { trends, loading: trendsLoading } = useTrends();
+  // React Query hooks for data fetching
+  const { data: stats, isLoading: statsLoading } = useQuery({
+    queryKey: ['stats'],
+    queryFn: dashboardService.getStats,
+  });
+
+  const { data: districts = [], isLoading: mapLoading } = useQuery({
+    queryKey: ['district-crimes', activeTimeframe],
+    queryFn: () => dashboardService.getDistrictCrimes(activeTimeframe),
+  });
+
+  const { data: apiAlerts = [], isLoading: alertsLoading } = useQuery({
+    queryKey: ['alerts'],
+    queryFn: () => dashboardService.getAlerts(),
+    refetchInterval: 60000, // Auto-refresh every 60s
+  });
+
+  const { data: trends = [], isLoading: trendsLoading } = useQuery({
+    queryKey: ['trends'],
+    queryFn: dashboardService.getTrends,
+  });
 
   // Clock ticks every second
   useEffect(() => {
@@ -299,7 +316,8 @@ export default function CommandDashboardScreen() {
                   Intensity Legend
                 </span>
                 <div className="flex items-center gap-2">
-                  <div className="w-24 h-2 bg-gradient-to-r from-[#050608] to-red-500 rounded-sm"></div>
+                  <span className="font-label-mono text-[10px] text-primary">LOW</span>
+                  <div className="w-24 h-2 bg-gradient-to-r from-yellow-500 to-red-500 rounded-sm"></div>
                   <span className="font-label-mono text-[10px] text-primary">HIGH</span>
                 </div>
               </div>
