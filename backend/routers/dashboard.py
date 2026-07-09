@@ -148,12 +148,12 @@ async def get_active_alerts(
                 crime_alerts.spike_ratio,
                 crime_alerts.created_at,
                 crime_alerts.is_acknowledged,
-                District.DistrictName,
-                CrimeSubHead.CrimeHeadName
+                COALESCE(District.DistrictName, crime_alerts.alert_message) as DistrictName,
+                COALESCE(CrimeSubHead.CrimeHeadName, 'Crime') as CrimeHeadName
             FROM crime_alerts
             LEFT JOIN District ON crime_alerts.district_id = District.ROWID
             LEFT JOIN CrimeSubHead ON crime_alerts.crime_sub_head_id = CrimeSubHead.ROWID
-            WHERE crime_alerts.is_acknowledged = false OR crime_alerts.is_acknowledged IS NULL
+            WHERE crime_alerts.is_acknowledged = '0' OR crime_alerts.is_acknowledged = 0 OR crime_alerts.is_acknowledged IS NULL
             ORDER BY 
                 CASE WHEN crime_alerts.severity = 'HIGH' THEN 0 ELSE 1 END,
                 crime_alerts.created_at DESC

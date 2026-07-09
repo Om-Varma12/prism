@@ -20,7 +20,7 @@ def sync_alert_count(zcql, datastore):
         query = """
             SELECT COUNT(ROWID) as count 
             FROM crime_alerts 
-            WHERE is_acknowledged = 0 OR is_acknowledged IS NULL
+            WHERE is_acknowledged = '0' OR is_acknowledged = 0 OR is_acknowledged IS NULL
         """
         result = zcql.execute_query(query)
         
