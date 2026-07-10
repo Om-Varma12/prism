@@ -3,22 +3,37 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useRef, useEffect } from 'react';
 import { Screen, ChatMessage } from '../types';
+import { useChat } from '../hooks/useChat';
 
 interface ChatScreenProps {
   onNavigate: (screen: Screen) => void;
 }
 
 export default function ChatScreen({ onNavigate }: ChatScreenProps) {
-  const [messages, setMessages] = useState<ChatMessage[]>([]);
-  const [inputText, setInputText] = useState('');
-  const [openSqlQueryId, setOpenSqlQueryId] = useState<string | null>(null);
-  const [openSourcesId, setOpenSourcesId] = useState<string | null>(null);
-  const [activeHistoryId, setActiveHistoryId] = useState('');
-  const [isTyping, setIsTyping] = useState(false);
+  const {
+    messages,
+    isTyping,
+    history,
+    activeSessionId,
+    latestResponse,
+    sendMessage,
+    loadHistory,
+    startNewConversation,
+    selectConversation,
+  } = useChat();
+
+  const [inputText, setInputText] = React.useState('');
+  const [openSqlQueryId, setOpenSqlQueryId] = React.useState<string | null>(null);
+  const [openSourcesId, setOpenSourcesId] = React.useState<string | null>(null);
 
   const scrollContainerRef = useRef<HTMLDivElement>(null);
+
+  // Load history on mount
+  useEffect(() => {
+    loadHistory();
+  }, [loadHistory]);
 
   // Auto-scroll on new messages
   useEffect(() => {
@@ -29,27 +44,16 @@ export default function ChatScreen({ onNavigate }: ChatScreenProps) {
 
   const handleSendMessage = (text: string) => {
     if (!text.trim()) return;
-
-    // Add user message
-    const userMessage: ChatMessage = {
-      id: `msg-user-${Date.now()}`,
-      sender: 'user',
-      text: text,
-      timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-      status: 'ACTIVE'
-    } as any;
-
-    setMessages((prev) => [...prev, userMessage]);
+    sendMessage(text);
     setInputText('');
-    setIsTyping(true);
   };
 
   const handleNewConversation = () => {
-    setMessages([]);
+    startNewConversation();
   };
 
   const handleHistoryClick = (id: string, title: string) => {
-    setActiveHistoryId(id);
+    selectConversation(id);
   };
 
   return (
@@ -71,7 +75,23 @@ export default function ChatScreen({ onNavigate }: ChatScreenProps) {
               Today
             </h3>
             <ul className="space-y-1">
-              {/* Conversation history will be populated from API */}
+              {history.filter(h => h.category === 'Today').map((item) => {
+                const isActive = activeSessionId === item.session_id;
+                return (
+                  <li key={item.session_id}>
+                    <button
+                      onClick={() => handleHistoryClick(item.session_id, item.title)}
+                      className={`w-full text-left block px-2 py-1.5 rounded text-sm truncate font-body-sm transition-colors cursor-pointer ${
+                        isActive
+                          ? 'bg-surface-container-high text-primary-fixed border-l-2 border-primary-container'
+                          : 'text-on-surface-variant hover:bg-surface-container'
+                      }`}
+                    >
+                      {item.title}
+                    </button>
+                  </li>
+                );
+              })}
             </ul>
           </div>
           <div>
@@ -79,7 +99,23 @@ export default function ChatScreen({ onNavigate }: ChatScreenProps) {
               Previous 7 Days
             </h3>
             <ul className="space-y-1">
-              {/* Conversation history will be populated from API */}
+              {history.filter(h => h.category === 'Previous 7 Days').map((item) => {
+                const isActive = activeSessionId === item.session_id;
+                return (
+                  <li key={item.session_id}>
+                    <button
+                      onClick={() => handleHistoryClick(item.session_id, item.title)}
+                      className={`w-full text-left block px-2 py-1.5 rounded text-sm truncate font-body-sm transition-colors cursor-pointer ${
+                        isActive
+                          ? 'bg-surface-container-high text-primary-fixed border-l-2 border-primary-container'
+                          : 'text-on-surface-variant hover:bg-surface-container'
+                      }`}
+                    >
+                      {item.title}
+                    </button>
+                  </li>
+                );
+              })}
             </ul>
           </div>
         </div>
@@ -198,8 +234,9 @@ export default function ChatScreen({ onNavigate }: ChatScreenProps) {
                         </button>
                         {openSourcesId === msg.id && (
                           <div className="mt-1 pl-4 text-[10px] text-outline font-mono space-y-1">
-                            <div>• ksp_state_central_db.archive_fir (Index: OPTIMIZED)</div>
-                            <div>• nlp_extracted_pattern_manifest_2026.json</div>
+                            {latestResponse?.sources.map((source, idx) => (
+                              <div key={idx}>• {source}</div>
+                            ))}
                           </div>
                         )}
                       </div>
@@ -262,7 +299,28 @@ export default function ChatScreen({ onNavigate }: ChatScreenProps) {
             Mentioned Entities
           </h3>
           <div className="space-y-3">
-            {/* Entities will be populated from API */}
+            {latestResponse?.entities.map((entity, idx) => (
+              <div
+                key={idx}
+                onClick={() => onNavigate(Screen.NETWORK)}
+                className="border border-layout-border rounded p-3 bg-layout-bg hover:border-primary-container/50 transition-colors cursor-pointer group"
+              >
+                <div className="flex justify-between items-start mb-2">
+                  <div className="flex items-center gap-2 text-on-surface">
+                    <span className="material-symbols-outlined text-[16px] text-outline">
+                      {entity.type === 'person' ? 'person' : 'location_on'}
+                    </span>
+                    <span className="font-body-sm font-semibold">{entity.name}</span>
+                  </div>
+                </div>
+                <div className="text-[12px] text-on-surface-variant mb-2 font-mono">
+                  {entity.type}
+                </div>
+                <div className="text-[11px] font-label-mono text-outline">
+                  {entity.detail}
+                </div>
+              </div>
+            ))}
           </div>
         </div>
         <div>
@@ -270,7 +328,15 @@ export default function ChatScreen({ onNavigate }: ChatScreenProps) {
             Suggested Follow-ups
           </h3>
           <div className="flex flex-col gap-2">
-            {/* Follow-ups will be populated from API */}
+            {latestResponse?.follow_ups.map((text, idx) => (
+              <button
+                key={idx}
+                onClick={() => handleSendMessage(text)}
+                className="text-left px-3 py-2 text-[12px] text-on-surface-variant bg-surface-container-low border border-layout-border rounded hover:bg-surface-container hover:text-primary-fixed transition-colors cursor-pointer"
+              >
+                {text}
+              </button>
+            ))}
           </div>
         </div>
       </aside>
