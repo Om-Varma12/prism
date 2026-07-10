@@ -33,7 +33,8 @@ export default function ChatScreen({ onNavigate }: ChatScreenProps) {
   // Load history on mount
   useEffect(() => {
     loadHistory();
-  }, [loadHistory]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   // Auto-scroll on new messages
   useEffect(() => {

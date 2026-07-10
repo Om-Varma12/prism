@@ -2,20 +2,36 @@
 Catalyst Quick ML LLM client service for AI-powered query processing.
 """
 import os
-import requests
 import json
 from typing import Optional
+from .token_manager import TokenManager
 
 
 class CatalystLLMClient:
     """Client for interacting with Catalyst Quick ML LLM API for inference."""
     
     def __init__(self):
-        """Initialize Catalyst LLM client."""
+        """Initialize Catalyst LLM client with OAuth token manager."""
         # Catalyst Quick ML endpoint
-        self.base_url = "https://api.catalyst.zoho.com/glm/chat"
+        self.base_url = "https://api.catalyst.zoho.in/quickml/v1/project/46143000000022001/glm/chat"
         self.model = "crm-di-glm47b_30b_it"  # Default model from Catalyst
-        # Catalyst SDK handles authentication automatically
+        self.org_id = os.getenv("CATALYST_ORG_ID", "60074849663")
+        
+        # Initialize OAuth token manager
+        self.token_manager = TokenManager()
+    
+    def _get_headers(self) -> dict:
+        """
+        Get request headers with OAuth authorization.
+        
+        Returns:
+            Headers dictionary with authorization
+        """
+        return {
+            "Content-Type": "application/json",
+            "Authorization": f"Zoho-oauthtoken {self.token_manager.get_access_token()}",
+            "CATALYST-ORG": self.org_id
+        }
     
     def chat_completion(
         self,
@@ -55,19 +71,18 @@ class CatalystLLMClient:
         }
         
         try:
-            response = requests.post(self.base_url, json=payload, timeout=30)
+            response = self.token_manager.make_authenticated_request(
+                method="POST",
+                url=self.base_url,
+                headers=self._get_headers(),
+                json=payload,
+                timeout=30
+            )
             response.raise_for_status()
             result = response.json()
             return result["choices"][0]["message"]["content"]
         except Exception as e:
-            # Retry once on rate limit or temporary errors
-            try:
-                response = requests.post(self.base_url, json=payload, timeout=30)
-                response.raise_for_status()
-                result = response.json()
-                return result["choices"][0]["message"]["content"]
-            except Exception as retry_error:
-                raise RuntimeError(f"Catalyst LLM API request failed: {retry_error}")
+            raise RuntimeError(f"Catalyst LLM API request failed: {e}")
     
     def chat_completion_json(
         self,
