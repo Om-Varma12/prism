@@ -66,7 +66,22 @@ def test_chat_history():
         print(f"[TEST] FAILED: {response.text}")
 
 
+def test_db_status():
+    print(f"\n[TEST] Checking DB status (row counts)...")
+    try:
+        response = requests.get(f"{BASE_URL}/api/chat/db-status", timeout=10)
+        print(f"[TEST] Status code: {response.status_code}")
+        if response.status_code == 200:
+            print("[RESPONSE] Database Table Counts:")
+            print(json.dumps(response.json(), indent=2))
+        else:
+            print(f"[TEST] FAILED: {response.text}")
+    except Exception as e:
+        print(f"[TEST] Connection failed: {e}")
+
+
 if __name__ == "__main__":
+    test_db_status()
     test_new_conversation()
     test_chat_query()
     test_chat_history()

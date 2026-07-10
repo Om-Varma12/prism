@@ -196,7 +196,7 @@ export default function CommandDashboardScreen() {
 
 
   return (
-    <div className="flex-1 flex flex-col overflow-hidden bg-[#0A0C10] select-none">
+    <div className="flex-1 flex flex-col overflow-hidden bg-[#0A0C10]">
       {/* Header */}
       <header className="h-[72px] shrink-0 border-b border-tactical bg-panel flex items-center justify-between px-margin-desktop z-10">
         <h2 className="font-headline-md text-headline-md text-on-surface">

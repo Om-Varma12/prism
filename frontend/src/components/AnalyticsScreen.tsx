@@ -177,7 +177,7 @@ export default function AnalyticsScreen() {
                         onChange={(e) => setSliderVal(Number(e.target.value))}
                       />
                     </div>
-                    <div className="flex justify-between w-full mt-1 px-1 select-none">
+                    <div className="flex justify-between w-full mt-1 px-1">
                       <div className="w-px h-2 bg-outline-variant"></div>
                       <div className="w-px h-2 bg-outline-variant"></div>
                       <div className="w-px h-2 bg-outline-variant"></div>
@@ -306,7 +306,7 @@ export default function AnalyticsScreen() {
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -10 }}
-              className="space-y-6 select-none"
+              className="space-y-6"
             >
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div className="bg-surface border border-outline-variant p-5 rounded-none">
@@ -380,7 +380,7 @@ export default function AnalyticsScreen() {
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -10 }}
-              className="space-y-4 select-none"
+              className="space-y-4"
             >
               {/* Search bar offenders filter */}
               <div className="max-w-md relative border border-outline-variant bg-[#0A0C10] flex items-center px-3 py-2 rounded-none">
@@ -451,7 +451,7 @@ export default function AnalyticsScreen() {
               exit={{ scale: 0.95, opacity: 0 }}
               className="bg-black border border-white/10 rounded-none shadow-2xl max-w-lg w-full overflow-hidden"
             >
-              <div className="p-4 border-b border-white/10 bg-black flex justify-between items-center select-none font-mono">
+              <div className="p-4 border-b border-white/10 bg-black flex justify-between items-center font-mono">
                 <div className="flex items-center gap-2">
                   <span className="material-symbols-outlined text-primary text-[18px]">table_chart</span>
                   <span className="text-[10px] font-mono font-black tracking-[0.15em] text-primary uppercase">

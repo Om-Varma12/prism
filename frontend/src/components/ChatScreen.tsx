@@ -58,7 +58,7 @@ export default function ChatScreen({ onNavigate }: ChatScreenProps) {
   };
 
   return (
-    <div className="flex-1 flex overflow-hidden bg-layout-bg h-full select-none">
+    <div className="flex-1 flex overflow-hidden bg-layout-bg h-full">
       {/* Column 1: Conversation History */}
       <aside className="w-[220px] flex-shrink-0 bg-layout-surface border-r border-layout-border flex flex-col hidden lg:flex">
         <div className="p-4 border-b border-layout-border">

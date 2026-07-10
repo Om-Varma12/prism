@@ -15,6 +15,7 @@ SCHEMA_CONTEXT = """
 - Use ROWID for primary key references
 - Table aliases only in SELECT statements
 - Always include LIMIT clause (default 50)
+- LIKE wildcards use `*` NOT `%` (e.g., LIKE '*Lakshmi*' NOT LIKE '%Lakshmi%')
 
 ## CORE TABLES
 
@@ -31,59 +32,67 @@ Key Notes:
 
 ### CrimeSubHead (Crime Types)
 Columns: CrimeSubHeadID (PK), CrimeHeadID, CrimeHeadName, SeqID
-Join: CaseMaster.CrimeMinorHeadID → CrimeSubHead.CrimeSubHeadID
+Join: CrimeSubHead.ROWID = CaseMaster.CrimeMinorHeadID
 
 ### CaseStatusMaster (Status)
 Columns: CaseStatusID (PK), CaseStatusName
 Values: Under Investigation, Charge Sheeted, Closed, Referred to Court, Stayed
-Join: CaseMaster.CaseStatusID → CaseStatusMaster.CaseStatusID
+Join: CaseStatusMaster.ROWID = CaseMaster.CaseStatusID
 
 ### Unit (Police Stations)
 Columns: UnitID (PK), UnitName, TypeID, ParentUnit, StateID, DistrictID
-Join: CaseMaster.PoliceStationID → Unit.UnitID
+Join: Unit.ROWID = CaseMaster.PoliceStationID
 
 ### District (Geography)
 Columns: DistrictID (PK), DistrictName, StateID
-Join: Unit.DistrictID → District.DistrictID
+Join: District.ROWID = Unit.DistrictID
 
 ### Accused (Per FIR)
 Columns: AccusedMasterID (PK), CaseMasterID, AccusedName, AgeYear, GenderID, PersonID
-Join: CaseMaster.CaseMasterID → Accused.CaseMasterID
+Join: CaseMaster.ROWID = Accused.CaseMasterID
 Note: No cross-case identity - use fuzzy matching on Name + Age + Gender
 
 ### Victim (Per FIR)
 Columns: VictimMasterID (PK), CaseMasterID, VictimName, AgeYear, GenderID, VictimPolice
-Join: CaseMaster.CaseMasterID → Victim.CaseMasterID
+Join: CaseMaster.ROWID = Victim.CaseMasterID
 
 ### ArrestSurrender (Arrest Events)
 Columns: ArrestSurrenderID (PK), CaseMasterID, AccusedMasterID, ArrestSurrenderDate, 
 ArrestSurrenderStateId, ArrestSurrenderDistrictId, PoliceStationID, IOID, CourtID
-Join: CaseMaster.CaseMasterID → ArrestSurrender.CaseMasterID
+Join: CaseMaster.ROWID = ArrestSurrender.CaseMasterID
 Note: Accused without ArrestSurrender = absconding
 
 ### ActSectionAssociation (Legal Charges)
 Columns: CaseMasterID, ActID, SectionID, ActOrderID, SectionOrderID
-Join: CaseMaster.CaseMasterID → ActSectionAssociation.CaseMasterID
+Join: CaseMaster.ROWID = ActSectionAssociation.CaseMasterID
 Note: Junction table - composite key (CaseMasterID, ActID, SectionID)
 
 ### Act (Legal Acts)
 Columns: ActCode (PK), ActDescription, ShortName, Active
-Join: ActSectionAssociation.ActID → Act.ActCode
+Join: Act.ROWID = ActSectionAssociation.ActID
 
 ### Section (Legal Sections)
 Columns: ActCode, SectionCode, SectionDescription, Active
-Join: ActSectionAssociation.SectionID → Section.SectionCode
+Join: Section.ROWID = ActSectionAssociation.SectionID
 Note: Composite key (ActCode, SectionCode)
 
-## JOIN PATH RULES
+## JOIN PATH RULES (EXPLICIT ZCQL PATTERNS - USE EXACT ON CLAUSES)
 
-Rule 1: Always start from CaseMaster
-Rule 2: Geography: CaseMaster → Unit → District
-Rule 3: Crime type: CaseMaster → CrimeSubHead
-Rule 4: Status: CaseMaster → CaseStatusMaster
-Rule 5: Accused: CaseMaster → Accused
-Rule 6: Arrest: CaseMaster → ArrestSurrender
-Rule 7: Legal sections: CaseMaster → ActSectionAssociation → Act + Section
+Rule 1: Always start queries from CaseMaster.
+Rule 2: Geography (CaseMaster → Unit → District):
+  `FROM CaseMaster INNER JOIN Unit ON CaseMaster.PoliceStationID = Unit.ROWID INNER JOIN District ON Unit.DistrictID = District.ROWID`
+Rule 3: Crime type (CaseMaster → CrimeSubHead):
+  `FROM CaseMaster INNER JOIN CrimeSubHead ON CaseMaster.CrimeMinorHeadID = CrimeSubHead.ROWID`
+Rule 4: Status (CaseMaster → CaseStatusMaster):
+  `FROM CaseMaster INNER JOIN CaseStatusMaster ON CaseMaster.CaseStatusID = CaseStatusMaster.ROWID`
+Rule 5: Accused (CaseMaster → Accused):
+  `FROM CaseMaster INNER JOIN Accused ON CaseMaster.ROWID = Accused.CaseMasterID`
+Rule 6: Victim (CaseMaster → Victim):
+  `FROM CaseMaster INNER JOIN Victim ON CaseMaster.ROWID = Victim.CaseMasterID`
+Rule 7: Arrest (CaseMaster → ArrestSurrender):
+  `FROM CaseMaster INNER JOIN ArrestSurrender ON CaseMaster.ROWID = ArrestSurrender.CaseMasterID`
+Rule 8: Legal sections (CaseMaster → ActSectionAssociation → Act + Section):
+  `FROM CaseMaster INNER JOIN ActSectionAssociation ON CaseMaster.ROWID = ActSectionAssociation.CaseMasterID INNER JOIN Act ON ActSectionAssociation.ActID = Act.ROWID INNER JOIN Section ON ActSectionAssociation.SectionID = Section.ROWID`
 
 ## COLUMN NAME MAPPINGS FOR NATURAL LANGUAGE
 - "district" → District.DistrictName
@@ -122,7 +131,7 @@ SELECT CaseMaster.CrimeNo, Accused.AccusedName, Accused.AgeYear, CrimeSubHead.Cr
 FROM CaseMaster
 INNER JOIN Accused ON CaseMaster.ROWID = Accused.CaseMasterID
 INNER JOIN CrimeSubHead ON CaseMaster.CrimeMinorHeadID = CrimeSubHead.ROWID
-WHERE Accused.AccusedName LIKE '%Suresh%' AND Accused.AccusedName LIKE '%Hegde%'
+WHERE Accused.AccusedName LIKE '*Suresh*' AND Accused.AccusedName LIKE '*Hegde*'
 LIMIT 50
 
 ### Query: "Cases by district with count"
@@ -138,7 +147,7 @@ LIMIT 50
 1. Always use LIMIT clause to avoid excessive results
 2. Use INNER JOIN for required relationships, LEFT JOIN for optional
 3. Date filters use string literals: 'YYYY-MM-DD'
-4. String comparisons are STRICTLY CASE-SENSITIVE! Capitalize proper nouns appropriately (e.g. 'Lakshmi Devi', 'Bengaluru'). Use LIKE with wildcards for flexible matching: '%Value%'
+4. ZCQL LIKE uses `*` as wildcard, NOT `%`! Example: LIKE '*Lakshmi*' (NEVER '%Lakshmi%'). String comparisons are case-sensitive — capitalize proper nouns (e.g. 'Lakshmi Devi', 'Bengaluru').
 5. Compute dates in Python before passing to query
 6. Never use CASE WHEN - use Python post-processing instead
 7. Never use subqueries - break into multiple queries if needed
