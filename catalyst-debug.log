@@ -130,3 +130,119 @@ Response Headers: {"server":"ZGS","date":"Fri, 10 Jul 2026 06:42:04 GMT","conten
 [info] [2026-07-10T06:42:31.101Z] : [1783665751101]  Appsail[backend]  "GET"  "/api/dashboard/stats"
 [info] [2026-07-10T06:42:31.104Z] : [1783665751103]  Appsail[backend]  "GET"  "/api/dashboard/district-crimes?timeframe=30d"
 [info] [2026-07-10T06:42:31.106Z] : [1783665751106]  Appsail[backend]  "GET"  "/api/dashboard/trends"
+[info] [2026-07-10T07:23:19.710Z] : [react-plugin]: Compiling...
+[info] [2026-07-10T07:23:26.193Z] : [react-plugin]: Compiled successfully!
+[info] [2026-07-10T07:23:26.193Z] : [react-plugin]: 
+[info] [2026-07-10T07:23:26.194Z] : [react-plugin]: You can now view fron in the browser.
+[info] [2026-07-10T07:23:26.194Z] : [react-plugin]: 
+[info] [2026-07-10T07:23:26.194Z] : [react-plugin]:   http://localhost:3000/app/
+[info] [2026-07-10T07:23:26.194Z] : [react-plugin]: 
+[info] [2026-07-10T07:23:26.194Z] : [react-plugin]: Note that the development build is not optimized.
+[info] [2026-07-10T07:23:26.194Z] : [react-plugin]: To create a production build, use npm run build.
+[info] [2026-07-10T07:23:26.194Z] : [react-plugin]: 
+[info] [2026-07-10T07:23:26.228Z] : [react-plugin]: Compiling...
+[info] [2026-07-10T07:23:26.618Z] : [1783668206618]  "GET"  "/app/main.d4075538701f314796dc.hot-update.json"
+[info] [2026-07-10T07:23:27.061Z] : [react-plugin]: Compiled successfully!
+[info] [2026-07-10T07:23:27.062Z] : [react-plugin]: 
+[info] [2026-07-10T07:23:27.062Z] : [react-plugin]: You can now view fron in the browser.
+[info] [2026-07-10T07:23:27.062Z] : [react-plugin]: 
+[info] [2026-07-10T07:23:27.063Z] : [react-plugin]:   http://localhost:3000/app/
+[info] [2026-07-10T07:23:27.063Z] : [react-plugin]: 
+[info] [2026-07-10T07:23:27.063Z] : [react-plugin]: Note that the development build is not optimized.
+[info] [2026-07-10T07:23:27.063Z] : [react-plugin]: To create a production build, use npm run build.
+[info] [2026-07-10T07:23:27.063Z] : [react-plugin]: 
+[info] [2026-07-10T07:23:27.112Z] : [1783668207111]  "GET"  "/app/main.d4075538701f314796dc.hot-update.js"
+[info] [2026-07-10T07:23:27.495Z] : [1783668207495]  "GET"  "/app/main.622c1a4c798df25fc5f2.hot-update.json"
+[info] [2026-07-10T07:23:27.762Z] : [1783668207762]  "GET"  "/app/main.622c1a4c798df25fc5f2.hot-update.js"
+[info] [2026-07-10T07:23:28.440Z] : [1783668208440]  "GET"  "/app/map.svg"
+[info] [2026-07-10T07:23:28.618Z] : [1783668208618]  Appsail[backend]  "GET"  "/api/dashboard/stats"
+[info] [2026-07-10T07:23:28.620Z] : [1783668208620]  Appsail[backend]  "GET"  "/api/dashboard/district-crimes?timeframe=30d"
+[info] [2026-07-10T07:23:28.621Z] : [1783668208621]  Appsail[backend]  "GET"  "/api/dashboard/trends"
+[info] [2026-07-10T07:23:32.780Z] : [react-plugin]: Compiling...
+[info] [2026-07-10T07:23:33.317Z] : [react-plugin]: Compiled successfully!
+[info] [2026-07-10T07:23:33.317Z] : [react-plugin]: 
+[info] [2026-07-10T07:23:33.318Z] : [react-plugin]: You can now view fron in the browser.
+[info] [2026-07-10T07:23:33.318Z] : [react-plugin]: 
+[info] [2026-07-10T07:23:33.318Z] : [react-plugin]:   http://localhost:3000/app/
+[info] [2026-07-10T07:23:33.318Z] : [react-plugin]: 
+[info] [2026-07-10T07:23:33.318Z] : [react-plugin]: Note that the development build is not optimized.
+[info] [2026-07-10T07:23:33.318Z] : [react-plugin]: To create a production build, use npm run build.
+[info] [2026-07-10T07:23:33.318Z] : [react-plugin]: 
+[info] [2026-07-10T07:23:33.632Z] : [1783668213631]  "GET"  "/app/main.0fde78b29283095bc275.hot-update.json"
+[info] [2026-07-10T07:23:33.896Z] : [1783668213896]  "GET"  "/app/main.0fde78b29283095bc275.hot-update.js"
+[info] [2026-07-10T07:23:37.249Z] : [react-plugin]: Compiling...
+[info] [2026-07-10T07:23:37.772Z] : [react-plugin]: Compiled successfully!
+[info] [2026-07-10T07:23:37.772Z] : [react-plugin]: 
+[info] [2026-07-10T07:23:37.772Z] : [react-plugin]: You can now view fron in the browser.
+[info] [2026-07-10T07:23:37.772Z] : [react-plugin]: 
+[info] [2026-07-10T07:23:37.772Z] : [react-plugin]:   http://localhost:3000/app/
+[info] [2026-07-10T07:23:37.773Z] : [react-plugin]: 
+[info] [2026-07-10T07:23:37.773Z] : [react-plugin]: Note that the development build is not optimized.
+[info] [2026-07-10T07:23:37.773Z] : [react-plugin]: To create a production build, use npm run build.
+[info] [2026-07-10T07:23:37.773Z] : [react-plugin]: 
+[info] [2026-07-10T07:23:37.791Z] : [1783668217791]  "GET"  "/app/main.a1c163bd639217c4bac1.hot-update.json"
+[info] [2026-07-10T07:23:38.114Z] : [1783668218114]  "GET"  "/app/main.a1c163bd639217c4bac1.hot-update.js"
+[info] [2026-07-10T07:23:43.372Z] : [react-plugin]: Compiling...
+[info] [2026-07-10T07:23:43.896Z] : [react-plugin]: Compiled successfully!
+[info] [2026-07-10T07:23:43.896Z] : [react-plugin]: 
+[info] [2026-07-10T07:23:43.896Z] : [react-plugin]: You can now view fron in the browser.
+[info] [2026-07-10T07:23:43.896Z] : [react-plugin]: 
+[info] [2026-07-10T07:23:43.897Z] : [react-plugin]:   http://localhost:3000/app/
+[info] [2026-07-10T07:23:43.897Z] : [react-plugin]: 
+[info] [2026-07-10T07:23:43.897Z] : [react-plugin]: Note that the development build is not optimized.
+[info] [2026-07-10T07:23:43.897Z] : [react-plugin]: To create a production build, use npm run build.
+[info] [2026-07-10T07:23:43.897Z] : [react-plugin]: 
+[info] [2026-07-10T07:23:43.909Z] : [1783668223909]  "GET"  "/app/main.16b1c307a706f20f8cf3.hot-update.json"
+[info] [2026-07-10T07:23:44.221Z] : [1783668224221]  "GET"  "/app/main.16b1c307a706f20f8cf3.hot-update.js"
+[info] [2026-07-10T07:23:54.663Z] : [react-plugin]: Compiling...
+[info] [2026-07-10T07:23:55.154Z] : [react-plugin]: Compiled with warnings.
+
+[info] [2026-07-10T07:23:55.154Z] : [react-plugin]: [eslint] 
+src\components\ChatScreen.tsx
+  Line 18:10:  'activeHistoryId' is assigned a value but never used     @typescript-eslint/no-unused-vars
+  Line 51:9:   'handleHistoryClick' is assigned a value but never used  @typescript-eslint/no-unused-vars
+[info] [2026-07-10T07:23:55.154Z] : [react-plugin]: 
+Search for the keywords to learn more about each warning.
+[info] [2026-07-10T07:23:55.154Z] : [react-plugin]: To ignore, add // eslint-disable-next-line to the line before.
+
+[info] [2026-07-10T07:23:55.178Z] : [1783668235178]  "GET"  "/app/main.7ce7c65dc0d4552f1bdf.hot-update.json"
+[info] [2026-07-10T07:23:55.490Z] : [1783668235490]  "GET"  "/app/main.7ce7c65dc0d4552f1bdf.hot-update.js"
+[info] [2026-07-10T07:24:04.729Z] : [react-plugin]: Compiling...
+[info] [2026-07-10T07:24:05.173Z] : [react-plugin]: Compiled with warnings.
+
+[info] [2026-07-10T07:24:05.174Z] : [react-plugin]: [eslint] 
+src\components\ChatScreen.tsx
+  Line 18:10:  'activeHistoryId' is assigned a value but never used     @typescript-eslint/no-unused-vars
+  Line 51:9:   'handleHistoryClick' is assigned a value but never used  @typescript-eslint/no-unused-vars
+[info] [2026-07-10T07:24:05.174Z] : [react-plugin]: 
+Search for the keywords to learn more about each warning.
+[info] [2026-07-10T07:24:05.174Z] : [react-plugin]: To ignore, add // eslint-disable-next-line to the line before.
+
+[info] [2026-07-10T07:24:05.222Z] : [1783668245222]  "GET"  "/app/main.ad1250117c731ad50dd1.hot-update.json"
+[info] [2026-07-10T07:24:05.544Z] : [1783668245544]  "GET"  "/app/main.ad1250117c731ad50dd1.hot-update.js"
+[info] [2026-07-10T07:27:17.872Z] : [react-plugin]: Compiling...
+[info] [2026-07-10T07:27:18.436Z] : [react-plugin]: Failed to compile.
+
+[info] [2026-07-10T07:27:18.436Z] : [react-plugin]: SyntaxError: D:\STUDY\PROJECTS\prism\frontend\src\components\ChatScreen.tsx: Unexpected token, expected "," (211:12)
+  209 |               )}
+  210 |             </div>
+> 211 |           ))}
+      |             ^
+  212 |
+  213 |           {isTyping && (
+  214 |             <div className="flex justify-start">
+[info] [2026-07-10T07:27:24.181Z] : [react-plugin]: Compiling...
+[info] [2026-07-10T07:27:24.695Z] : [react-plugin]: Compiled with warnings.
+
+[info] [2026-07-10T07:27:24.695Z] : [react-plugin]: [eslint] 
+src\components\ChatScreen.tsx
+  Line 18:10:  'activeHistoryId' is assigned a value but never used     @typescript-eslint/no-unused-vars
+  Line 51:9:   'handleHistoryClick' is assigned a value but never used  @typescript-eslint/no-unused-vars
+[info] [2026-07-10T07:27:24.695Z] : [react-plugin]: 
+Search for the keywords to learn more about each warning.
+[info] [2026-07-10T07:27:24.696Z] : [react-plugin]: To ignore, add // eslint-disable-next-line to the line before.
+
+[info] [2026-07-10T07:27:25.004Z] : [1783668445004]  "GET"  "/app/main.1ac252026254820d6383.hot-update.json"
+[info] [2026-07-10T07:27:25.266Z] : [1783668445266]  "GET"  "/app/main.1ac252026254820d6383.hot-update.js"
+[info] [2026-07-10T07:27:25.328Z] : [1783668445328]  "GET"  "/app/main.577d6787b45abb6bf10d.hot-update.json"
+[info] [2026-07-10T07:27:25.591Z] : [1783668445591]  "GET"  "/app/main.577d6787b45abb6bf10d.hot-update.js"
