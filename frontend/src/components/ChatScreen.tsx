@@ -4,7 +4,7 @@
  */
 
 import React, { useRef, useEffect } from 'react';
-import { Screen, ChatMessage } from '../types';
+import { Screen } from '../types';
 import { useChat } from '../hooks/useChat';
 
 interface ChatScreenProps {
