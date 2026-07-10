@@ -48,6 +48,9 @@ def flatten_zcql_results(results: list) -> list:
                     # Extract values from nested dict
                     for nested_key, nested_value in value.items():
                         flat_row[f"{key}_{nested_key}"] = nested_value
+                        # Keep un-prefixed key for direct column name lookup
+                        if nested_key not in flat_row:
+                            flat_row[nested_key] = nested_value
                 else:
                     flat_row[key] = value
             flattened.append(flat_row)
@@ -72,15 +75,38 @@ async def chat_query(
     3. Response structurer formats results
     4. Return structured response
     """
+    import re
+    import random
+    
     # Initialize agents
     llm_client = CatalystLLMClient()
     text_to_sql_agent = TextToSQLAgent(llm_client)
     response_structurer = ResponseStructurer(llm_client)
     
+    # Fetch conversation history for context
+    history_rows = []
+    try:
+        history_query = f"""
+        SELECT role, content FROM conversations 
+        WHERE session_id = '{request.session_id}' 
+        ORDER BY created_at ASC 
+        LIMIT 10
+        """
+        history_result = zcql.execute_query(history_query)
+        # Flatten results
+        for r in (history_result if isinstance(history_result, list) else []):
+            conv_data = r.get("conversations", r)
+            history_rows.append({
+                "role": conv_data.get("role"),
+                "content": conv_data.get("content")
+            })
+    except Exception as e:
+        print(f"[Warning] Failed to fetch conversation context: {e}")
+    
     # Generate SQL query
     sql_result = text_to_sql_agent.generate_query(
         user_query=request.query,
-        conversation_history=None  # TODO: Implement conversation history
+        conversation_history=history_rows
     )
     
     if not sql_result["is_valid"] or not sql_result["zcql_query"]:
@@ -120,10 +146,22 @@ async def chat_query(
     # Flatten results
     flat_results = flatten_zcql_results(raw_results)
     
+    # Extract tables accessed from ZCQL query
+    tables_accessed = []
+    if zcql_query:
+        # Match table names after FROM or JOIN
+        tables = re.findall(r'FROM\s+(\w+)|JOIN\s+(\w+)', zcql_query, re.IGNORECASE)
+        for table_tuple in tables:
+            t = table_tuple[0] or table_tuple[1]
+            if t and t not in tables_accessed:
+                tables_accessed.append(t)
+    if not tables_accessed:
+        tables_accessed = ["CaseMaster"]
+    
     # Extract metadata
     metadata = {
         "record_count": len(flat_results),
-        "tables_accessed": ["CaseMaster"],  # TODO: Extract from SQL query
+        "tables_accessed": tables_accessed,
         "sql_query": zcql_query
     }
     
@@ -141,7 +179,7 @@ async def chat_query(
         table_data=structured_response["table_data"],
         sql_query=zcql_query,
         scanned_records=len(flat_results),
-        sources=["CaseMaster"],  # TODO: Extract from SQL query
+        sources=tables_accessed,
         entities=structured_response["entities"],
         follow_ups=structured_response["follow_ups"],
         timestamp=datetime.utcnow().isoformat()
@@ -154,7 +192,7 @@ async def chat_query(
         
         # Save user message
         table.insert({
-            "conversation_id": str(uuid.uuid4()),
+            "conversation_id": random.randint(1, 2147483647),
             "user_id": "dev_user",  # TODO: Get from auth
             "session_id": request.session_id,
             "role": "user",
@@ -165,7 +203,7 @@ async def chat_query(
         
         # Save assistant response
         table.insert({
-            "conversation_id": str(uuid.uuid4()),
+            "conversation_id": random.randint(1, 2147483647),
             "user_id": "dev_user",
             "session_id": request.session_id,
             "role": "assistant",

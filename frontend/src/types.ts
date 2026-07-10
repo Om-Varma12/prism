@@ -77,6 +77,7 @@ export interface ChatMessage {
   sqlQuery?: string;
   scannedRecords?: number;
   status?: string;
+  sources?: string[];
 }
 
 export interface ChatEntity {

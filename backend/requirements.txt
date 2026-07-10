@@ -3,3 +3,6 @@ uvicorn
 zcatalyst-sdk
 catalyst
 requests
+apscheduler
+python-dotenv
+dotenv

@@ -3,3 +3,7 @@ first page: dashboard
 3. map changing w.r.t. time zone selected
 4. 30-days crime trend analysis
 5. ek micro-service for real-time data change and dashboard value updates
+
+second page: chat
+2. LLM api endpoint fix
+3. create conversation and add to table

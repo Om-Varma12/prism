@@ -70,12 +70,29 @@ class ResponseStructurer:
             return {
                 "response_text": response.get("response_text", ""),
                 "table_data": self._format_table_data(raw_results[:10]),  # Limit to 10
-                "entities": response.get("entities", []),
+                "entities": self._clean_entities(response.get("entities", [])),
                 "follow_ups": response.get("follow_ups", [])
             }
         except Exception as e:
             # Fallback to raw data display on LLM failure
             return self._fallback_response(query, raw_results, str(e))
+    
+    def _clean_entities(self, raw_entities: Any) -> List[Dict[str, str]]:
+        if not isinstance(raw_entities, list):
+            return []
+        cleaned = []
+        for ent in raw_entities:
+            if isinstance(ent, dict):
+                name = ent.get("name") or ent.get("entity_name") or ent.get("value")
+                type_val = ent.get("type") or ent.get("entity_type") or "Unknown"
+                detail = ent.get("detail") or ent.get("description") or ent.get("info") or ""
+                if name:
+                    cleaned.append({
+                        "name": str(name),
+                        "type": str(type_val),
+                        "detail": str(detail)
+                    })
+        return cleaned
     
     def _handle_empty_results(
         self,
@@ -107,7 +124,7 @@ class ResponseStructurer:
             return {
                 "response_text": response.get("response_text", "No matching records found."),
                 "table_data": [],
-                "entities": response.get("entities", []),
+                "entities": self._clean_entities(response.get("entities", [])),
                 "follow_ups": response.get("follow_ups", [
                     "Try broadening your search criteria",
                     "Check for alternative spellings",

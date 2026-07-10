@@ -33,7 +33,8 @@ export default function ChatScreen({ onNavigate }: ChatScreenProps) {
   // Load history on mount
   useEffect(() => {
     loadHistory();
-  }, [loadHistory]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   // Auto-scroll on new messages
   useEffect(() => {
@@ -233,11 +234,15 @@ export default function ChatScreen({ onNavigate }: ChatScreenProps) {
                           Data Sources ({msg.scannedRecords || 0} records scanned)
                         </button>
                         {openSourcesId === msg.id && (
-                          <div className="mt-1 pl-4 text-[10px] text-outline font-mono space-y-1">
-                            {latestResponse?.sources.map((source, idx) => (
-                              <div key={idx}>• {source}</div>
-                            ))}
-                          </div>
+                           <div className="mt-1 pl-4 text-[10px] text-outline font-mono space-y-1">
+                             {msg.sources && msg.sources.length > 0 ? (
+                               msg.sources.map((source, idx) => (
+                                 <div key={idx}>• {source}</div>
+                               ))
+                             ) : (
+                               <div>• CaseMaster</div>
+                             )}
+                           </div>
                         )}
                       </div>
                     </div>

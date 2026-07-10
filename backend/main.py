@@ -4,6 +4,8 @@ from fastapi.middleware.cors import CORSMiddleware
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
 from apscheduler.triggers.interval import IntervalTrigger
 import asyncio
+from dotenv import load_dotenv
+load_dotenv()
 
 from tests.db.data_insertion import router as insertion_router
 from tests.db.truncate import router as truncate_router
