@@ -15,6 +15,7 @@ from tests.db.insert_recent_cases import router as recent_cases_router
 from tests.db.update_alerts_acknowledgment import router as alerts_ack_router
 from tests.db.update_dashboard_stats import router as dashboard_stats_router
 from tests.db.auto_sync_alerts import router as auto_sync_router, sync_alert_count
+from routers.chat import router as chat_router
 from core.database import get_datastore, get_zcql
 
 app = FastAPI()
@@ -70,6 +71,7 @@ app.include_router(router=recent_cases_router)
 app.include_router(router=alerts_ack_router)
 app.include_router(router=dashboard_stats_router)
 app.include_router(router=auto_sync_router)
+app.include_router(router=chat_router)
 
 app.add_middleware(
     CORSMiddleware,

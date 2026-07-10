@@ -3,27 +3,37 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import React, { useState, useRef, useEffect } from 'react';
-import { Screen, ChatMessage } from '../types';
-import { 
-  INITIAL_CHAT_MESSAGES, 
-  CONVERSATION_HISTORY, 
-  CHAT_RESPONSES 
-} from '../data/mockData';
+import React, { useRef, useEffect } from 'react';
+import { Screen } from '../types';
+import { useChat } from '../hooks/useChat';
 
 interface ChatScreenProps {
   onNavigate: (screen: Screen) => void;
 }
 
 export default function ChatScreen({ onNavigate }: ChatScreenProps) {
-  const [messages, setMessages] = useState<ChatMessage[]>(INITIAL_CHAT_MESSAGES);
-  const [inputText, setInputText] = useState('');
-  const [openSqlQueryId, setOpenSqlQueryId] = useState<string | null>(null);
-  const [openSourcesId, setOpenSourcesId] = useState<string | null>(null);
-  const [activeHistoryId, setActiveHistoryId] = useState('ch-1');
-  const [isTyping, setIsTyping] = useState(false);
+  const {
+    messages,
+    isTyping,
+    history,
+    activeSessionId,
+    latestResponse,
+    sendMessage,
+    loadHistory,
+    startNewConversation,
+    selectConversation,
+  } = useChat();
+
+  const [inputText, setInputText] = React.useState('');
+  const [openSqlQueryId, setOpenSqlQueryId] = React.useState<string | null>(null);
+  const [openSourcesId, setOpenSourcesId] = React.useState<string | null>(null);
 
   const scrollContainerRef = useRef<HTMLDivElement>(null);
+
+  // Load history on mount
+  useEffect(() => {
+    loadHistory();
+  }, [loadHistory]);
 
   // Auto-scroll on new messages
   useEffect(() => {
@@ -34,86 +44,16 @@ export default function ChatScreen({ onNavigate }: ChatScreenProps) {
 
   const handleSendMessage = (text: string) => {
     if (!text.trim()) return;
-
-    // Add user message
-    const userMessage: ChatMessage = {
-      id: `msg-user-${Date.now()}`,
-      sender: 'user',
-      text: text,
-      timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-      status: 'ACTIVE' // dummy property matching interface if required
-    } as any;
-
-    setMessages((prev) => [...prev, userMessage]);
+    sendMessage(text);
     setInputText('');
-    setIsTyping(true);
-
-    setTimeout(() => {
-      const normalizedQuery = text.toLowerCase().trim();
-      let matchedResponse = CHAT_RESPONSES[normalizedQuery];
-
-      if (!matchedResponse) {
-        matchedResponse = {
-          sender: 'ai',
-          text: `Executing intelligence scanning for query: "${text}". No pre-computed threat signature matches this exact request, but real-time logs point to active units in Bengaluru North.`,
-          tableData: [
-            { firNo: 'FIR-2023-BN-1102', crimeType: 'Suspicious Activity', district: 'Bengaluru North', status: 'ACTIVE' },
-            { firNo: 'FIR-2023-HC-0922', crimeType: 'Public Disturbance', district: 'Hubballi Central', status: 'INVESTIGATION' }
-          ],
-          sqlQuery: `SELECT * FROM general_firs WHERE incident_description LIKE "%${text}%" AND status IN ("ACTIVE", "INVESTIGATION");`,
-          scannedRecords: 512
-        };
-      }
-
-      const aiMessage: ChatMessage = {
-        id: `msg-ai-${Date.now()}`,
-        sender: 'ai',
-        text: matchedResponse.text,
-        timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-        tableData: matchedResponse.tableData,
-        sqlQuery: matchedResponse.sqlQuery,
-        scannedRecords: matchedResponse.scannedRecords
-      };
-
-      setMessages((prev) => [...prev, aiMessage]);
-      setIsTyping(false);
-    }, 1500);
   };
 
   const handleNewConversation = () => {
-    setMessages([
-      {
-        id: `msg-init-${Date.now()}`,
-        sender: 'ai',
-        text: 'PRISM terminal online. State your inquiry regarding active FIR cases, suspect profiles, coordinate crossings, or hot spot trends.',
-        timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
-      }
-    ]);
+    startNewConversation();
   };
 
   const handleHistoryClick = (id: string, title: string) => {
-    setActiveHistoryId(id);
-    setMessages([
-      {
-        id: `msg-user-hist`,
-        sender: 'user',
-        text: title,
-        timestamp: '08:41 AM'
-      },
-      {
-        id: `msg-ai-hist`,
-        sender: 'ai',
-        text: `I have retrieved robbery cases associated with "${title}". Real-time tactical feeds have been loaded below.`,
-        timestamp: '08:41 AM',
-        tableData: [
-          { firNo: 'FIR-2023-BN-0847', crimeType: 'Robbery', district: 'Bengaluru North', status: 'ACTIVE' },
-          { firNo: 'FIR-2023-BN-0912', crimeType: 'Robbery', district: 'Bengaluru North', status: 'INVESTIGATION' },
-          { firNo: 'FIR-2023-BN-1004', crimeType: 'Robbery', district: 'Bengaluru North', status: 'ACTIVE' }
-        ],
-        sqlQuery: 'SELECT * FROM fir_records WHERE crime_type = "Robbery" AND district = "Bengaluru North" AND status = "ACTIVE";',
-        scannedRecords: 847
-      }
-    ]);
+    selectConversation(id);
   };
 
   return (
@@ -135,12 +75,12 @@ export default function ChatScreen({ onNavigate }: ChatScreenProps) {
               Today
             </h3>
             <ul className="space-y-1">
-              {CONVERSATION_HISTORY.filter(h => h.category === 'Today').map((item) => {
-                const isActive = activeHistoryId === item.id;
+              {history.filter(h => h.category === 'Today').map((item) => {
+                const isActive = activeSessionId === item.session_id;
                 return (
-                  <li key={item.id}>
+                  <li key={item.session_id}>
                     <button
-                      onClick={() => handleHistoryClick(item.id, item.title)}
+                      onClick={() => handleHistoryClick(item.session_id, item.title)}
                       className={`w-full text-left block px-2 py-1.5 rounded text-sm truncate font-body-sm transition-colors cursor-pointer ${
                         isActive
                           ? 'bg-surface-container-high text-primary-fixed border-l-2 border-primary-container'
@@ -159,12 +99,12 @@ export default function ChatScreen({ onNavigate }: ChatScreenProps) {
               Previous 7 Days
             </h3>
             <ul className="space-y-1">
-              {CONVERSATION_HISTORY.filter(h => h.category === 'Previous 7 Days').map((item) => {
-                const isActive = activeHistoryId === item.id;
+              {history.filter(h => h.category === 'Previous 7 Days').map((item) => {
+                const isActive = activeSessionId === item.session_id;
                 return (
-                  <li key={item.id}>
+                  <li key={item.session_id}>
                     <button
-                      onClick={() => handleHistoryClick(item.id, item.title)}
+                      onClick={() => handleHistoryClick(item.session_id, item.title)}
                       className={`w-full text-left block px-2 py-1.5 rounded text-sm truncate font-body-sm transition-colors cursor-pointer ${
                         isActive
                           ? 'bg-surface-container-high text-primary-fixed border-l-2 border-primary-container'
@@ -201,7 +141,18 @@ export default function ChatScreen({ onNavigate }: ChatScreenProps) {
           ref={scrollContainerRef}
           className="flex-1 overflow-y-auto custom-scrollbar p-6 space-y-8 pb-32"
         >
-          {messages.map((msg) => (
+          {messages.length === 0 ? (
+            <div className="flex flex-col items-center justify-center h-full text-center">
+              <div className="text-on-surface-variant text-sm mb-4">
+                <span className="material-symbols-outlined text-4xl mb-2">chat_bubble_outline</span>
+              </div>
+              <h2 className="text-xl font-semibold text-on-surface mb-2">Start a new conversation</h2>
+              <p className="text-sm text-on-surface-variant max-w-md">
+                Ask about FIR cases, accused profiles, crime patterns, or location-based intelligence.
+              </p>
+            </div>
+          ) : (
+            messages.map((msg) => (
             <div key={msg.id} className={`flex ${msg.sender === 'user' ? 'justify-end' : 'justify-start'}`}>
               {msg.sender === 'user' ? (
                 <div className="bg-primary-container text-white px-4 py-3 rounded-lg max-w-[80%] lg:max-w-[70%] font-body-sm shadow-sm">
@@ -283,8 +234,9 @@ export default function ChatScreen({ onNavigate }: ChatScreenProps) {
                         </button>
                         {openSourcesId === msg.id && (
                           <div className="mt-1 pl-4 text-[10px] text-outline font-mono space-y-1">
-                            <div>• ksp_state_central_db.archive_fir (Index: OPTIMIZED)</div>
-                            <div>• nlp_extracted_pattern_manifest_2026.json</div>
+                            {latestResponse?.sources.map((source, idx) => (
+                              <div key={idx}>• {source}</div>
+                            ))}
                           </div>
                         )}
                       </div>
@@ -293,7 +245,7 @@ export default function ChatScreen({ onNavigate }: ChatScreenProps) {
                 </div>
               )}
             </div>
-          ))}
+          )))}
 
           {isTyping && (
             <div className="flex justify-start">
@@ -347,42 +299,28 @@ export default function ChatScreen({ onNavigate }: ChatScreenProps) {
             Mentioned Entities
           </h3>
           <div className="space-y-3">
-            {/* Entity Card 1 */}
-            <div
-              onClick={() => onNavigate(Screen.NETWORK)}
-              className="border border-layout-border rounded p-3 bg-layout-bg hover:border-primary-container/50 transition-colors cursor-pointer group"
-            >
-              <div className="flex justify-between items-start mb-2">
-                <div className="flex items-center gap-2 text-on-surface">
-                  <span className="material-symbols-outlined text-[16px] text-outline">person</span>
-                  <span className="font-body-sm font-semibold">Suresh Hegde</span>
+            {latestResponse?.entities.map((entity, idx) => (
+              <div
+                key={idx}
+                onClick={() => onNavigate(Screen.NETWORK)}
+                className="border border-layout-border rounded p-3 bg-layout-bg hover:border-primary-container/50 transition-colors cursor-pointer group"
+              >
+                <div className="flex justify-between items-start mb-2">
+                  <div className="flex items-center gap-2 text-on-surface">
+                    <span className="material-symbols-outlined text-[16px] text-outline">
+                      {entity.type === 'person' ? 'person' : 'location_on'}
+                    </span>
+                    <span className="font-body-sm font-semibold">{entity.name}</span>
+                  </div>
+                </div>
+                <div className="text-[12px] text-on-surface-variant mb-2 font-mono">
+                  {entity.type}
+                </div>
+                <div className="text-[11px] font-label-mono text-outline">
+                  {entity.detail}
                 </div>
               </div>
-              <div className="text-[12px] text-on-surface-variant mb-2 font-mono">
-                Accused Person
-              </div>
-              <div className="flex items-center justify-between mt-2 pt-2 border-t border-layout-border/50">
-                <span className="text-[11px] font-label-mono text-outline">6 active cases</span>
-                <span className="px-1.5 py-0.5 border border-tertiary text-tertiary text-[9px] font-bold rounded">
-                  HIGH-RISK
-                </span>
-              </div>
-            </div>
-            {/* Entity Card 2 */}
-            <div className="border border-layout-border rounded p-3 bg-layout-bg hover:border-primary-container/50 transition-colors cursor-pointer group">
-              <div className="flex justify-between items-start mb-2">
-                <div className="flex items-center gap-2 text-on-surface">
-                  <span className="material-symbols-outlined text-[16px] text-outline">location_on</span>
-                  <span className="font-body-sm font-semibold">Yelahanka PS</span>
-                </div>
-              </div>
-              <div className="text-[12px] text-on-surface-variant mb-2 font-mono">
-                Location
-              </div>
-              <div className="flex items-center justify-between mt-2 pt-2 border-t border-layout-border/50">
-                <span className="text-[11px] font-label-mono text-outline">12 incidents / 24h</span>
-              </div>
-            </div>
+            ))}
           </div>
         </div>
         <div>
@@ -390,11 +328,7 @@ export default function ChatScreen({ onNavigate }: ChatScreenProps) {
             Suggested Follow-ups
           </h3>
           <div className="flex flex-col gap-2">
-            {[
-              'Expand search to surrounding sectors',
-              'Show similar modus operandi in Mysore',
-              'Cross-reference with KA-01 vehicle sightings'
-            ].map((text, idx) => (
+            {latestResponse?.follow_ups.map((text, idx) => (
               <button
                 key={idx}
                 onClick={() => handleSendMessage(text)}
