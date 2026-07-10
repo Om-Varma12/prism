@@ -5,3 +5,4 @@ catalyst
 requests
 apscheduler
 python-dotenv
+dotenv

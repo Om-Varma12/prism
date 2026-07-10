@@ -70,7 +70,7 @@ class CatalystLLMClient:
             }
         }
         
-        try:
+        def _execute_request():
             response = self.token_manager.make_authenticated_request(
                 method="POST",
                 url=self.base_url,
@@ -80,9 +80,29 @@ class CatalystLLMClient:
             )
             response.raise_for_status()
             result = response.json()
-            return result["choices"][0]["message"]["content"]
+            
+            # Extract content from Catalyst QuickML structure
+            if "response" in result:
+                content = result["response"]
+            elif "choices" in result and len(result["choices"]) > 0:
+                content = result["choices"][0]["message"]["content"]
+            else:
+                raise KeyError(f"Unexpected response structure: {result}")
+                
+            # Strip reasoning/thinking block if present
+            if "</think>" in content:
+                content = content.split("</think>")[-1].strip()
+                
+            return content
+
+        try:
+            return _execute_request()
         except Exception as e:
-            raise RuntimeError(f"Catalyst LLM API request failed: {e}")
+            # Retry once
+            try:
+                return _execute_request()
+            except Exception as retry_error:
+                raise RuntimeError(f"Catalyst LLM API request failed: {retry_error}")
     
     def chat_completion_json(
         self,
@@ -111,7 +131,18 @@ class CatalystLLMClient:
             max_tokens=max_tokens
         )
         
+        # Clean markdown code blocks from JSON string if LLM returned them
+        clean_text = response_text.strip()
+        if clean_text.startswith("```json"):
+            clean_text = clean_text[7:]
+        elif clean_text.startswith("```"):
+            clean_text = clean_text[3:]
+        if clean_text.endswith("```"):
+            clean_text = clean_text[:-3]
+        clean_text = clean_text.strip()
+        
         try:
-            return json.loads(response_text)
+            return json.loads(clean_text)
         except json.JSONDecodeError as e:
-            raise ValueError(f"Failed to parse JSON response: {e}\nResponse: {response_text}")
+            raise ValueError(f"Failed to parse JSON response: {e}\nResponse: {response_text}\nCleaned: {clean_text}")
+

@@ -100,19 +100,19 @@ Rule 7: Legal sections: CaseMaster → ActSectionAssociation → Act + Section
 ### Query: "Show me robbery cases in Bengaluru North"
 SELECT CaseMaster.CrimeNo, CrimeSubHead.CrimeHeadName, District.DistrictName, CaseStatusMaster.CaseStatusName
 FROM CaseMaster
-INNER JOIN Unit ON CaseMaster.PoliceStationID = Unit.UnitID
-INNER JOIN District ON Unit.DistrictID = District.DistrictID
-INNER JOIN CrimeSubHead ON CaseMaster.CrimeMinorHeadID = CrimeSubHead.CrimeSubHeadID
-INNER JOIN CaseStatusMaster ON CaseMaster.CaseStatusID = CaseStatusMaster.CaseStatusID
+INNER JOIN Unit ON CaseMaster.PoliceStationID = Unit.ROWID
+INNER JOIN District ON Unit.DistrictID = District.ROWID
+INNER JOIN CrimeSubHead ON CaseMaster.CrimeMinorHeadID = CrimeSubHead.ROWID
+INNER JOIN CaseStatusMaster ON CaseMaster.CaseStatusID = CaseStatusMaster.ROWID
 WHERE District.DistrictName = 'Bengaluru North' AND CrimeSubHead.CrimeHeadName = 'Robbery'
 LIMIT 50
 
 ### Query: "Active murder cases in last 30 days"
 SELECT CaseMaster.CrimeNo, CaseMaster.IncidentFromDate, Unit.UnitName, CrimeSubHead.CrimeHeadName
 FROM CaseMaster
-INNER JOIN Unit ON CaseMaster.PoliceStationID = Unit.UnitID
-INNER JOIN CrimeSubHead ON CaseMaster.CrimeMinorHeadID = CrimeSubHead.CrimeSubHeadID
-INNER JOIN CaseStatusMaster ON CaseMaster.CaseStatusID = CaseStatusMaster.CaseStatusID
+INNER JOIN Unit ON CaseMaster.PoliceStationID = Unit.ROWID
+INNER JOIN CrimeSubHead ON CaseMaster.CrimeMinorHeadID = CrimeSubHead.ROWID
+INNER JOIN CaseStatusMaster ON CaseMaster.CaseStatusID = CaseStatusMaster.ROWID
 WHERE CrimeSubHead.CrimeHeadName = 'Murder' AND CaseStatusMaster.CaseStatusName = 'Under Investigation'
 AND CaseMaster.IncidentFromDate >= '2026-06-10'
 LIMIT 50
@@ -120,16 +120,16 @@ LIMIT 50
 ### Query: "Accused named Suresh Hegde"
 SELECT CaseMaster.CrimeNo, Accused.AccusedName, Accused.AgeYear, CrimeSubHead.CrimeHeadName
 FROM CaseMaster
-INNER JOIN Accused ON CaseMaster.CaseMasterID = Accused.CaseMasterID
-INNER JOIN CrimeSubHead ON CaseMaster.CrimeMinorHeadID = CrimeSubHead.CrimeSubHeadID
+INNER JOIN Accused ON CaseMaster.ROWID = Accused.CaseMasterID
+INNER JOIN CrimeSubHead ON CaseMaster.CrimeMinorHeadID = CrimeSubHead.ROWID
 WHERE Accused.AccusedName LIKE '%Suresh%' AND Accused.AccusedName LIKE '%Hegde%'
 LIMIT 50
 
 ### Query: "Cases by district with count"
-SELECT District.DistrictName, COUNT(CaseMaster.CaseMasterID) as case_count
+SELECT District.DistrictName, COUNT(CaseMaster.ROWID) as case_count
 FROM CaseMaster
-INNER JOIN Unit ON CaseMaster.PoliceStationID = Unit.UnitID
-INNER JOIN District ON Unit.DistrictID = District.DistrictID
+INNER JOIN Unit ON CaseMaster.PoliceStationID = Unit.ROWID
+INNER JOIN District ON Unit.DistrictID = District.ROWID
 GROUP BY District.DistrictName
 ORDER BY case_count DESC
 LIMIT 50
@@ -138,7 +138,7 @@ LIMIT 50
 1. Always use LIMIT clause to avoid excessive results
 2. Use INNER JOIN for required relationships, LEFT JOIN for optional
 3. Date filters use string literals: 'YYYY-MM-DD'
-4. String comparisons use LIKE with wildcards: '%value%'
+4. String comparisons are STRICTLY CASE-SENSITIVE! Capitalize proper nouns appropriately (e.g. 'Lakshmi Devi', 'Bengaluru'). Use LIKE with wildcards for flexible matching: '%Value%'
 5. Compute dates in Python before passing to query
 6. Never use CASE WHEN - use Python post-processing instead
 7. Never use subqueries - break into multiple queries if needed

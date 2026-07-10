@@ -7,8 +7,12 @@ from typing import Tuple
 
 # Valid table names from schema
 VALID_TABLES = {
-    'CaseMaster', 'CrimeSubHead', 'CaseStatusMaster', 'Unit', 'District',
-    'Accused', 'Victim', 'ArrestSurrender', 'ActSectionAssociation', 'Act', 'Section'
+    'CaseMaster', 'ChargesheetDetails', 'ActSectionAssociation', 'Accused', 'Victim',
+    'ComplainantDetails', 'ArrestSurrender', 'Act', 'Section', 'CrimeHead', 'CrimeSubHead',
+    'CrimeHeadActSection', 'State', 'District', 'Unit', 'UnitType', 'Court', 'Employee',
+    'Rank', 'Designation', 'CaseCategory', 'GravityOffence', 'CaseStatusMaster',
+    'OccupationMaster', 'ReligionMaster', 'CasteMaster',
+    'dashboard_stats', 'crime_alerts', 'risk_scores', 'conversations', 'audit_logs'
 }
 
 # Dangerous keywords that should not appear in queries
@@ -19,7 +23,7 @@ DANGEROUS_KEYWORDS = {
 
 # Keywords not allowed in ZCQL
 ZCQL_FORBIDDEN = {
-    'CASE WHEN', 'UNION', 'INTERSECT', 'EXCEPT', 'HAVING'
+    'CASE WHEN', 'UNION', 'INTERSECT', 'EXCEPT'
 }
 
 
@@ -57,10 +61,11 @@ def validate_query(sql: str) -> Tuple[bool, str]:
         return False, "Query must include LIMIT clause"
     
     # Check for valid table names
+    VALID_TABLES_LOWER = {t.lower() for t in VALID_TABLES}
     tables_used = re.findall(r'FROM\s+(\w+)|JOIN\s+(\w+)', sql_upper, re.IGNORECASE)
     for table_tuple in tables_used:
         table_name = table_tuple[0] or table_tuple[1]
-        if table_name and table_name not in VALID_TABLES:
+        if table_name and table_name.lower() not in VALID_TABLES_LOWER:
             return False, f"Invalid table name: {table_name}"
     
     # Check for subqueries (parentheses after FROM/JOIN)

@@ -59,6 +59,7 @@ export const useChat = () => {
         tableData: response.table_data,
         sqlQuery: response.sql_query,
         scannedRecords: response.scanned_records,
+        sources: response.sources,
       };
 
       setMessages((prev) => [...prev, aiMessage]);

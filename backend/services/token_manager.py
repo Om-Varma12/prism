@@ -9,6 +9,11 @@ import time
 import requests
 from typing import Optional
 from dataclasses import dataclass
+try:
+    from dotenv import load_dotenv
+    load_dotenv()
+except ImportError:
+    pass
 
 
 @dataclass
@@ -32,6 +37,11 @@ class TokenManager:
         self.client_secret = os.getenv("ZOHO_CLIENT_SECRET")
         self.refresh_token = os.getenv("ZOHO_REFRESH_TOKEN")
         self._token_data: Optional[TokenData] = None
+        
+        # Debug: Print environment variable status
+        print(f"[TokenManager] ZOHO_CLIENT_ID: {'SET' if self.client_id else 'MISSING'}")
+        print(f"[TokenManager] ZOHO_CLIENT_SECRET: {'SET' if self.client_secret else 'MISSING'}")
+        print(f"[TokenManager] ZOHO_REFRESH_TOKEN: {'SET' if self.refresh_token else 'MISSING'}")
         
         # Validate required environment variables
         if not all([self.client_id, self.client_secret, self.refresh_token]):
