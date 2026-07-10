@@ -78,3 +78,28 @@ export interface ChatMessage {
   scannedRecords?: number;
   status?: string;
 }
+
+export interface ChatEntity {
+  name: string;
+  type: string;
+  detail: string;
+}
+
+export interface ChatQueryResponse {
+  message_id: string;
+  response_text: string;
+  table_data: ChatTableRow[];
+  sql_query: string;
+  scanned_records: number;
+  sources: string[];
+  entities: ChatEntity[];
+  follow_ups: string[];
+  timestamp: string;
+}
+
+export interface ConversationItem {
+  session_id: string;
+  title: string;
+  created_at: string;
+  category: string;
+}
