@@ -7,24 +7,24 @@ This document outlines the step-by-step implementation plan for the PRISM Intell
 
 ---
 
-### Step 1: Groq LLM Service Client
+### Step 1: Catalyst Quick ML LLM Service Client
 
 **Implementation:**
 - Create `backend/services/__init__.py`
-- Create `backend/services/groq_client.py`
-- Implement a `GroqClient` class wrapping the Groq SDK:
-  - `__init__()` — reads `GROQ_API_KEY` from environment
-  - `chat_completion(system_prompt, user_prompt, json_mode=False) → str` — sends a chat completion request, returns the response text
+- Create `backend/services/llm_client.py`
+- Implement a `CatalystLLMClient` class wrapping the Catalyst Quick ML API:
+  - `__init__()` — initializes Catalyst Quick ML endpoint
+  - `chat_completion(system_prompt, user_prompt, json_mode=False) → str` — sends a chat completion request to Catalyst API, returns the response text
   - `chat_completion_json(system_prompt, user_prompt) → dict` — same but forces JSON output and parses the response
   - Includes retry logic (1 retry on rate limit) and timeout handling
-- Install `groq` Python package (add to `requirements.txt`)
+- Install `requests` Python package (add to `requirements.txt`)
 
 **Files Created:**
 - `backend/services/__init__.py`
-- `backend/services/groq_client.py`
+- `backend/services/llm_client.py`
 
 **Commit Message:**
-`feat(backend): implement Groq LLM client service for agent pipeline`
+`feat(backend): implement Catalyst Quick ML LLM client service for agent pipeline`
 
 ---
 
@@ -79,11 +79,11 @@ This document outlines the step-by-step implementation plan for the PRISM Intell
 **Implementation:**
 - Create `backend/agents/text_to_sql/agent.py`
 - Implement `TextToSQLAgent` class:
-  - `__init__(groq_client: GroqClient)` — stores the LLM client and loads schema context
+  - `__init__(llm_client: CatalystLLMClient)` — stores the LLM client and loads schema context
   - `generate_query(user_query: str, conversation_history: list[dict] = None) → dict` — main method:
     1. Builds system prompt with schema context
     2. Builds user prompt from template
-    3. Calls `groq_client.chat_completion_json()`
+    3. Calls `llm_client.chat_completion_json()`
     4. Parses the JSON response to extract `zcql_query`, `intent`, `entities`
     5. Runs `validate_query()` on the extracted SQL
     6. If validation fails, retries once with the error message appended to the prompt
@@ -107,7 +107,7 @@ This document outlines the step-by-step implementation plan for the PRISM Intell
   - Output format mandated: `{ response_text, table_data: [{firNo, crimeType, district, status}], entities: [{name, type, detail}], follow_ups: [str] }`
 - Create `backend/agents/response_structurer/agent.py` with:
   - `ResponseStructurer` class:
-    - `__init__(groq_client: GroqClient)`
+    - `__init__(llm_client: CatalystLLMClient)`
     - `structure_response(query: str, raw_results: list[dict], metadata: dict) → dict` — calls LLM, parses JSON response
     - Handles edge cases: empty results → "No matching records found" + broadening suggestions
     - Handles LLM parse failure → falls back to raw data display with generic summary
@@ -148,7 +148,7 @@ This document outlines the step-by-step implementation plan for the PRISM Intell
   
   **`POST /query`** — Main endpoint:
   1. Receive `ChatQueryRequest` body
-  2. Instantiate `GroqClient`, `TextToSQLAgent`, `ResponseStructurer`
+  2. Instantiate `CatalystLLMClient`, `TextToSQLAgent`, `ResponseStructurer`
   3. Call `text_to_sql_agent.generate_query(request.query)`
   4. If valid SQL → execute via `zcql.execute_query(generated_sql)`
   5. Flatten ZCQL result rows (handle nested dict structure)
@@ -183,8 +183,8 @@ This document outlines the step-by-step implementation plan for the PRISM Intell
 ### Step 8: Backend Testing and Environment Setup
 
 **Implementation:**
-- Add `groq` to `backend/requirements.txt`
-- Create/update `backend/.env.example` with `GROQ_API_KEY=your_key_here`
+- Add `requests` to `backend/requirements.txt`
+- Catalyst SDK handles authentication automatically
 - Manually test the pipeline:
   - Start backend: `uvicorn main:app --port 3001`
   - `curl -X POST http://localhost:3001/api/chat/query -H "Content-Type: application/json" -d '{"query": "Show me robbery cases in Bengaluru", "session_id": "test-1"}'`
@@ -198,7 +198,7 @@ This document outlines the step-by-step implementation plan for the PRISM Intell
 - `backend/requirements.txt`
 
 **Commit Message:**
-`chore(backend): add groq dependency and test chat agent pipeline end-to-end`
+`chore(backend): add requests dependency and test chat agent pipeline end-to-end`
 
 ---
 
@@ -298,7 +298,7 @@ This document outlines the step-by-step implementation plan for the PRISM Intell
 
 | Step | Layer | Description |
 |------|-------|-------------|
-| 1 | Backend | Groq LLM client service |
+| 1 | Backend | Catalyst Quick ML LLM client service |
 | 2 | Backend | Database schema context for SQL agent |
 | 3 | Backend | Text-to-SQL prompts and SQL validator |
 | 4 | Backend | Text-to-SQL agent implementation |
