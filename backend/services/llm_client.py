@@ -1,21 +1,21 @@
 """
-Groq LLM client service for AI-powered query processing.
+Catalyst Quick ML LLM client service for AI-powered query processing.
 """
 import os
+import requests
+import json
 from typing import Optional
-from groq import Groq
 
 
-class GroqClient:
-    """Client for interacting with Groq API for LLM inference."""
+class CatalystLLMClient:
+    """Client for interacting with Catalyst Quick ML LLM API for inference."""
     
     def __init__(self):
-        """Initialize Groq client with API key from environment."""
-        api_key = os.getenv("GROQ_API_KEY")
-        if not api_key:
-            raise ValueError("GROQ_API_KEY environment variable not set")
-        self.client = Groq(api_key=api_key)
-        self.model = "llama3-70b-70b-versatile"  # Default model
+        """Initialize Catalyst LLM client."""
+        # Catalyst Quick ML endpoint
+        self.base_url = "https://api.catalyst.zoho.com/glm/chat"
+        self.model = "crm-di-glm47b_30b_it"  # Default model from Catalyst
+        # Catalyst SDK handles authentication automatically
     
     def chat_completion(
         self,
@@ -26,7 +26,7 @@ class GroqClient:
         max_tokens: int = 1024
     ) -> str:
         """
-        Send a chat completion request to Groq API.
+        Send a chat completion request to Catalyst Quick ML API.
         
         Args:
             system_prompt: System message defining the AI's role
@@ -43,30 +43,31 @@ class GroqClient:
             {"role": "user", "content": user_prompt}
         ]
         
-        response_format = {"type": "json_object"} if json_mode else None
+        payload = {
+            "model": self.model,
+            "messages": messages,
+            "max_tokens": max_tokens,
+            "temperature": temperature,
+            "stream": False,
+            "chat_template_kwargs": {
+                "enable_thinking": False
+            }
+        }
         
         try:
-            response = self.client.chat.completions.create(
-                model=self.model,
-                messages=messages,
-                response_format=response_format,
-                temperature=temperature,
-                max_tokens=max_tokens
-            )
-            return response.choices[0].message.content
+            response = requests.post(self.base_url, json=payload, timeout=30)
+            response.raise_for_status()
+            result = response.json()
+            return result["choices"][0]["message"]["content"]
         except Exception as e:
             # Retry once on rate limit or temporary errors
             try:
-                response = self.client.chat.completions.create(
-                    model=self.model,
-                    messages=messages,
-                    response_format=response_format,
-                    temperature=temperature,
-                    max_tokens=max_tokens
-                )
-                return response.choices[0].message.content
+                response = requests.post(self.base_url, json=payload, timeout=30)
+                response.raise_for_status()
+                result = response.json()
+                return result["choices"][0]["message"]["content"]
             except Exception as retry_error:
-                raise RuntimeError(f"Groq API request failed: {retry_error}")
+                raise RuntimeError(f"Catalyst LLM API request failed: {retry_error}")
     
     def chat_completion_json(
         self,
@@ -87,8 +88,6 @@ class GroqClient:
         Returns:
             Parsed JSON response as dictionary
         """
-        import json
-        
         response_text = self.chat_completion(
             system_prompt=system_prompt,
             user_prompt=user_prompt,
