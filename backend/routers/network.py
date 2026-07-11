@@ -9,6 +9,8 @@ from typing import Optional
 
 from fastapi import APIRouter, Depends
 
+from agents.network_agent.graph_builder import NetworkGraphBuilder
+from core.database import get_zcql
 from core.security import require_role
 from schemas.network import (
     AccusedProfileResponse,
@@ -46,15 +48,20 @@ async def get_network_graph(
     date_from: Optional[str] = None,
     date_to: Optional[str] = None,
     view: GraphView = "all",
+    zcql=Depends(get_zcql),
     user=Depends(require_role(["investigator", "analyst", "supervisor"])),
 ):
     """
     Return the co-accused network graph.
 
-    Step 2 intentionally returns an empty but valid graph. Later steps will use
-    the query parameters above to build and filter a live graph from Catalyst.
+    Builds the first live co-accused graph from Catalyst data. Later steps will
+    apply the query parameters above as filters and alternate graph views.
     """
-    return _empty_graph_response()
+    try:
+        return NetworkGraphBuilder(zcql).build_graph()
+    except Exception as exc:
+        print(f"[Warning] Failed to build network graph: {exc}")
+        return _empty_graph_response()
 
 
 @router.get("/profile/{accused_id}", response_model=AccusedProfileResponse)
