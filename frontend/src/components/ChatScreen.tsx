@@ -119,9 +119,6 @@ function ScanStyles() {
         }
         .sentinel-sidebar-item:hover::before { height: 16px; }
         .sentinel-sidebar-item.active::before { height: 28px; }
-        .sentinel-composer:focus {
-          box-shadow: 0 0 0 1px rgba(94, 234, 212, 0.15), 0 0 20px rgba(94, 234, 212, 0.06);
-        }
         .sentinel-quick { transition: all 0.2s ease; }
         .sentinel-quick:hover {
           transform: translateY(-1px);
@@ -171,7 +168,7 @@ function HistoryItem({
         className="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded border"
         style={{ backgroundColor: `${muted}33`, borderColor: `${muted}66`, color }}
       >
-        <Glyph name="bar_chart" className="text-[13px]" />
+        <Glyph name="chat" className="text-[13px]" />
       </span>
       <span className="min-w-0 flex-1">
         <span className="block truncate text-[13px] font-medium leading-snug text-slate-100">{item.title}</span>
@@ -418,20 +415,6 @@ function EmptyTranscript({ onPrompt }: { onPrompt: (text: string) => void }) {
         <p className="mt-2 text-sm leading-6 text-slate-400">
           Ask about FIRs, accused networks, hotspots, or patterns. Results will appear in the same Sentinel transcript format.
         </p>
-        <div className="mt-5 flex flex-wrap justify-center gap-2">
-          {quickActions.slice(0, 3).map(([icon, color, label, prompt]) => (
-            <button
-              key={label}
-              type="button"
-              onClick={() => onPrompt(prompt)}
-              className="sentinel-quick flex items-center gap-2 rounded-lg border px-3 py-1.5 text-[11px] whitespace-nowrap"
-              style={{ backgroundColor: shell.panelRaised, borderColor: shell.line, color: shell.slate }}
-            >
-              <Glyph name={icon} className="text-[14px]" style={{ color } as any} />
-              {label}
-            </button>
-          ))}
-        </div>
       </div>
     </div>
   );
@@ -453,6 +436,7 @@ export default function ChatScreen({ onNavigate: _onNavigate }: ChatScreenProps)
   const [historySearch, setHistorySearch] = React.useState('');
   const [openSqlQueryId, setOpenSqlQueryId] = React.useState<string | null>(null);
   const [openSourcesId, setOpenSourcesId] = React.useState<string | null>(null);
+  const [isExporting, setIsExporting] = React.useState(false);
   const scrollContainerRef = useRef<HTMLDivElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const historyInputRef = useRef<HTMLInputElement>(null);
@@ -484,6 +468,7 @@ export default function ChatScreen({ onNavigate: _onNavigate }: ChatScreenProps)
   const handleExportPDF = async () => {
     if (!activeSessionId) return;
 
+    setIsExporting(true);
     try {
       const response = await fetch(`http://localhost:3001/api/chat/export-pdf?session_id=${activeSessionId}`);
       if (!response.ok) throw new Error('Failed to export PDF');
@@ -498,6 +483,8 @@ export default function ChatScreen({ onNavigate: _onNavigate }: ChatScreenProps)
       document.body.removeChild(a);
     } catch (error) {
       console.error('Failed to export PDF:', error);
+    } finally {
+      setIsExporting(false);
     }
   };
 
@@ -584,11 +571,21 @@ export default function ChatScreen({ onNavigate: _onNavigate }: ChatScreenProps)
               <button
                 type="button"
                 onClick={handleExportPDF}
-                className="flex h-7 items-center gap-1.5 rounded-md px-2.5 text-[11px] font-medium transition-all hover:bg-white/5 hover:text-slate-300"
+                disabled={isExporting}
+                className="flex h-7 items-center gap-1.5 rounded-md px-2.5 text-[11px] font-medium transition-all hover:bg-white/5 hover:text-slate-300 disabled:opacity-50 disabled:cursor-not-allowed"
                 style={{ color: shell.ghost }}
               >
-                <Glyph name="download" className="text-[14px]" />
-                Export
+                {isExporting ? (
+                  <>
+                    <span className="animate-spin h-3 w-3 border-2 border-current border-t-transparent rounded-full" />
+                    Exporting...
+                  </>
+                ) : (
+                  <>
+                    <Glyph name="download" className="text-[14px]" />
+                    Export
+                  </>
+                )}
               </button>
               <button
                 type="button"
@@ -620,26 +617,6 @@ export default function ChatScreen({ onNavigate: _onNavigate }: ChatScreenProps)
             {isTyping && <TypingBlock />}
           </div>
 
-          <div className="px-5 pb-3">
-            <div className="mb-2 flex items-center gap-2">
-              <Glyph name="bolt" className="text-[14px]" style={{ color: shell.ghost } as any} />
-              <span className="text-[10px] font-semibold uppercase tracking-widest" style={{ color: shell.ghost }}>Quick Actions</span>
-            </div>
-            <div className="sentinel-scroll flex gap-2 overflow-x-auto pb-1">
-              {quickActions.map(([icon, color, label, prompt]) => (
-                <button
-                  key={label}
-                  type="button"
-                  onClick={() => handleSendMessage(prompt)}
-                  className="sentinel-quick flex shrink-0 items-center gap-2 whitespace-nowrap rounded-lg border px-3 py-1.5 text-[11px] hover:text-slate-200"
-                  style={{ backgroundColor: shell.panelRaised, borderColor: shell.line, color: shell.slate }}
-                >
-                  <Glyph name={icon} className="text-[14px]" style={{ color } as any} />
-                  {label}
-                </button>
-              ))}
-            </div>
-          </div>
 
           <div className="px-5 pb-4">
             <form
