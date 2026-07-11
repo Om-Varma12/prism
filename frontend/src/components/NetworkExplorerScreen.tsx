@@ -3,102 +3,111 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { MOCK_SUSPECTS } from '../data/mockData';
 import { SuspectProfile } from '../types';
+import { useNetworkGraph, useAccusedProfile, useSearchAccused } from '../hooks/useNetworkGraph';
+import { NetworkGraphFilters, NetworkGraphView, NetworkGraphNode } from '../types/network';
+import { NetworkGraph } from './network/NetworkGraph';
 
 export default function NetworkExplorerScreen() {
-  const [activeSegment, setActiveSegment] = useState<'all' | 'gang' | 'repeat'>('all');
+  const [activeSegment, setActiveSegment] = useState<NetworkGraphView>('all');
   const [searchQuery, setSearchQuery] = useState('');
+  const [debouncedSearchQuery, setDebouncedSearchQuery] = useState('');
+  const [showSearchResults, setShowSearchResults] = useState(false);
   const [selectedDistrict, setSelectedDistrict] = useState('All Districts');
   const [selectedCrimeType, setSelectedCrimeType] = useState('All Types');
   const [selectedDateRange, setSelectedDateRange] = useState('Last 30 Days');
   
+  // Debounce search query
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setDebouncedSearchQuery(searchQuery);
+    }, 300);
+    return () => clearTimeout(timer);
+  }, [searchQuery]);
+  
+  // Search for accused
+  const { data: searchResults, isLoading: searchLoading } = useSearchAccused(debouncedSearchQuery);
+  
+  // Update filters when segment changes
+  React.useEffect(() => {
+    setFilters(prev => ({ ...prev, view: activeSegment }));
+  }, [activeSegment]);
+
+  // Convert date range to actual dates
+  const getDateRange = () => {
+    const now = new Date();
+    const toDate = now.toISOString().split('T')[0];
+    
+    let fromDate: string | null = null;
+    
+    if (selectedDateRange === 'Last 30 Days') {
+      const thirtyDaysAgo = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000);
+      fromDate = thirtyDaysAgo.toISOString().split('T')[0];
+    } else if (selectedDateRange === 'Last 6 Months') {
+      const sixMonthsAgo = new Date(now.getTime() - 180 * 24 * 60 * 60 * 1000);
+      fromDate = sixMonthsAgo.toISOString().split('T')[0];
+    } else if (selectedDateRange === 'Year to Date') {
+      const yearStart = new Date(now.getFullYear(), 0, 1);
+      fromDate = yearStart.toISOString().split('T')[0];
+    }
+    
+    return { date_from: fromDate, date_to: toDate };
+  };
+
+  // Update filters when filter values change
+  React.useEffect(() => {
+    const { date_from, date_to } = getDateRange();
+    
+    setFilters({
+      view: activeSegment,
+      crime_type: selectedCrimeType === 'All Types' ? null : selectedCrimeType,
+      district: selectedDistrict === 'All Districts' ? null : selectedDistrict,
+      date_from,
+      date_to,
+    });
+  }, [selectedDistrict, selectedCrimeType, selectedDateRange, activeSegment]);
+  
   // Selected Profile state
   const [selectedProfile, setSelectedProfile] = useState<SuspectProfile | null>(MOCK_SUSPECTS[0]);
   const [showBriefingDialog, setShowBriefingDialog] = useState(false);
+  const [selectedNodeId, setSelectedNodeId] = useState<string | null>(null);
+  const [selectedAccusedId, setSelectedAccusedId] = useState<number | null>(null);
+  
+  // Network graph filters
+  const [filters, setFilters] = useState<NetworkGraphFilters>({
+    view: 'all',
+  });
+  
+  // Fetch live graph data
+  const { data: graphData, isLoading, error } = useNetworkGraph(filters);
 
-  // Nodes simulation positions based on segment selected
-  const getNodes = () => {
-    const baseNodes = [
-      { id: 'SP-90210', name: 'Suresh Hegde', type: 'accused', cx: 60, cy: 50, isCentral: true },
-      { id: 'SP-90211', name: 'K. Manjunath', type: 'accused', cx: 75, cy: 60 },
-      { id: 'SP-90212', name: 'R. Ravi', type: 'accused', cx: 55, cy: 70 },
-      { id: 'SP-90214', name: 'S. Kumar', type: 'accused', cx: 80, cy: 45 },
-      
-      // Crime incidents
-      { id: 'CR-001', name: 'FIR-2023-BN-0847', type: 'crime', cx: 40, cy: 45 },
-      { id: 'CR-002', name: 'FIR-2023-BN-0912', type: 'crime', cx: 70, cy: 30 },
-      
-      // Locations
-      { id: 'LO-001', name: 'Yelahanka PS', type: 'location', cx: 35, cy: 55 },
-      { id: 'LO-002', name: 'Hebbal Flyover', type: 'location', cx: 80, cy: 25 },
-      
-      // Distant Nodes
-      { id: 'SP-90213', name: 'Ramesh Gowda', type: 'accused', cx: 20, cy: 30 },
-      { id: 'CR-003', name: 'FIR-2023-MW-0502', type: 'crime', cx: 15, cy: 20 },
-      { id: 'LO-003', name: 'Mysore West', type: 'location', cx: 80, cy: 45 }
-    ];
+  // Use live API data when available, fallback to mock for empty/error states
+  const nodes = graphData?.nodes || [];
+  const edges = graphData?.edges || [];
 
-    if (activeSegment === 'gang') {
-      // Pull nodes closer into distinct cluster groups
-      return baseNodes.map(node => {
-        if (node.id === 'SP-90210' || node.id === 'SP-90211' || node.id === 'SP-90212' || node.id === 'CR-001' || node.id === 'LO-001') {
-          return { ...node, cx: node.cx * 0.9 + 5, cy: node.cy * 0.9 + 5 };
+  // Fetch accused profile when a node is selected
+  const { data: profileData, isLoading: profileLoading, error: profileError } = useAccusedProfile(selectedAccusedId);
+
+  const handleNodeClick = (nodeId: string) => {
+    setSelectedNodeId(nodeId);
+    // Find corresponding node data
+    const node = nodes.find((n: NetworkGraphNode) => n.id === nodeId);
+    if (node && node.type === 'accused') {
+      // Extract accused_id from node and fetch real profile
+      if (node.accused_id) {
+        setSelectedAccusedId(node.accused_id);
+      } else {
+        // Fallback to mock if no accused_id
+        const suspect = MOCK_SUSPECTS.find(s => s.name === node.label);
+        if (suspect) {
+          setSelectedProfile(suspect);
         }
-        return node;
-      });
-    }
-
-    if (activeSegment === 'repeat') {
-      // Emphasize repeat offenders
-      return baseNodes.map(node => {
-        if (node.type === 'accused' && (node.id === 'SP-90210' || node.id === 'SP-90213')) {
-          return { ...node, cy: node.cy * 0.8 }; // Lift repeat offenders
-        }
-        return node;
-      });
-    }
-
-    return baseNodes;
-  };
-
-  const nodes = getNodes();
-
-  // Draw lines connecting nodes based on relationships
-  const getConnections = () => {
-    return [
-      { from: 'SP-90210', to: 'SP-90211', thick: true },
-      { from: 'SP-90210', to: 'SP-90212', thick: true },
-      { from: 'SP-90210', to: 'SP-90214', thick: true },
-      { from: 'SP-90210', to: 'CR-001', thick: true },
-      { from: 'SP-90211', to: 'LO-001', thick: false },
-      { from: 'SP-90212', to: 'LO-001', thick: false },
-      { from: 'CR-001', to: 'LO-001', thick: true },
-      { from: 'SP-90214', to: 'CR-002', thick: false },
-      { from: 'CR-002', to: 'LO-002', thick: true },
-      { from: 'SP-90213', to: 'CR-003', thick: false }
-    ];
-  };
-
-  const connections = getConnections();
-
-  const handleNodeClick = (node: any) => {
-    if (node.type === 'accused') {
-      const suspect = MOCK_SUSPECTS.find(s => s.name === node.name);
-      if (suspect) {
-        setSelectedProfile(suspect);
       }
     }
   };
-
-  const filteredNodes = nodes.filter(node => {
-    if (searchQuery) {
-      return node.name.toLowerCase().includes(searchQuery.toLowerCase());
-    }
-    return true;
-  });
 
   return (
     <div className="flex-1 flex flex-col relative h-screen bg-[#0A0C10]">
@@ -107,6 +116,12 @@ export default function NetworkExplorerScreen() {
         <h2 className="font-headline-sm text-headline-sm text-on-surface">
           Network Explorer
         </h2>
+        {isLoading && (
+          <span className="text-xs text-on-surface-variant">Loading graph data...</span>
+        )}
+        {error && (
+          <span className="text-xs text-error">Error loading graph</span>
+        )}
         {/* Segmented Control */}
         <div className="flex items-center bg-[#0A0C10] p-1 rounded-DEFAULT border border-[#252830] text-sm font-medium">
           <button
@@ -120,9 +135,9 @@ export default function NetworkExplorerScreen() {
             All Connections
           </button>
           <button
-            onClick={() => setActiveSegment('gang')}
+            onClick={() => setActiveSegment('clusters')}
             className={`px-4 py-1.5 rounded-DEFAULT transition-colors cursor-pointer ${
-              activeSegment === 'gang'
+              activeSegment === 'clusters'
                 ? 'bg-[#3B6FE8] text-white'
                 : 'text-on-surface-variant hover:text-on-surface hover:bg-[#1A1D24]'
             }`}
@@ -144,93 +159,12 @@ export default function NetworkExplorerScreen() {
 
       {/* Canvas Area */}
       <div className="flex-1 relative overflow-hidden" id="network-canvas">
-        {/* Background Grid */}
-        <div
-          className="absolute inset-0 pointer-events-none"
-          style={{
-            backgroundSize: '24px 24px',
-            backgroundImage:
-              'linear-gradient(to right, #191b23 1px, transparent 1px), linear-gradient(to bottom, #191b23 1px, transparent 1px)',
-            opacity: 0.3,
-          }}
-        ></div>
-
-        {/* SVG Lines Layer */}
-        <svg className="absolute inset-0 w-full h-full pointer-events-none z-0">
-          {connections.map((conn, idx) => {
-            const fromNode = filteredNodes.find(n => n.id === conn.from);
-            const toNode = filteredNodes.find(n => n.id === conn.to);
-            if (!fromNode || !toNode) return null;
-
-            return (
-              <line
-                key={idx}
-                className={conn.thick ? 'line-thick' : 'line-thin'}
-                x1={`${fromNode.cx}%`}
-                y1={`${fromNode.cy}%`}
-                x2={`${toNode.cx}%`}
-                y2={`${toNode.cy}%`}
-                stroke={fromNode.isCentral || toNode.isCentral ? '#ffb4ab' : undefined}
-                strokeOpacity={fromNode.isCentral || toNode.isCentral ? 0.5 : undefined}
-              />
-            );
-          })}
-        </svg>
-
-        {/* Cluster Annotation */}
-        {activeSegment === 'gang' && (
-          <>
-            <div
-              className="cluster-boundary"
-              style={{ left: '20%', top: '35%', width: '25%', height: '25%' }}
-            ></div>
-            <div
-              className="absolute text-primary text-xs font-label-mono bg-[#0A0C10] px-2 py-1 border border-[#003fa4] rounded-sm"
-              style={{ left: '25%', top: '32%' }}
-            >
-              Cluster #3 — Suspected Gang
-            </div>
-          </>
-        )}
-
-        {/* Nodes Layer */}
-        <div className="absolute inset-0 pointer-events-auto z-10">
-          {filteredNodes.map((node) => {
-            const isSelected = selectedProfile && selectedProfile.name === node.name;
-            let nodeClass = '';
-            if (node.type === 'accused') {
-              nodeClass = node.isCentral ? 'node-accused node-high-centrality' : 'node-accused';
-            } else if (node.type === 'crime') {
-              nodeClass = 'node-crime';
-            } else {
-              nodeClass = 'node-location';
-            }
-
-            return (
-              <div
-                key={node.id}
-                onClick={() => handleNodeClick(node)}
-                className={`${nodeClass} transition-all duration-500 hover:scale-125 cursor-pointer`}
-                style={{
-                  left: `${node.cx}%`,
-                  top: `${node.cy}%`,
-                  transform: 'translate(-50%, -50%)',
-                }}
-                title={node.name}
-              />
-            );
-          })}
-
-          {/* Central Label for Suresh Hegde */}
-          {filteredNodes.find(n => n.id === 'SP-90210') && (
-            <div
-              className="absolute text-error text-xs font-label-mono bg-[#111318] px-2 py-0.5 border border-[#93000a] rounded-sm whitespace-nowrap"
-              style={{ left: 'calc(60% + 15px)', top: 'calc(50% - 10px)' }}
-            >
-              Suresh Hegde
-            </div>
-          )}
-        </div>
+        <NetworkGraph
+          nodes={nodes}
+          edges={edges}
+          selectedNodeId={selectedNodeId}
+          onNodeClick={handleNodeClick}
+        />
 
         {/* LEFT FLOATING PANEL: Filters */}
         <div className="absolute left-lg top-lg w-72 bg-[#111318] panel-border rounded-lg shadow-xl flex flex-col z-20 max-h-[calc(100%-48px)] overflow-y-auto">
@@ -241,15 +175,62 @@ export default function NetworkExplorerScreen() {
           </div>
           <div className="p-4 flex flex-col gap-4">
             {/* Search */}
-            <div className="relative input-border rounded-DEFAULT bg-[#0A0C10] flex items-center px-3 py-2">
-              <span className="material-symbols-outlined text-outline text-[18px] mr-2">search</span>
-              <input
-                className="bg-transparent border-none p-0 text-sm text-on-surface placeholder:text-outline w-full focus:ring-0 outline-none"
-                placeholder="Search by name, location, case..."
-                type="text"
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-              />
+            <div className="relative">
+              <div className="relative input-border rounded-DEFAULT bg-[#0A0C10] flex items-center px-3 py-2">
+                <span className="material-symbols-outlined text-outline text-[18px] mr-2">search</span>
+                <input
+                  className="bg-transparent border-none p-0 text-sm text-on-surface placeholder:text-outline w-full focus:ring-0 outline-none"
+                  placeholder="Search by name..."
+                  type="text"
+                  value={searchQuery}
+                  onChange={(e) => {
+                    setSearchQuery(e.target.value);
+                    setShowSearchResults(e.target.value.length >= 2);
+                  }}
+                  onFocus={() => setShowSearchResults(searchQuery.length >= 2)}
+                  onBlur={() => setTimeout(() => setShowSearchResults(false), 200)}
+                />
+              </div>
+              
+              {/* Search Results Dropdown */}
+              <AnimatePresence>
+                {showSearchResults && searchQuery.length >= 2 && (
+                  <motion.div
+                    initial={{ opacity: 0, y: -10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -10 }}
+                    className="absolute top-full left-0 right-0 mt-2 bg-[#111318] border border-[#252830] rounded-lg shadow-xl z-50 max-h-60 overflow-y-auto"
+                  >
+                    {searchLoading ? (
+                      <div className="p-3 text-center text-on-surface-variant text-sm">Searching...</div>
+                    ) : searchResults && searchResults.results.length > 0 ? (
+                      searchResults.results.map((result) => (
+                        <div
+                          key={result.accused_id}
+                          className="p-3 hover:bg-[#1A1D24] cursor-pointer border-b border-[#252830] last:border-b-0"
+                          onClick={() => {
+                            setSearchQuery(result.name);
+                            setShowSearchResults(false);
+                            setSelectedAccusedId(result.accused_id);
+                            // Find and select the node in the graph
+                            const node = nodes.find((n: NetworkGraphNode) => n.accused_id === result.accused_id);
+                            if (node) {
+                              setSelectedNodeId(node.id);
+                            }
+                          }}
+                        >
+                          <div className="text-sm text-on-surface font-medium">{result.name}</div>
+                          <div className="text-xs text-on-surface-variant mt-1">
+                            {result.fir_count} FIRs • Risk: {result.risk_score}
+                          </div>
+                        </div>
+                      ))
+                    ) : (
+                      <div className="p-3 text-center text-on-surface-variant text-sm">No results found</div>
+                    )}
+                  </motion.div>
+                )}
+              </AnimatePresence>
             </div>
             {/* Dropdowns */}
             <div className="flex flex-col gap-1">
@@ -314,70 +295,128 @@ export default function NetworkExplorerScreen() {
         </div>
 
         {/* RIGHT FLOATING PANEL: Entity Details */}
-        {selectedProfile && (
+        {(selectedProfile || profileData) && (
           <div className="absolute right-lg top-lg w-80 bg-[#111318] panel-border rounded-lg shadow-xl flex flex-col z-20">
-            <div className="p-4 border-b border-[#252830] flex justify-between items-start">
-              <div>
-                <div className="text-xs text-error font-label-mono mb-1 uppercase tracking-wider">
-                  Selected Profile
+            {profileLoading && (
+              <div className="p-4 text-center text-on-surface-variant text-sm">Loading profile...</div>
+            )}
+            {profileError && (
+              <div className="p-4 text-center text-error text-sm">Error loading profile</div>
+            )}
+            {!profileLoading && !profileError && (
+              <>
+                <div className="p-4 border-b border-[#252830] flex justify-between items-start">
+                  <div>
+                    <div className="text-xs text-error font-label-mono mb-1 uppercase tracking-wider">
+                      Selected Profile
+                    </div>
+                    <h3 className="font-headline-md text-[20px] font-bold text-on-surface leading-tight">
+                      {profileData?.name || selectedProfile?.name}
+                    </h3>
+                    <p className="text-sm text-on-surface-variant mt-1">
+                      Age: {profileData?.age || selectedProfile?.age} | Gender: {profileData?.gender || selectedProfile?.gender}
+                    </p>
+                  </div>
+                  <button 
+                    onClick={() => {
+                      setSelectedProfile(null);
+                      setSelectedAccusedId(null);
+                    }}
+                    className="text-outline hover:text-on-surface cursor-pointer"
+                  >
+                    <span className="material-symbols-outlined text-[20px]">close</span>
+                  </button>
                 </div>
-                <h3 className="font-headline-md text-[20px] font-bold text-on-surface leading-tight">
-                  {selectedProfile.name}
-                </h3>
-                <p className="text-sm text-on-surface-variant mt-1">
-                  Age: {selectedProfile.age} | Gender: {selectedProfile.gender}
-                </p>
-              </div>
-              <button 
-                onClick={() => setSelectedProfile(null)}
-                className="text-outline hover:text-on-surface cursor-pointer"
-              >
-                <span className="material-symbols-outlined text-[20px]">close</span>
-              </button>
-            </div>
-            <div className="p-4 flex flex-col gap-5">
-              {/* Risk Score */}
-              <div>
-                <div className="flex justify-between text-sm mb-2">
-                  <span className="text-on-surface-variant">Risk Score</span>
-                  <span className="text-error font-data-mono-bold">{selectedProfile.riskScore}/100</span>
-                </div>
-                <div className="h-1.5 w-full bg-[#0A0C10] rounded-full overflow-hidden">
-                  <div
-                    className="h-full bg-error rounded-full"
-                    style={{ width: `${selectedProfile.riskScore}%` }}
-                  ></div>
-                </div>
-              </div>
-              {/* Stats */}
-              <div className="bg-[#0A0C10] p-3 rounded-DEFAULT border border-[#252830]">
-                <p className="text-sm text-on-surface">
-                  Appears in{' '}
-                  <span className="font-data-mono-bold text-primary">{selectedProfile.firsCount} FIRs</span>
-                  {' '}across{' '}
-                  <span className="font-data-mono-bold text-primary">{selectedProfile.districtsCount} districts</span>
-                </p>
-              </div>
-              {/* Connections */}
-              <div>
-                <h4 className="text-xs font-semibold text-on-surface-variant mb-2 uppercase tracking-wider border-b border-[#252830] pb-1">
-                  Connected to
-                </h4>
-                <ul className="flex flex-col gap-2">
-                  {selectedProfile.connections.map((conn, idx) => (
-                    <li key={idx} className="flex items-center justify-between text-sm">
-                      <div className="flex items-center gap-2">
-                        <div className="w-2 h-2 rounded-full bg-[#ffb4ab]"></div>
-                        <span className="text-on-surface">{conn.name}</span>
-                      </div>
-                      <span className="text-xs text-outline font-label-mono border border-[#252830] px-1 rounded-sm">
-                        {conn.type}
+                <div className="p-4 flex flex-col gap-5">
+                  {/* Risk Score */}
+                  <div>
+                    <div className="flex justify-between text-sm mb-2">
+                      <span className="text-on-surface-variant">Risk Score</span>
+                      <span className="text-error font-data-mono-bold">
+                        {profileData?.risk_score || selectedProfile?.riskScore}/100
                       </span>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            </div>
+                    </div>
+                    <div className="h-1.5 w-full bg-[#0A0C10] rounded-full overflow-hidden">
+                      <div
+                        className="h-full bg-error rounded-full"
+                        style={{ width: `${profileData?.risk_score || selectedProfile?.riskScore}%` }}
+                      ></div>
+                    </div>
+                  </div>
+                  {/* Stats */}
+                  <div className="bg-[#0A0C10] p-3 rounded-DEFAULT border border-[#252830]">
+                    <p className="text-sm text-on-surface">
+                      Appears in{' '}
+                      <span className="font-data-mono-bold text-primary">
+                        {profileData?.fir_count || selectedProfile?.firsCount} FIRs
+                      </span>
+                      {' '}across{' '}
+                      {profileData?.firs && profileData.firs.length > 0 && (
+                        <span className="font-data-mono-bold text-primary">
+                          {new Set(profileData.firs.map(f => f.district)).size} districts
+                        </span>
+                      )}
+                      {!profileData?.firs && selectedProfile && (
+                        <span className="font-data-mono-bold text-primary">
+                          {selectedProfile.districtsCount} districts
+                        </span>
+                      )}
+                    </p>
+                  </div>
+                  {/* Connections */}
+                  <div>
+                    <h4 className="text-xs font-semibold text-on-surface-variant mb-2 uppercase tracking-wider border-b border-[#252830] pb-1">
+                      Connected to
+                    </h4>
+                    <ul className="flex flex-col gap-2">
+                      {profileData?.co_accused && profileData.co_accused.length > 0 ? (
+                        profileData.co_accused.map((conn, idx) => (
+                          <li key={idx} className="flex items-center justify-between text-sm">
+                            <div className="flex items-center gap-2">
+                              <div className="w-2 h-2 rounded-full bg-[#ffb4ab]"></div>
+                              <span className="text-on-surface">{conn.name}</span>
+                            </div>
+                            <span className="text-xs text-outline font-label-mono border border-[#252830] px-1 rounded-sm">
+                              {conn.times_together} FIRs
+                            </span>
+                          </li>
+                        ))
+                      ) : selectedProfile?.connections ? (
+                        selectedProfile.connections.map((conn, idx) => (
+                          <li key={idx} className="flex items-center justify-between text-sm">
+                            <div className="flex items-center gap-2">
+                              <div className="w-2 h-2 rounded-full bg-[#ffb4ab]"></div>
+                              <span className="text-on-surface">{conn.name}</span>
+                            </div>
+                            <span className="text-xs text-outline font-label-mono border border-[#252830] px-1 rounded-sm">
+                              {conn.type}
+                            </span>
+                          </li>
+                        ))
+                      ) : (
+                        <li className="text-sm text-on-surface-variant">No connections data</li>
+                      )}
+                    </ul>
+                  </div>
+                  {/* Crime Types */}
+                  {profileData?.crime_types && profileData.crime_types.length > 0 && (
+                    <div>
+                      <h4 className="text-xs font-semibold text-on-surface-variant mb-2 uppercase tracking-wider border-b border-[#252830] pb-1">
+                        Crime Types
+                      </h4>
+                      <ul className="flex flex-col gap-2">
+                        {profileData.crime_types.map((ct, idx) => (
+                          <li key={idx} className="flex items-center justify-between text-sm">
+                            <span className="text-on-surface">{ct.name}</span>
+                            <span className="text-xs text-outline font-label-mono">{ct.count}</span>
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  )}
+                </div>
+              </>
+            )}
             {/* Footer Action */}
             <div className="p-4 border-t border-[#252830] bg-[#0c0e15] rounded-b-lg">
               <button

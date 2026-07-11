@@ -2,11 +2,13 @@
 Co-accused graph builder for the Network Explorer.
 """
 from collections import defaultdict, deque
-from datetime import datetime
+from datetime import datetime, timedelta
 from itertools import combinations
-from typing import Any
+from typing import Any, Optional
 
-from schemas.network import DensestNode, GraphEdge, GraphMetadata, GraphNode, GraphResponse
+from schemas.network import DensestNode, GraphEdge, GraphMetadata, GraphNode, GraphResponse, GraphView
+from agents.network_agent.centrality import CentralityComputer
+from agents.network_agent.community_detection import CommunityDetector
 
 
 class NetworkGraphBuilder:
@@ -15,8 +17,20 @@ class NetworkGraphBuilder:
     def __init__(self, zcql):
         self.zcql = zcql
 
-    def build_graph(self) -> GraphResponse:
-        rows = self._fetch_accused_rows()
+    def build_graph(
+        self,
+        crime_type: Optional[str] = None,
+        district: Optional[str] = None,
+        date_from: Optional[str] = None,
+        date_to: Optional[str] = None,
+        view: GraphView = "all",
+    ) -> GraphResponse:
+        # Apply default date window if no date filters provided (last 90 days)
+        if not date_from and not date_to:
+            date_to = datetime.utcnow().strftime("%Y-%m-%d")
+            date_from = (datetime.utcnow() - timedelta(days=90)).strftime("%Y-%m-%d")
+        
+        rows = self._fetch_accused_rows(crime_type, district, date_from, date_to)
         nodes_by_id: dict[str, GraphNode] = {}
         case_groups: dict[str, list[str]] = defaultdict(list)
         case_incidents: dict[str, int] = {}
@@ -113,7 +127,23 @@ class NetworkGraphBuilder:
 
         nodes = list(nodes_by_id.values())
         edges = list(edges_by_pair.values())
-        self._attach_degree_scores(nodes, edges)
+        
+        # Apply view-specific filtering
+        if view == "repeat":
+            # Filter to only repeat offenders (2+ FIRs)
+            repeat_node_ids = {node.id for node in nodes if node.fir_count >= 2}
+            nodes = [node for node in nodes if node.id in repeat_node_ids]
+            # Filter edges to only connect repeat offenders
+            edges = [
+                edge for edge in edges
+                if edge.source in repeat_node_ids and edge.target in repeat_node_ids
+            ]
+        
+        # Assign gang clusters for all views (used in clusters view)
+        CommunityDetector.assign_clusters_to_nodes(nodes, edges)
+        
+        # Compute centrality metrics and attach to nodes
+        CentralityComputer.attach_centrality_to_nodes(nodes, edges)
 
         return GraphResponse(
             nodes=nodes,
@@ -124,13 +154,37 @@ class NetworkGraphBuilder:
                 largest_cluster_size=self._largest_connected_component_size(nodes, edges),
                 num_clusters=self._connected_component_count(nodes, edges),
                 repeat_offender_count=sum(1 for node in nodes if node.fir_count >= 2),
-                densest_node=self._densest_node(nodes),
+                densest_node=CentralityComputer.find_densest_node(nodes),
                 generated_at=datetime.utcnow(),
             ),
         )
 
-    def _fetch_accused_rows(self) -> list[dict[str, Any]]:
-        query = """
+    def _fetch_accused_rows(
+        self,
+        crime_type: Optional[str] = None,
+        district: Optional[str] = None,
+        date_from: Optional[str] = None,
+        date_to: Optional[str] = None,
+    ) -> list[dict[str, Any]]:
+        where_clauses = []
+        
+        if crime_type:
+            where_clauses.append(f"CrimeSubHead.CrimeHeadName = '{crime_type}'")
+        
+        if district:
+            where_clauses.append(f"District.DistrictName = '{district}'")
+        
+        if date_from:
+            where_clauses.append(f"CaseMaster.IncidentFromDate >= '{date_from}'")
+        
+        if date_to:
+            where_clauses.append(f"CaseMaster.IncidentFromDate <= '{date_to}'")
+        
+        where_sql = ""
+        if where_clauses:
+            where_sql = "WHERE " + " AND ".join(where_clauses)
+        
+        query = f"""
             SELECT
                 Accused.ROWID,
                 Accused.AccusedMasterID,
@@ -150,10 +204,19 @@ class NetworkGraphBuilder:
             LEFT JOIN CrimeSubHead ON CaseMaster.CrimeMinorHeadID = CrimeSubHead.ROWID
             LEFT JOIN Unit ON CaseMaster.PoliceStationID = Unit.ROWID
             LEFT JOIN District ON Unit.DistrictID = District.ROWID
+            {where_sql}
             LIMIT 1000
         """
         result = self.zcql.execute_query(query)
         return result if isinstance(result, list) else []
+
+    def _attach_degree_scores(self, nodes: list[GraphNode], edges: list[GraphEdge]) -> None:
+        """Deprecated: Use CentralityComputer.attach_centrality_to_nodes instead."""
+        CentralityComputer.attach_centrality_to_nodes(nodes, edges)
+
+    def _densest_node(self, nodes: list[GraphNode]) -> DensestNode | None:
+        """Deprecated: Use CentralityComputer.find_densest_node instead."""
+        return CentralityComputer.find_densest_node(nodes)
 
     def _value(
         self,
