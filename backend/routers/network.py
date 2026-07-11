@@ -260,12 +260,57 @@ def _gender_label(gender_id):
 async def search_accused(
     q: str,
     limit: int = 10,
+    zcql=Depends(get_zcql),
     user=Depends(require_role(["investigator", "analyst", "supervisor"])),
 ):
     """
-    Search accused persons by name.
-
-    This returns no matches until the Catalyst-backed search implementation is
-    added in the search step.
+    Search accused persons by name with wildcard matching.
+    
+    Results are ranked by FIR count and latest FIR date.
     """
-    return SearchResponse(results=[])
+    try:
+        if not q or len(q.strip()) < 2:
+            return SearchResponse(results=[])
+        
+        search_term = q.strip()
+        
+        # Query accused with FIR count and latest FIR date
+        search_query = f"""
+            SELECT
+                Accused.AccusedMasterID,
+                Accused.AccusedName,
+                COUNT(DISTINCT CaseMaster.CaseMasterID) as fir_count,
+                MAX(CaseMaster.IncidentFromDate) as last_fir_date
+            FROM Accused
+            INNER JOIN CaseMaster ON Accused.CaseMasterID = CaseMaster.ROWID
+            WHERE Accused.AccusedName LIKE '%{search_term}%'
+            GROUP BY Accused.AccusedMasterID, Accused.AccusedName
+            ORDER BY fir_count DESC, last_fir_date DESC
+            LIMIT {limit}
+        """
+        
+        result = zcql.execute_query(search_query)
+        rows = result if isinstance(result, list) else []
+        
+        results = []
+        for row in rows:
+            accused_id = _to_int(_value(row, "Accused", "AccusedMasterID", "AccusedMasterID"))
+            name = _value(row, "Accused", "AccusedName", "AccusedName") or "Unknown"
+            fir_count = _to_int(_value(row, "", "fir_count", "fir_count")) or 0
+            last_fir_date = _value(row, "", "last_fir_date", "last_fir_date")
+            
+            # Calculate simple risk score based on FIR count
+            risk_score = min(100, fir_count * 15)
+            
+            results.append({
+                "accused_id": accused_id,
+                "name": name,
+                "fir_count": fir_count,
+                "risk_score": risk_score,
+                "last_fir_date": last_fir_date
+            })
+        
+        return SearchResponse(results=results)
+    except Exception as exc:
+        print(f"[Warning] Failed to search accused: {exc}")
+        return SearchResponse(results=[])
