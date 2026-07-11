@@ -5,23 +5,32 @@
 
 import { useState, useEffect, useRef } from 'react';
 import { ChatMessage, ChatQueryResponse, ConversationItem } from '../types';
-import { chatService } from '../services/chat.service';
+import { useChatHistory, useSessionMessages, useNewConversation, useSendQuery } from './useChatQuery';
 
 export const useChat = () => {
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [isTyping, setIsTyping] = useState(false);
-  const [history, setHistory] = useState<ConversationItem[]>([]);
   const [activeSessionId, setActiveSessionId] = useState<string>('');
   const [latestResponse, setLatestResponse] = useState<ChatQueryResponse | null>(null);
 
+  // React Query hooks
+  const { data: history = [] } = useChatHistory();
+  const { data: sessionData } = useSessionMessages(activeSessionId);
+  const newConversationMutation = useNewConversation();
+  const sendQueryMutation = useSendQuery();
+
   // Track whether this session has been added to history yet
   const isNewSession = useRef(true);
+  const isInitialized = useRef(false);
 
   // Generate session ID on mount
   useEffect(() => {
     const initSession = async () => {
+      if (isInitialized.current) return;
+      isInitialized.current = true;
+
       try {
-        const { session_id } = await chatService.newConversation();
+        const { session_id } = await newConversationMutation.mutateAsync();
         setActiveSessionId(session_id);
         isNewSession.current = true;
       } catch (error) {
@@ -43,7 +52,7 @@ export const useChat = () => {
     let sessionId = activeSessionId;
     if (!sessionId) {
       try {
-        const created = await chatService.newConversation();
+        const created = await newConversationMutation.mutateAsync();
         sessionId = created.session_id;
         setActiveSessionId(sessionId);
         isNewSession.current = true;
@@ -67,7 +76,7 @@ export const useChat = () => {
     setIsTyping(true);
 
     try {
-      const response = await chatService.sendQuery(trimmedText, sessionId);
+      const response = await sendQueryMutation.mutateAsync({ query: trimmedText, sessionId });
 
       const aiMessage: ChatMessage = {
         id: `msg-ai-${Date.now()}`,
@@ -86,7 +95,6 @@ export const useChat = () => {
       // After the first message in a new session, refresh the sidebar
       if (isNewSession.current) {
         isNewSession.current = false;
-        setTimeout(() => loadHistory(), 800); // small delay for DB write to commit
       }
     } catch (error) {
       console.error('Failed to send message:', error);
@@ -106,12 +114,8 @@ export const useChat = () => {
    * Load conversation history list into the sidebar
    */
   const loadHistory = async () => {
-    try {
-      const conversations = await chatService.getHistory();
-      setHistory(conversations);
-    } catch (error) {
-      console.error('Failed to load history:', error);
-    }
+    // History is automatically loaded by react-query hook
+    // This function is kept for compatibility but no longer needed
   };
 
   /**
@@ -119,7 +123,7 @@ export const useChat = () => {
    */
   const startNewConversation = async () => {
     try {
-      const { session_id } = await chatService.newConversation();
+      const { session_id } = await newConversationMutation.mutateAsync();
       setActiveSessionId(session_id);
       setMessages([]);
       setLatestResponse(null);
@@ -140,10 +144,16 @@ export const useChat = () => {
     setLatestResponse(null);
     isNewSession.current = false; // this session already exists in history
 
-    try {
-      const { messages: rows } = await chatService.getSessionMessages(sessionId);
+    // Messages will be loaded automatically by useSessionMessages hook
+    // We need to wait for the data to be available
+  };
 
-      const restored: ChatMessage[] = rows.map((row, idx) => {
+  // Update messages when sessionData changes (from react-query)
+  useEffect(() => {
+    if (sessionData && sessionData.messages && activeSessionId) {
+      const rows = sessionData.messages;
+      
+      const restored: ChatMessage[] = rows.map((row: any, idx: number) => {
         const message: ChatMessage = {
           id: `msg-restored-${idx}-${Date.now()}`,
           sender: row.role === 'user' ? 'user' : 'ai',
@@ -186,7 +196,7 @@ export const useChat = () => {
       setMessages(restored);
 
       // Restore latestResponse from the last assistant message
-      const lastAssistantMessage = rows.filter(r => r.role === 'assistant').pop();
+      const lastAssistantMessage = rows.filter((r: any) => r.role === 'assistant').pop();
       if (lastAssistantMessage) {
         try {
           const latestResponseData: ChatQueryResponse = {
@@ -205,10 +215,8 @@ export const useChat = () => {
           console.error('Failed to restore latestResponse:', e);
         }
       }
-    } catch (error) {
-      console.error('Failed to load conversation messages:', error);
     }
-  };
+  }, [sessionData, activeSessionId]);
 
   return {
     messages,

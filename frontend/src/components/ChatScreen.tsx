@@ -496,8 +496,8 @@ export default function ChatScreen({ onNavigate: _onNavigate }: ChatScreenProps)
     }
   };
 
-  const filteredHistory = history.filter((item) => item.title.toLowerCase().includes(historySearch.toLowerCase()));
-  const currentConversation = history.find((item) => item.session_id === activeSessionId);
+  const filteredHistory = history.filter((item: ConversationItem) => item.title.toLowerCase().includes(historySearch.toLowerCase()));
+  const currentConversation = history.find((item: ConversationItem) => item.session_id === activeSessionId);
   const activeTitle = currentConversation?.title || (messages.length > 0 ? 'Current conversation' : 'New conversation');
 
   return (
@@ -526,7 +526,7 @@ export default function ChatScreen({ onNavigate: _onNavigate }: ChatScreenProps)
           </div>
           <div className="sentinel-scroll flex-1 space-y-0.5 overflow-y-auto px-2">
             {filteredHistory.length > 0 ? (
-              filteredHistory.map((item) => (
+              filteredHistory.map((item: ConversationItem) => (
                 <HistoryItem
                   key={item.session_id}
                   item={item}
