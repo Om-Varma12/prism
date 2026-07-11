@@ -56,3 +56,17 @@ class ChatHistoryResponse(BaseModel):
 class NewConversationResponse(BaseModel):
     """Response model for new conversation endpoint."""
     session_id: str
+
+
+class SessionMessage(BaseModel):
+    """Single message within a session, returned by GET /messages."""
+    role: str                          # 'user' | 'assistant'
+    content: str
+    sql_generated: Optional[str] = None
+    created_at: str
+
+
+class SessionMessagesResponse(BaseModel):
+    """Response model for GET /api/chat/messages endpoint."""
+    session_id: str
+    messages: List[SessionMessage]

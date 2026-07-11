@@ -104,3 +104,15 @@ export interface ConversationItem {
   created_at: string;
   category: string;
 }
+
+export interface SessionMessage {
+  role: 'user' | 'assistant';
+  content: string;
+  sql_generated?: string | null;
+  created_at: string;
+}
+
+export interface SessionMessagesResponse {
+  session_id: string;
+  messages: SessionMessage[];
+}

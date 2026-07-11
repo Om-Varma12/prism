@@ -4,7 +4,7 @@
  */
 
 import { apiClient } from '../lib/api-client';
-import { ChatQueryResponse, ConversationItem } from '../types';
+import { ChatQueryResponse, ConversationItem, SessionMessagesResponse } from '../types';
 
 export const chatService = {
   /**
@@ -19,11 +19,21 @@ export const chatService = {
   },
 
   /**
-   * Get conversation history
+   * Get conversation history (list of sessions)
    */
   getHistory: async (): Promise<ConversationItem[]> => {
     const response = await apiClient.get<{ conversations: ConversationItem[] }>('/api/chat/history');
     return response.data.conversations;
+  },
+
+  /**
+   * Get all messages for a specific session
+   */
+  getSessionMessages: async (sessionId: string): Promise<SessionMessagesResponse> => {
+    const response = await apiClient.get<SessionMessagesResponse>(
+      `/api/chat/messages?session_id=${encodeURIComponent(sessionId)}`
+    );
+    return response.data;
   },
 
   /**

@@ -14,7 +14,9 @@ from schemas.chat import (
     ChatQueryResponse,
     ChatHistoryResponse,
     ConversationItem,
-    NewConversationResponse
+    NewConversationResponse,
+    SessionMessage,
+    SessionMessagesResponse,
 )
 from core.database import get_zcql
 from core.security import require_role
@@ -219,64 +221,114 @@ async def chat_history(
     """
     Get conversation history for the current user.
     
-    Groups conversations by session_id and categorizes by date.
+    Returns one item per unique session_id, titled by the first user message,
+    grouped into Today / Previous 7 Days / Older categories.
     """
     try:
-        # Query conversations table
+        # Fetch one row per session: the oldest user message (used as title)
         query = """
-        SELECT session_id, MIN(content) as first_message, MIN(created_at) as created_at
+        SELECT session_id, content, created_at
         FROM conversations
-        WHERE user_id = 'dev_user'
-        GROUP BY session_id
-        ORDER BY created_at DESC
+        WHERE user_id = 'dev_user' AND role = 'user'
+        ORDER BY created_at ASC
         """
-        
         result = zcql.execute_query(query)
-        conversations = result if isinstance(result, list) else []
-        
-        # Categorize by date
+        rows = result if isinstance(result, list) else []
+
+        # Deduplicate: keep only the first (oldest) row per session_id
+        seen: dict = {}
+        for row in rows:
+            # ZCQL may wrap under table name key
+            r = row.get("conversations", row)
+            sid = r.get("session_id") or row.get("session_id", "")
+            if sid and sid not in seen:
+                seen[sid] = {
+                    "session_id": sid,
+                    "content": r.get("content") or row.get("content", "New Conversation"),
+                    "created_at": r.get("created_at") or row.get("created_at", ""),
+                }
+
         categorized = []
         now = datetime.utcnow()
-        
-        for conv in conversations:
-            created_at = conv.get("created_at", "")
-            first_message = conv.get("first_message", "New Conversation")
-            session_id = conv.get("session_id", "")
-            
-            # Parse date and categorize
+
+        for sid, data in seen.items():
+            raw_ts = data["created_at"]
+            content = data["content"]
             try:
-                conv_date = datetime.fromisoformat(created_at.replace("Z", "+00:00"))
+                # ZCQL returns datetimes like "2026-07-11 05:30:00" or ISO with T
+                normalized = raw_ts.replace("T", " ").split("+")[0].split("Z")[0].strip()
+                conv_date = datetime.strptime(normalized, "%Y-%m-%d %H:%M:%S")
                 days_ago = (now - conv_date).days
-                
                 if days_ago == 0:
                     category = "Today"
                 elif days_ago <= 7:
                     category = "Previous 7 Days"
                 else:
                     category = "Older"
-            except:
+            except Exception:
                 category = "Older"
-            
+
+            title = content[:50] if len(content) > 50 else content
             categorized.append(ConversationItem(
-                session_id=session_id,
-                title=first_message[:50] if len(first_message) > 50 else first_message,
-                created_at=created_at,
-                category=category
+                session_id=sid,
+                title=title,
+                created_at=raw_ts,
+                category=category,
             ))
-        
+
+        # Sort newest first within each category
+        categorized.sort(key=lambda x: x.created_at, reverse=True)
+
         return ChatHistoryResponse(conversations=categorized)
-    
+
     except Exception as e:
-        # Return empty history on error
         print(f"[Warning] Failed to fetch conversation history: {e}")
         return ChatHistoryResponse(conversations=[])
+
+
+@router.get("/messages", response_model=SessionMessagesResponse)
+async def get_session_messages(
+    session_id: str,
+    zcql = Depends(get_zcql)
+):
+    """
+    Return all messages for a given session_id in chronological order.
+    Used by the frontend to restore a previous conversation.
+    """
+    try:
+        escaped_sid = session_id.replace("'", "''")
+        query = f"""
+        SELECT role, content, sql_generated, created_at
+        FROM conversations
+        WHERE session_id = '{escaped_sid}' AND user_id = 'dev_user'
+        ORDER BY created_at ASC
+        """
+        result = zcql.execute_query(query)
+        rows = result if isinstance(result, list) else []
+
+        messages = []
+        for row in rows:
+            # ZCQL may wrap under table name key
+            r = row.get("conversations", row)
+            messages.append(SessionMessage(
+                role=r.get("role") or row.get("role", ""),
+                content=r.get("content") or row.get("content", ""),
+                sql_generated=r.get("sql_generated") or row.get("sql_generated"),
+                created_at=r.get("created_at") or row.get("created_at", ""),
+            ))
+
+        return SessionMessagesResponse(session_id=session_id, messages=messages)
+
+    except Exception as e:
+        print(f"[Warning] Failed to fetch session messages: {e}")
+        return SessionMessagesResponse(session_id=session_id, messages=[])
 
 
 @router.post("/new", response_model=NewConversationResponse)
 async def new_conversation():
     """
     Create a new conversation session.
-    
+
     Generates a new UUID for the session_id.
     """
     return NewConversationResponse(session_id=str(uuid.uuid4()))
