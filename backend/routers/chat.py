@@ -16,7 +16,7 @@ from schemas.chat import (
     ConversationItem,
     NewConversationResponse
 )
-from core.database import get_zcql, get_datastore
+from core.database import get_zcql
 from core.security import require_role
 
 
@@ -185,34 +185,27 @@ async def chat_query(
         timestamp=datetime.utcnow().isoformat()
     )
     
-    # Save to conversations table (optional - try/except)
+    # Save to conversations table via ZCQL INSERT (avoids Table API permission issues)
     try:
-        datastore = get_datastore(http_request)
-        table = datastore.table("conversations")
-        
-        # Save user message
-        table.insert({
-            "conversation_id": random.randint(1, 2147483647),
-            "user_id": "dev_user",  # TODO: Get from auth
-            "session_id": request.session_id,
-            "role": "user",
-            "content": request.query,
-            "sql_generated": zcql_query,
-            "created_at": datetime.utcnow().isoformat()
-        })
-        
-        # Save assistant response
-        table.insert({
-            "conversation_id": random.randint(1, 2147483647),
-            "user_id": "dev_user",
-            "session_id": request.session_id,
-            "role": "assistant",
-            "content": structured_response["response_text"],
-            "sql_generated": zcql_query,
-            "created_at": datetime.utcnow().isoformat()
-        })
+        ts = datetime.utcnow().strftime("%Y-%m-%d %H:%M:%S")
+        user_conv_id = random.randint(1, 2147483647)
+        asst_conv_id = random.randint(1, 2147483647)
+
+        # Escape single quotes in content
+        user_content = request.query.replace("'", "''")
+        asst_content = structured_response["response_text"].replace("'", "''")
+        sql_escaped = zcql_query.replace("'", "''") if zcql_query else ""
+
+        zcql.execute_query(f"""
+            INSERT INTO conversations (conversation_id, user_id, session_id, role, content, sql_generated, created_at)
+            VALUES ({user_conv_id}, 'dev_user', '{request.session_id}', 'user', '{user_content}', '{sql_escaped}', '{ts}')
+        """)
+
+        zcql.execute_query(f"""
+            INSERT INTO conversations (conversation_id, user_id, session_id, role, content, sql_generated, created_at)
+            VALUES ({asst_conv_id}, 'dev_user', '{request.session_id}', 'assistant', '{asst_content}', '{sql_escaped}', '{ts}')
+        """)
     except Exception as e:
-        # Log warning but don't fail the request
         print(f"[Warning] Failed to save to conversations table: {e}")
     
     return response
