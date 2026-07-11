@@ -7,6 +7,7 @@ from itertools import combinations
 from typing import Any, Optional
 
 from schemas.network import DensestNode, GraphEdge, GraphMetadata, GraphNode, GraphResponse
+from agents.network_agent.centrality import CentralityComputer
 
 
 class NetworkGraphBuilder:
@@ -124,7 +125,9 @@ class NetworkGraphBuilder:
 
         nodes = list(nodes_by_id.values())
         edges = list(edges_by_pair.values())
-        self._attach_degree_scores(nodes, edges)
+        
+        # Compute centrality metrics and attach to nodes
+        CentralityComputer.attach_centrality_to_nodes(nodes, edges)
 
         return GraphResponse(
             nodes=nodes,
@@ -135,7 +138,7 @@ class NetworkGraphBuilder:
                 largest_cluster_size=self._largest_connected_component_size(nodes, edges),
                 num_clusters=self._connected_component_count(nodes, edges),
                 repeat_offender_count=sum(1 for node in nodes if node.fir_count >= 2),
-                densest_node=self._densest_node(nodes),
+                densest_node=CentralityComputer.find_densest_node(nodes),
                 generated_at=datetime.utcnow(),
             ),
         )
@@ -190,6 +193,14 @@ class NetworkGraphBuilder:
         """
         result = self.zcql.execute_query(query)
         return result if isinstance(result, list) else []
+
+    def _attach_degree_scores(self, nodes: list[GraphNode], edges: list[GraphEdge]) -> None:
+        """Deprecated: Use CentralityComputer.attach_centrality_to_nodes instead."""
+        CentralityComputer.attach_centrality_to_nodes(nodes, edges)
+
+    def _densest_node(self, nodes: list[GraphNode]) -> DensestNode | None:
+        """Deprecated: Use CentralityComputer.find_densest_node instead."""
+        return CentralityComputer.find_densest_node(nodes)
 
     def _value(
         self,
