@@ -8,7 +8,8 @@ import { motion, AnimatePresence } from 'motion/react';
 import { MOCK_SUSPECTS } from '../data/mockData';
 import { SuspectProfile } from '../types';
 import { useNetworkGraph } from '../hooks/useNetworkGraph';
-import { NetworkGraphFilters, NetworkGraphView } from '../types/network';
+import { NetworkGraphFilters, NetworkGraphView, NetworkGraphNode } from '../types/network';
+import { NetworkGraph } from './network/NetworkGraph';
 
 export default function NetworkExplorerScreen() {
   const [activeSegment, setActiveSegment] = useState<NetworkGraphView>('all');
@@ -25,6 +26,7 @@ export default function NetworkExplorerScreen() {
   // Selected Profile state
   const [selectedProfile, setSelectedProfile] = useState<SuspectProfile | null>(MOCK_SUSPECTS[0]);
   const [showBriefingDialog, setShowBriefingDialog] = useState(false);
+  const [selectedNodeId, setSelectedNodeId] = useState<string | null>(null);
   
   // Network graph filters
   const [filters, setFilters] = useState<NetworkGraphFilters>({
@@ -37,72 +39,19 @@ export default function NetworkExplorerScreen() {
   // Use live API data when available, fallback to mock for empty/error states
   const nodes = graphData?.nodes || [];
   const edges = graphData?.edges || [];
-  
-  // For now, keep mock positioning for visualization (will be replaced with D3 in Step 12)
-  const getVisualNodes = () => {
-    if (nodes.length === 0) {
-      // Fallback to mock nodes when no data
-      return [
-        { id: 'SP-90210', name: 'Suresh Hegde', type: 'accused', cx: 60, cy: 50, isCentral: true },
-        { id: 'SP-90211', name: 'K. Manjunath', type: 'accused', cx: 75, cy: 60 },
-        { id: 'SP-90212', name: 'R. Ravi', type: 'accused', cx: 55, cy: 70 },
-        { id: 'SP-90214', name: 'S. Kumar', type: 'accused', cx: 80, cy: 45 },
-      ];
-    }
-    
-    // Map API nodes to visual positions (simple circular layout for now)
-    return nodes.map((node, index) => {
-      const angle = (index / nodes.length) * 2 * Math.PI;
-      const radius = 30;
-      const cx = 50 + radius * Math.cos(angle);
-      const cy = 50 + radius * Math.sin(angle);
-      return {
-        id: node.id,
-        name: node.label,
-        type: node.type === 'incident' ? 'crime' : node.type, // Map incident to crime for compatibility
-        cx,
-        cy,
-        isCentral: node.centrality_score > 0.7,
-      };
-    });
-  };
 
-  const visualNodes = getVisualNodes();
-  
-  // Map API edges to visual connections
-  const getVisualConnections = () => {
-    if (edges.length === 0) {
-      return [
-        { from: 'SP-90210', to: 'SP-90211', thick: true },
-        { from: 'SP-90210', to: 'SP-90212', thick: true },
-        { from: 'SP-90210', to: 'SP-90214', thick: true },
-      ];
-    }
-    
-    return edges.map(edge => ({
-      from: edge.source,
-      to: edge.target,
-      thick: edge.strength > 1,
-    }));
-  };
-
-  const connections = getVisualConnections();
-
-  const handleNodeClick = (node: any) => {
-    if (node.type === 'accused') {
-      const suspect = MOCK_SUSPECTS.find(s => s.name === node.name);
+  const handleNodeClick = (nodeId: string) => {
+    setSelectedNodeId(nodeId);
+    // Find corresponding node data
+    const node = nodes.find((n: NetworkGraphNode) => n.id === nodeId);
+    if (node && node.type === 'accused') {
+      // For now, use mock profile - will be replaced with real profile in Step 13
+      const suspect = MOCK_SUSPECTS.find(s => s.name === node.label);
       if (suspect) {
         setSelectedProfile(suspect);
       }
     }
   };
-
-  const filteredNodes = visualNodes.filter(node => {
-    if (searchQuery) {
-      return node.name.toLowerCase().includes(searchQuery.toLowerCase());
-    }
-    return true;
-  });
 
   return (
     <div className="flex-1 flex flex-col relative h-screen bg-[#0A0C10]">
@@ -154,93 +103,12 @@ export default function NetworkExplorerScreen() {
 
       {/* Canvas Area */}
       <div className="flex-1 relative overflow-hidden" id="network-canvas">
-        {/* Background Grid */}
-        <div
-          className="absolute inset-0 pointer-events-none"
-          style={{
-            backgroundSize: '24px 24px',
-            backgroundImage:
-              'linear-gradient(to right, #191b23 1px, transparent 1px), linear-gradient(to bottom, #191b23 1px, transparent 1px)',
-            opacity: 0.3,
-          }}
-        ></div>
-
-        {/* SVG Lines Layer */}
-        <svg className="absolute inset-0 w-full h-full pointer-events-none z-0">
-          {connections.map((conn, idx) => {
-            const fromNode = filteredNodes.find(n => n.id === conn.from);
-            const toNode = filteredNodes.find(n => n.id === conn.to);
-            if (!fromNode || !toNode) return null;
-
-            return (
-              <line
-                key={idx}
-                className={conn.thick ? 'line-thick' : 'line-thin'}
-                x1={`${fromNode.cx}%`}
-                y1={`${fromNode.cy}%`}
-                x2={`${toNode.cx}%`}
-                y2={`${toNode.cy}%`}
-                stroke={fromNode.isCentral || toNode.isCentral ? '#ffb4ab' : undefined}
-                strokeOpacity={fromNode.isCentral || toNode.isCentral ? 0.5 : undefined}
-              />
-            );
-          })}
-        </svg>
-
-        {/* Cluster Annotation */}
-        {activeSegment === 'clusters' && (
-          <>
-            <div
-              className="cluster-boundary"
-              style={{ left: '20%', top: '35%', width: '25%', height: '25%' }}
-            ></div>
-            <div
-              className="absolute text-primary text-xs font-label-mono bg-[#0A0C10] px-2 py-1 border border-[#003fa4] rounded-sm"
-              style={{ left: '25%', top: '32%' }}
-            >
-              Cluster #3 — Suspected Gang
-            </div>
-          </>
-        )}
-
-        {/* Nodes Layer */}
-        <div className="absolute inset-0 pointer-events-auto z-10">
-          {filteredNodes.map((node) => {
-            const isSelected = selectedProfile && selectedProfile.name === node.name;
-            let nodeClass = '';
-            if (node.type === 'accused') {
-              nodeClass = node.isCentral ? 'node-accused node-high-centrality' : 'node-accused';
-            } else if (node.type === 'crime') {
-              nodeClass = 'node-crime';
-            } else {
-              nodeClass = 'node-location';
-            }
-
-            return (
-              <div
-                key={node.id}
-                onClick={() => handleNodeClick(node)}
-                className={`${nodeClass} transition-all duration-500 hover:scale-125 cursor-pointer`}
-                style={{
-                  left: `${node.cx}%`,
-                  top: `${node.cy}%`,
-                  transform: 'translate(-50%, -50%)',
-                }}
-                title={node.name}
-              />
-            );
-          })}
-
-          {/* Central Label for Suresh Hegde */}
-          {filteredNodes.find(n => n.id === 'SP-90210') && (
-            <div
-              className="absolute text-error text-xs font-label-mono bg-[#111318] px-2 py-0.5 border border-[#93000a] rounded-sm whitespace-nowrap"
-              style={{ left: 'calc(60% + 15px)', top: 'calc(50% - 10px)' }}
-            >
-              Suresh Hegde
-            </div>
-          )}
-        </div>
+        <NetworkGraph
+          nodes={nodes}
+          edges={edges}
+          selectedNodeId={selectedNodeId}
+          onNodeClick={handleNodeClick}
+        />
 
         {/* LEFT FLOATING PANEL: Filters */}
         <div className="absolute left-lg top-lg w-72 bg-[#111318] panel-border rounded-lg shadow-xl flex flex-col z-20 max-h-[calc(100%-48px)] overflow-y-auto">
