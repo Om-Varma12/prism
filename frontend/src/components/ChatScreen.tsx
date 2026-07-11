@@ -413,8 +413,7 @@ export default function ChatScreen({ onNavigate }: ChatScreenProps) {
                 {latestResponse?.entities.map((entity, idx) => (
                   <div
                     key={idx}
-                    onClick={() => onNavigate(Screen.NETWORK)}
-                    className="border border-layout-border rounded p-3 bg-layout-bg hover:border-primary-container/50 transition-colors cursor-pointer group"
+                    className="border border-layout-border rounded p-3 bg-layout-bg transition-colors group"
                   >
                     <div className="flex justify-between items-start mb-2">
                       <div className="flex items-center gap-2 text-on-surface">
