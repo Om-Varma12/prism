@@ -7,7 +7,7 @@ import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { MOCK_SUSPECTS } from '../data/mockData';
 import { SuspectProfile } from '../types';
-import { useNetworkGraph } from '../hooks/useNetworkGraph';
+import { useNetworkGraph, useAccusedProfile } from '../hooks/useNetworkGraph';
 import { NetworkGraphFilters, NetworkGraphView, NetworkGraphNode } from '../types/network';
 import { NetworkGraph } from './network/NetworkGraph';
 
@@ -27,6 +27,7 @@ export default function NetworkExplorerScreen() {
   const [selectedProfile, setSelectedProfile] = useState<SuspectProfile | null>(MOCK_SUSPECTS[0]);
   const [showBriefingDialog, setShowBriefingDialog] = useState(false);
   const [selectedNodeId, setSelectedNodeId] = useState<string | null>(null);
+  const [selectedAccusedId, setSelectedAccusedId] = useState<number | null>(null);
   
   // Network graph filters
   const [filters, setFilters] = useState<NetworkGraphFilters>({
@@ -40,15 +41,23 @@ export default function NetworkExplorerScreen() {
   const nodes = graphData?.nodes || [];
   const edges = graphData?.edges || [];
 
+  // Fetch accused profile when a node is selected
+  const { data: profileData, isLoading: profileLoading, error: profileError } = useAccusedProfile(selectedAccusedId);
+
   const handleNodeClick = (nodeId: string) => {
     setSelectedNodeId(nodeId);
     // Find corresponding node data
     const node = nodes.find((n: NetworkGraphNode) => n.id === nodeId);
     if (node && node.type === 'accused') {
-      // For now, use mock profile - will be replaced with real profile in Step 13
-      const suspect = MOCK_SUSPECTS.find(s => s.name === node.label);
-      if (suspect) {
-        setSelectedProfile(suspect);
+      // Extract accused_id from node and fetch real profile
+      if (node.accused_id) {
+        setSelectedAccusedId(node.accused_id);
+      } else {
+        // Fallback to mock if no accused_id
+        const suspect = MOCK_SUSPECTS.find(s => s.name === node.label);
+        if (suspect) {
+          setSelectedProfile(suspect);
+        }
       }
     }
   };
@@ -192,70 +201,128 @@ export default function NetworkExplorerScreen() {
         </div>
 
         {/* RIGHT FLOATING PANEL: Entity Details */}
-        {selectedProfile && (
+        {(selectedProfile || profileData) && (
           <div className="absolute right-lg top-lg w-80 bg-[#111318] panel-border rounded-lg shadow-xl flex flex-col z-20">
-            <div className="p-4 border-b border-[#252830] flex justify-between items-start">
-              <div>
-                <div className="text-xs text-error font-label-mono mb-1 uppercase tracking-wider">
-                  Selected Profile
+            {profileLoading && (
+              <div className="p-4 text-center text-on-surface-variant text-sm">Loading profile...</div>
+            )}
+            {profileError && (
+              <div className="p-4 text-center text-error text-sm">Error loading profile</div>
+            )}
+            {!profileLoading && !profileError && (
+              <>
+                <div className="p-4 border-b border-[#252830] flex justify-between items-start">
+                  <div>
+                    <div className="text-xs text-error font-label-mono mb-1 uppercase tracking-wider">
+                      Selected Profile
+                    </div>
+                    <h3 className="font-headline-md text-[20px] font-bold text-on-surface leading-tight">
+                      {profileData?.name || selectedProfile?.name}
+                    </h3>
+                    <p className="text-sm text-on-surface-variant mt-1">
+                      Age: {profileData?.age || selectedProfile?.age} | Gender: {profileData?.gender || selectedProfile?.gender}
+                    </p>
+                  </div>
+                  <button 
+                    onClick={() => {
+                      setSelectedProfile(null);
+                      setSelectedAccusedId(null);
+                    }}
+                    className="text-outline hover:text-on-surface cursor-pointer"
+                  >
+                    <span className="material-symbols-outlined text-[20px]">close</span>
+                  </button>
                 </div>
-                <h3 className="font-headline-md text-[20px] font-bold text-on-surface leading-tight">
-                  {selectedProfile.name}
-                </h3>
-                <p className="text-sm text-on-surface-variant mt-1">
-                  Age: {selectedProfile.age} | Gender: {selectedProfile.gender}
-                </p>
-              </div>
-              <button 
-                onClick={() => setSelectedProfile(null)}
-                className="text-outline hover:text-on-surface cursor-pointer"
-              >
-                <span className="material-symbols-outlined text-[20px]">close</span>
-              </button>
-            </div>
-            <div className="p-4 flex flex-col gap-5">
-              {/* Risk Score */}
-              <div>
-                <div className="flex justify-between text-sm mb-2">
-                  <span className="text-on-surface-variant">Risk Score</span>
-                  <span className="text-error font-data-mono-bold">{selectedProfile.riskScore}/100</span>
-                </div>
-                <div className="h-1.5 w-full bg-[#0A0C10] rounded-full overflow-hidden">
-                  <div
-                    className="h-full bg-error rounded-full"
-                    style={{ width: `${selectedProfile.riskScore}%` }}
-                  ></div>
-                </div>
-              </div>
-              {/* Stats */}
-              <div className="bg-[#0A0C10] p-3 rounded-DEFAULT border border-[#252830]">
-                <p className="text-sm text-on-surface">
-                  Appears in{' '}
-                  <span className="font-data-mono-bold text-primary">{selectedProfile.firsCount} FIRs</span>
-                  {' '}across{' '}
-                  <span className="font-data-mono-bold text-primary">{selectedProfile.districtsCount} districts</span>
-                </p>
-              </div>
-              {/* Connections */}
-              <div>
-                <h4 className="text-xs font-semibold text-on-surface-variant mb-2 uppercase tracking-wider border-b border-[#252830] pb-1">
-                  Connected to
-                </h4>
-                <ul className="flex flex-col gap-2">
-                  {selectedProfile.connections.map((conn, idx) => (
-                    <li key={idx} className="flex items-center justify-between text-sm">
-                      <div className="flex items-center gap-2">
-                        <div className="w-2 h-2 rounded-full bg-[#ffb4ab]"></div>
-                        <span className="text-on-surface">{conn.name}</span>
-                      </div>
-                      <span className="text-xs text-outline font-label-mono border border-[#252830] px-1 rounded-sm">
-                        {conn.type}
+                <div className="p-4 flex flex-col gap-5">
+                  {/* Risk Score */}
+                  <div>
+                    <div className="flex justify-between text-sm mb-2">
+                      <span className="text-on-surface-variant">Risk Score</span>
+                      <span className="text-error font-data-mono-bold">
+                        {profileData?.risk_score || selectedProfile?.riskScore}/100
                       </span>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            </div>
+                    </div>
+                    <div className="h-1.5 w-full bg-[#0A0C10] rounded-full overflow-hidden">
+                      <div
+                        className="h-full bg-error rounded-full"
+                        style={{ width: `${profileData?.risk_score || selectedProfile?.riskScore}%` }}
+                      ></div>
+                    </div>
+                  </div>
+                  {/* Stats */}
+                  <div className="bg-[#0A0C10] p-3 rounded-DEFAULT border border-[#252830]">
+                    <p className="text-sm text-on-surface">
+                      Appears in{' '}
+                      <span className="font-data-mono-bold text-primary">
+                        {profileData?.fir_count || selectedProfile?.firsCount} FIRs
+                      </span>
+                      {' '}across{' '}
+                      {profileData?.firs && profileData.firs.length > 0 && (
+                        <span className="font-data-mono-bold text-primary">
+                          {new Set(profileData.firs.map(f => f.district)).size} districts
+                        </span>
+                      )}
+                      {!profileData?.firs && selectedProfile && (
+                        <span className="font-data-mono-bold text-primary">
+                          {selectedProfile.districtsCount} districts
+                        </span>
+                      )}
+                    </p>
+                  </div>
+                  {/* Connections */}
+                  <div>
+                    <h4 className="text-xs font-semibold text-on-surface-variant mb-2 uppercase tracking-wider border-b border-[#252830] pb-1">
+                      Connected to
+                    </h4>
+                    <ul className="flex flex-col gap-2">
+                      {profileData?.co_accused && profileData.co_accused.length > 0 ? (
+                        profileData.co_accused.map((conn, idx) => (
+                          <li key={idx} className="flex items-center justify-between text-sm">
+                            <div className="flex items-center gap-2">
+                              <div className="w-2 h-2 rounded-full bg-[#ffb4ab]"></div>
+                              <span className="text-on-surface">{conn.name}</span>
+                            </div>
+                            <span className="text-xs text-outline font-label-mono border border-[#252830] px-1 rounded-sm">
+                              {conn.times_together} FIRs
+                            </span>
+                          </li>
+                        ))
+                      ) : selectedProfile?.connections ? (
+                        selectedProfile.connections.map((conn, idx) => (
+                          <li key={idx} className="flex items-center justify-between text-sm">
+                            <div className="flex items-center gap-2">
+                              <div className="w-2 h-2 rounded-full bg-[#ffb4ab]"></div>
+                              <span className="text-on-surface">{conn.name}</span>
+                            </div>
+                            <span className="text-xs text-outline font-label-mono border border-[#252830] px-1 rounded-sm">
+                              {conn.type}
+                            </span>
+                          </li>
+                        ))
+                      ) : (
+                        <li className="text-sm text-on-surface-variant">No connections data</li>
+                      )}
+                    </ul>
+                  </div>
+                  {/* Crime Types */}
+                  {profileData?.crime_types && profileData.crime_types.length > 0 && (
+                    <div>
+                      <h4 className="text-xs font-semibold text-on-surface-variant mb-2 uppercase tracking-wider border-b border-[#252830] pb-1">
+                        Crime Types
+                      </h4>
+                      <ul className="flex flex-col gap-2">
+                        {profileData.crime_types.map((ct, idx) => (
+                          <li key={idx} className="flex items-center justify-between text-sm">
+                            <span className="text-on-surface">{ct.name}</span>
+                            <span className="text-xs text-outline font-label-mono">{ct.count}</span>
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  )}
+                </div>
+              </>
+            )}
             {/* Footer Action */}
             <div className="p-4 border-t border-[#252830] bg-[#0c0e15] rounded-b-lg">
               <button
