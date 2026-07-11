@@ -9,15 +9,20 @@ from typing import Optional
 from services.llm_client import CatalystLLMClient
 from agents.text_to_sql.agent import TextToSQLAgent
 from agents.response_structurer.agent import ResponseStructurer
+from agents.title_generator.agent import TitleGenerator
 from schemas.chat import (
     ChatQueryRequest,
     ChatQueryResponse,
     ChatHistoryResponse,
     ConversationItem,
-    NewConversationResponse
+    NewConversationResponse,
+    SessionMessage,
+    SessionMessagesResponse,
 )
-from core.database import get_zcql, get_datastore
+from core.database import get_zcql
 from core.security import require_role
+from fastapi.responses import StreamingResponse
+import json
 
 
 router = APIRouter(prefix="/api/chat", tags=["chat"])
@@ -185,34 +190,35 @@ async def chat_query(
         timestamp=datetime.utcnow().isoformat()
     )
     
-    # Save to conversations table (optional - try/except)
+    # Save to conversations table via ZCQL INSERT (avoids Table API permission issues)
     try:
-        datastore = get_datastore(http_request)
-        table = datastore.table("conversations")
+        ts = datetime.utcnow().strftime("%Y-%m-%d %H:%M:%S")
+        user_conv_id = random.randint(1, 2147483647)
+        asst_conv_id = random.randint(1, 2147483647)
+
+        # Escape single quotes in content and JSON strings
+        user_content = request.query.replace("'", "''")
+        asst_content = structured_response["response_text"].replace("'", "''")
+        sql_escaped = zcql_query.replace("'", "''") if zcql_query else ""
         
-        # Save user message
-        table.insert({
-            "conversation_id": random.randint(1, 2147483647),
-            "user_id": "dev_user",  # TODO: Get from auth
-            "session_id": request.session_id,
-            "role": "user",
-            "content": request.query,
-            "sql_generated": zcql_query,
-            "created_at": datetime.utcnow().isoformat()
-        })
-        
-        # Save assistant response
-        table.insert({
-            "conversation_id": random.randint(1, 2147483647),
-            "user_id": "dev_user",
-            "session_id": request.session_id,
-            "role": "assistant",
-            "content": structured_response["response_text"],
-            "sql_generated": zcql_query,
-            "created_at": datetime.utcnow().isoformat()
-        })
+        # Convert response metadata to JSON strings and escape
+        import json
+        table_data_json = json.dumps(structured_response["table_data"]).replace("'", "''")
+        entities_json = json.dumps(structured_response["entities"]).replace("'", "''")
+        follow_ups_json = json.dumps(structured_response["follow_ups"]).replace("'", "''")
+        sources_json = json.dumps(tables_accessed).replace("'", "''")
+        scanned_records = len(flat_results)
+
+        zcql.execute_query(f"""
+            INSERT INTO conversations (conversation_id, user_id, session_id, role, content, sql_generated, created_at, table_data_json, entities_json, follow_ups_json, sources_json, scanned_records)
+            VALUES ({user_conv_id}, 'dev_user', '{request.session_id}', 'user', '{user_content}', '{sql_escaped}', '{ts}', NULL, NULL, NULL, NULL, NULL)
+        """)
+
+        zcql.execute_query(f"""
+            INSERT INTO conversations (conversation_id, user_id, session_id, role, content, sql_generated, created_at, table_data_json, entities_json, follow_ups_json, sources_json, scanned_records)
+            VALUES ({asst_conv_id}, 'dev_user', '{request.session_id}', 'assistant', '{asst_content}', '{sql_escaped}', '{ts}', '{table_data_json}', '{entities_json}', '{follow_ups_json}', '{sources_json}', {scanned_records})
+        """)
     except Exception as e:
-        # Log warning but don't fail the request
         print(f"[Warning] Failed to save to conversations table: {e}")
     
     return response
@@ -226,64 +232,119 @@ async def chat_history(
     """
     Get conversation history for the current user.
     
-    Groups conversations by session_id and categorizes by date.
+    Returns one item per unique session_id, titled by the first user message,
+    grouped into Today / Previous 7 Days / Older categories.
     """
     try:
-        # Query conversations table
+        # Fetch one row per session: the oldest user message (used as title)
         query = """
-        SELECT session_id, MIN(content) as first_message, MIN(created_at) as created_at
+        SELECT session_id, content, created_at
         FROM conversations
-        WHERE user_id = 'dev_user'
-        GROUP BY session_id
-        ORDER BY created_at DESC
+        WHERE user_id = 'dev_user' AND role = 'user'
+        ORDER BY created_at ASC
         """
-        
         result = zcql.execute_query(query)
-        conversations = result if isinstance(result, list) else []
-        
-        # Categorize by date
+        rows = result if isinstance(result, list) else []
+
+        # Deduplicate: keep only the first (oldest) row per session_id
+        seen: dict = {}
+        for row in rows:
+            # ZCQL may wrap under table name key
+            r = row.get("conversations", row)
+            sid = r.get("session_id") or row.get("session_id", "")
+            if sid and sid not in seen:
+                seen[sid] = {
+                    "session_id": sid,
+                    "content": r.get("content") or row.get("content", "New Conversation"),
+                    "created_at": r.get("created_at") or row.get("created_at", ""),
+                }
+
         categorized = []
         now = datetime.utcnow()
-        
-        for conv in conversations:
-            created_at = conv.get("created_at", "")
-            first_message = conv.get("first_message", "New Conversation")
-            session_id = conv.get("session_id", "")
-            
-            # Parse date and categorize
+
+        for sid, data in seen.items():
+            raw_ts = data["created_at"]
+            content = data["content"]
             try:
-                conv_date = datetime.fromisoformat(created_at.replace("Z", "+00:00"))
+                # ZCQL returns datetimes like "2026-07-11 05:30:00" or ISO with T
+                normalized = raw_ts.replace("T", " ").split("+")[0].split("Z")[0].strip()
+                conv_date = datetime.strptime(normalized, "%Y-%m-%d %H:%M:%S")
                 days_ago = (now - conv_date).days
-                
                 if days_ago == 0:
                     category = "Today"
                 elif days_ago <= 7:
                     category = "Previous 7 Days"
                 else:
                     category = "Older"
-            except:
+            except Exception:
                 category = "Older"
-            
+
+            title = content[:50] if len(content) > 50 else content
             categorized.append(ConversationItem(
-                session_id=session_id,
-                title=first_message[:50] if len(first_message) > 50 else first_message,
-                created_at=created_at,
-                category=category
+                session_id=sid,
+                title=title,
+                created_at=raw_ts,
+                category=category,
             ))
-        
+
+        # Sort newest first within each category
+        categorized.sort(key=lambda x: x.created_at, reverse=True)
+
         return ChatHistoryResponse(conversations=categorized)
-    
+
     except Exception as e:
-        # Return empty history on error
         print(f"[Warning] Failed to fetch conversation history: {e}")
         return ChatHistoryResponse(conversations=[])
+
+
+@router.get("/messages", response_model=SessionMessagesResponse)
+async def get_session_messages(
+    session_id: str,
+    zcql = Depends(get_zcql)
+):
+    """
+    Return all messages for a given session_id in chronological order.
+    Used by the frontend to restore a previous conversation.
+    """
+    try:
+        escaped_sid = session_id.replace("'", "''")
+        query = f"""
+        SELECT role, content, sql_generated, created_at, table_data_json, entities_json, follow_ups_json, sources_json, scanned_records
+        FROM conversations
+        WHERE session_id = '{escaped_sid}' AND user_id = 'dev_user'
+        ORDER BY created_at ASC
+        """
+        result = zcql.execute_query(query)
+        rows = result if isinstance(result, list) else []
+
+        messages = []
+        for row in rows:
+            # ZCQL may wrap under table name key
+            r = row.get("conversations", row)
+            messages.append(SessionMessage(
+                role=r.get("role") or row.get("role", ""),
+                content=r.get("content") or row.get("content", ""),
+                sql_generated=r.get("sql_generated") or row.get("sql_generated"),
+                created_at=r.get("created_at") or row.get("created_at", ""),
+                table_data_json=r.get("table_data_json") or row.get("table_data_json"),
+                entities_json=r.get("entities_json") or row.get("entities_json"),
+                follow_ups_json=r.get("follow_ups_json") or row.get("follow_ups_json"),
+                sources_json=r.get("sources_json") or row.get("sources_json"),
+                scanned_records=r.get("scanned_records") or row.get("scanned_records"),
+            ))
+
+        return SessionMessagesResponse(session_id=session_id, messages=messages)
+
+    except Exception as e:
+        print(f"[Warning] Failed to fetch session messages: {e}")
+        return SessionMessagesResponse(session_id=session_id, messages=[])
 
 
 @router.post("/new", response_model=NewConversationResponse)
 async def new_conversation():
     """
     Create a new conversation session.
-    
+
     Generates a new UUID for the session_id.
     """
     return NewConversationResponse(session_id=str(uuid.uuid4()))
@@ -409,5 +470,201 @@ async def debug_query(zcql = Depends(get_zcql)):
         diagnostics["Victim_Where_Only_Error"] = str(e)
 
     return diagnostics
+
+
+@router.get("/export-pdf")
+async def export_chat_pdf(
+    session_id: str,
+    request: Request,
+    zcql = Depends(get_zcql)
+):
+    """
+    Export conversation to PDF with title, date/time, and all content except SQL.
+    """
+    from reportlab.lib.pagesizes import letter
+    from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
+    from reportlab.lib.units import inch
+    from reportlab.lib import colors
+    from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, Table, TableStyle, PageBreak
+    from reportlab.lib.enums import TA_CENTER, TA_LEFT
+    from io import BytesIO
+    
+    try:
+        # Fetch conversation messages
+        escaped_sid = session_id.replace("'", "''")
+        query = f"""
+        SELECT role, content, sql_generated, created_at, table_data_json, entities_json, follow_ups_json, sources_json, scanned_records
+        FROM conversations
+        WHERE session_id = '{escaped_sid}' AND user_id = 'dev_user'
+        ORDER BY created_at ASC
+        """
+        result = zcql.execute_query(query)
+        rows = result if isinstance(result, list) else []
+        
+        if not rows:
+            return {"error": "No messages found for this session"}
+        
+        # Format messages for title generation
+        messages_for_title = []
+        for row in rows:
+            r = row.get("conversations", row)
+            messages_for_title.append({
+                "role": r.get("role") or row.get("role", ""),
+                "content": r.get("content") or row.get("content", "")
+            })
+        
+        # Generate title using LLM agent
+        llm_client = CatalystLLMClient()
+        title_generator = TitleGenerator(llm_client)
+        title = title_generator.generate_title(messages_for_title)
+        
+        # Get conversation date/time (from first message)
+        first_row = rows[0]
+        r = first_row.get("conversations", first_row)
+        created_at = r.get("created_at") or first_row.get("created_at", "")
+        try:
+            conv_date = datetime.strptime(created_at.replace('T', ' ').split('+')[0].split('Z')[0].strip(), "%Y-%m-%d %H:%M:%S")
+            date_str = conv_date.strftime("%B %d, %Y at %I:%M %p")
+        except:
+            date_str = created_at
+        
+        # Create PDF
+        buffer = BytesIO()
+        doc = SimpleDocTemplate(buffer, pagesize=letter, rightMargin=72, leftMargin=72, topMargin=72, bottomMargin=18)
+        styles = getSampleStyleSheet()
+        story = []
+        
+        # Custom styles
+        title_style = ParagraphStyle(
+            'CustomTitle',
+            parent=styles['Heading1'],
+            fontSize=18,
+            textColor=colors.HexColor('#3B6FE8'),
+            spaceAfter=12,
+            alignment=TA_CENTER
+        )
+        
+        date_style = ParagraphStyle(
+            'DateStyle',
+            parent=styles['Normal'],
+            fontSize=10,
+            textColor=colors.gray,
+            alignment=TA_CENTER,
+            spaceAfter=30
+        )
+        
+        header_style = ParagraphStyle(
+            'HeaderStyle',
+            parent=styles['Heading2'],
+            fontSize=14,
+            textColor=colors.HexColor('#1E2025'),
+            spaceBefore=12,
+            spaceAfter=6
+        )
+        
+        normal_style = ParagraphStyle(
+            'NormalStyle',
+            parent=styles['Normal'],
+            fontSize=11,
+            textColor=colors.HexColor('#2A2D35'),
+            spaceAfter=12,
+            leading=14
+        )
+        
+        # Add title
+        story.append(Paragraph(title, title_style))
+        story.append(Paragraph(f"Generated on {date_str}", date_style))
+        story.append(Spacer(1, 0.2*inch))
+        
+        # Add messages
+        for row in rows:
+            r = row.get("conversations", row)
+            role = r.get("role") or row.get("role", "")
+            content = r.get("content") or row.get("content", "")
+            
+            if role == 'user':
+                story.append(Paragraph("<b>User:</b>", header_style))
+            else:
+                story.append(Paragraph("<b>Assistant:</b>", header_style))
+            
+            story.append(Paragraph(content, normal_style))
+            
+            # Add table data if available (assistant only)
+            if role == 'assistant':
+                table_data_json = r.get("table_data_json") or row.get("table_data_json")
+                if table_data_json:
+                    try:
+                        table_data = json.loads(table_data_json)
+                        if table_data:
+                            story.append(Paragraph("<b>Results:</b>", header_style))
+                            
+                            # Create table
+                            if table_data:
+                                headers = list(table_data[0].keys())
+                                data = [headers]
+                                for row_data in table_data:
+                                    data.append([str(row_data.get(h, '')) for h in headers])
+                                
+                                table = Table(data, colWidths=[1.5*inch]*len(headers))
+                                table.setStyle(TableStyle([
+                                    ('BACKGROUND', (0, 0), (-1, 0), colors.HexColor('#3B3E47')),
+                                    ('TEXTCOLOR', (0, 0), (-1, 0), colors.white),
+                                    ('ALIGN', (0, 0), (-1, -1), 'LEFT'),
+                                    ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
+                                    ('FONTSIZE', (0, 0), (-1, 0), 10),
+                                    ('BOTTOMPADDING', (0, 0), (-1, 0), 12),
+                                    ('BACKGROUND', (0, 1), (-1, -1), colors.beige),
+                                    ('GRID', (0, 0), (-1, -1), 1, colors.black),
+                                ]))
+                                story.append(table)
+                                story.append(Spacer(1, 0.1*inch))
+                    except Exception as e:
+                        print(f"[PDF Export] Error parsing table data: {e}")
+                
+                # Add entities if available
+                entities_json = r.get("entities_json") or row.get("entities_json")
+                if entities_json:
+                    try:
+                        entities = json.loads(entities_json)
+                        if entities:
+                            story.append(Paragraph("<b>Mentioned Entities:</b>", header_style))
+                            for entity in entities:
+                                entity_text = f"• {entity.get('name', '')} ({entity.get('type', '')})"
+                                story.append(Paragraph(entity_text, normal_style))
+                            story.append(Spacer(1, 0.1*inch))
+                    except Exception as e:
+                        print(f"[PDF Export] Error parsing entities: {e}")
+                
+                # Add sources if available
+                sources_json = r.get("sources_json") or row.get("sources_json")
+                if sources_json:
+                    try:
+                        sources = json.loads(sources_json)
+                        if sources:
+                            story.append(Paragraph("<b>Data Sources:</b>", header_style))
+                            for source in sources:
+                                story.append(Paragraph(f"• {source}", normal_style))
+                            story.append(Spacer(1, 0.1*inch))
+                    except Exception as e:
+                        print(f"[PDF Export] Error parsing sources: {e}")
+            
+            story.append(Spacer(1, 0.2*inch))
+        
+        # Build PDF
+        doc.build(story)
+        
+        # Return PDF as response
+        buffer.seek(0)
+        filename = f"chat_export_{session_id[:8]}.pdf"
+        
+        return StreamingResponse(
+            buffer,
+            media_type="application/pdf",
+            headers={"Content-Disposition": f"attachment; filename=\"{filename}\""}
+        )
+        
+    except Exception as e:
+        print(f"[PDF Export] Error: {e}")
+        return {"error": f"Failed to generate PDF: {str(e)}"}
 
 

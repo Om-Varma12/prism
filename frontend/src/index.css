@@ -46,10 +46,10 @@ html, body, #root {
 }
 
 /* ─── Scrollbar ──────────────────────────────────────────────────────────────── */
-.custom-scrollbar::-webkit-scrollbar { width: 4px; }
+.custom-scrollbar::-webkit-scrollbar { width: 6px; }
 .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
-.custom-scrollbar::-webkit-scrollbar-thumb { background: #252830; border-radius: 2px; }
-.custom-scrollbar::-webkit-scrollbar-thumb:hover { background: #3B6FE8; }
+.custom-scrollbar::-webkit-scrollbar-thumb { background: #2A2D35 !important; border-radius: 3px; }
+.custom-scrollbar::-webkit-scrollbar-thumb:hover { background: #3B3E47 !important; }
 
 /* ─── Network Graph nodes ────────────────────────────────────────────────────── */
 .node-accused {

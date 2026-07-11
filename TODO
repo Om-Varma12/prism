@@ -5,5 +5,5 @@ first page: dashboard
 5. ek micro-service for real-time data change and dashboard value updates
 
 second page: chat
-2. LLM api endpoint fix
-3. create conversation and add to table
+1. session restoration does not restore mentioned entities or any table that is displayed
+3. chat to pdf export
