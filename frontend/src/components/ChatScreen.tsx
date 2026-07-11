@@ -3,21 +3,446 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import React, { useRef, useEffect } from 'react';
-import { Screen } from '../types';
+import React, { useEffect, useRef } from 'react';
+import { ChatMessage, ConversationItem } from '../types';
 import { useChat } from '../hooks/useChat';
 
 interface ChatScreenProps {
-  onNavigate: (screen: Screen) => void;
+  onNavigate: unknown;
 }
 
-export default function ChatScreen({ onNavigate }: ChatScreenProps) {
+const shell = {
+  obsidian: '#0b0c0f',
+  panel: '#111318',
+  panelRaised: '#161921',
+  line: '#1b1e26',
+  surface: '#1c212b',
+  teal: '#5eead4',
+  tealMuted: '#2c6b63',
+  blue: '#60a5fa',
+  blueMuted: '#1e3a5f',
+  gold: '#fbbf24',
+  goldMuted: '#5c4a1f',
+  red: '#f87171',
+  redMuted: '#5c2a2a',
+  green: '#4ade80',
+  greenMuted: '#1e4a2e',
+  slate: '#94a3b8',
+  ghost: '#334155',
+  dim: '#475569',
+};
+
+const quickActions = [
+  ['travel_explore', shell.teal, 'Area pattern scan', 'Robbery cases in Bengaluru North'],
+  ['shield_person', shell.blue, 'High-risk offenders', 'List high-risk offenders in Mysuru'],
+  ['hub', shell.gold, 'Network lead', 'Find connected accused in vehicle theft cases'],
+  ['warning', shell.red, 'Hotspot scan', 'Identify active crime hotspots in Bengaluru'],
+  ['article', shell.green, 'Executive brief', 'Draft an executive briefing on current FIR trends'],
+];
+
+function Glyph({
+  name,
+  className = '',
+  style,
+}: {
+  name: string;
+  className?: string;
+  style?: React.CSSProperties;
+}) {
+  return (
+    <span className={`material-symbols-outlined ${className}`} style={style}>
+      {name}
+    </span>
+  );
+}
+
+function ScanStyles() {
+  return (
+    <style>
+      {`
+        .sentinel-grid {
+          background-color: ${shell.obsidian};
+          background-image:
+            linear-gradient(rgba(94, 234, 212, 0.015) 1px, transparent 1px),
+            linear-gradient(90deg, rgba(94, 234, 212, 0.015) 1px, transparent 1px);
+          background-size: 60px 60px;
+        }
+        .sentinel-grid::before {
+          content: '';
+          position: absolute;
+          inset: 0;
+          pointer-events: none;
+          z-index: 30;
+          background: repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0,0,0,0.03) 2px, rgba(0,0,0,0.03) 4px);
+        }
+        @keyframes sentinelMsgIn {
+          from { opacity: 0; transform: translateY(10px) scale(0.98); }
+          to { opacity: 1; transform: translateY(0) scale(1); }
+        }
+        @keyframes sentinelPulse {
+          0% { box-shadow: 0 0 0 0 rgba(74, 222, 128, 0.4); }
+          70% { box-shadow: 0 0 0 6px rgba(74, 222, 128, 0); }
+          100% { box-shadow: 0 0 0 0 rgba(74, 222, 128, 0); }
+        }
+        @keyframes sentinelDot {
+          0%, 60%, 100% { transform: translateY(0); }
+          30% { transform: translateY(-4px); }
+        }
+        @keyframes sentinelScan {
+          0% { left: 0; opacity: 0; }
+          10% { opacity: 1; }
+          90% { opacity: 1; }
+          100% { left: 100%; opacity: 0; }
+        }
+        .sentinel-msg-in { animation: sentinelMsgIn 0.35s cubic-bezier(0.22, 1, 0.36, 1) forwards; }
+        .sentinel-status-pulse { animation: sentinelPulse 2s infinite; }
+        .sentinel-dot { animation: sentinelDot 1.2s infinite ease-in-out; }
+        .sentinel-dot:nth-child(2) { animation-delay: 0.15s; }
+        .sentinel-dot:nth-child(3) { animation-delay: 0.3s; }
+        .sentinel-scroll { scrollbar-width: thin; scrollbar-color: #242a36 transparent; }
+        .sentinel-scroll::-webkit-scrollbar { width: 5px; height: 5px; }
+        .sentinel-scroll::-webkit-scrollbar-track { background: transparent; }
+        .sentinel-scroll::-webkit-scrollbar-thumb { background: #242a36; border-radius: 3px; }
+        .sentinel-scroll::-webkit-scrollbar-thumb:hover { background: #334155; }
+        .sentinel-sidebar-item { position: relative; transition: all 0.15s ease; }
+        .sentinel-sidebar-item::before {
+          content: '';
+          position: absolute;
+          left: 0;
+          top: 50%;
+          transform: translateY(-50%);
+          width: 2px;
+          height: 0;
+          background: ${shell.teal};
+          border-radius: 0 2px 2px 0;
+          transition: height 0.2s ease;
+        }
+        .sentinel-sidebar-item:hover::before { height: 16px; }
+        .sentinel-sidebar-item.active::before { height: 28px; }
+        .sentinel-composer:focus {
+          box-shadow: 0 0 0 1px rgba(94, 234, 212, 0.15), 0 0 20px rgba(94, 234, 212, 0.06);
+        }
+        .sentinel-quick { transition: all 0.2s ease; }
+        .sentinel-quick:hover {
+          transform: translateY(-1px);
+          box-shadow: 0 0 0 1px rgba(94, 234, 212, 0.2), 0 4px 16px rgba(0,0,0,0.3);
+        }
+        .sentinel-scan { position: relative; overflow: hidden; }
+        .sentinel-scan::after {
+          content: '';
+          position: absolute;
+          top: 0;
+          bottom: 0;
+          width: 40px;
+          background: linear-gradient(90deg, transparent, rgba(94,234,212,0.08), transparent);
+          animation: sentinelScan 3s linear infinite;
+        }
+      `}
+    </style>
+  );
+}
+
+function HistoryItem({
+  item,
+  active,
+  onClick,
+  color = shell.teal,
+  muted = shell.tealMuted,
+}: {
+  item: ConversationItem;
+  active: boolean;
+  onClick: () => void;
+  color?: string;
+  muted?: string;
+}) {
+  const created = item.created_at
+    ? new Date(item.created_at.replace(' ', 'T')).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+    : 'now';
+
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      className={`sentinel-sidebar-item flex w-full cursor-pointer items-start gap-2.5 rounded-lg px-3 py-2.5 text-left ${
+        active ? 'active bg-white/[0.04]' : 'hover:bg-white/[0.03]'
+      }`}
+    >
+      <span
+        className="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded border"
+        style={{ backgroundColor: `${muted}33`, borderColor: `${muted}66`, color }}
+      >
+        <Glyph name="bar_chart" className="text-[13px]" />
+      </span>
+      <span className="min-w-0 flex-1">
+        <span className="block truncate text-[13px] font-medium leading-snug text-slate-100">{item.title}</span>
+        <span className="mt-0.5 block truncate text-[11px]" style={{ color: shell.ghost }}>
+          {active ? 'Active session' : 'Saved thread'} - {created}
+        </span>
+      </span>
+    </button>
+  );
+}
+
+function ResultTable({ message }: { message: ChatMessage }) {
+  if (!message.tableData || message.tableData.length === 0) return null;
+
+  return (
+    <div className="overflow-hidden rounded-xl border shadow-[0_0_0_1px_rgba(255,255,255,0.04),0_4px_24px_rgba(0,0,0,0.4)]" style={{ backgroundColor: shell.panelRaised, borderColor: shell.line }}>
+      <div className="flex items-center justify-between border-b px-3.5 py-2" style={{ borderColor: shell.line, backgroundColor: 'rgba(28,33,43,0.4)' }}>
+        <div className="flex items-center gap-2">
+          <Glyph name="table" className="text-[15px]" style={{ color: shell.blue } as any} />
+          <span className="text-[11px] font-semibold text-slate-200">FIR Result Summary</span>
+        </div>
+        <span className="font-mono text-[10px]" style={{ color: shell.ghost }}>{message.tableData.length} rows</span>
+      </div>
+      <div className="sentinel-scroll relative overflow-x-auto">
+        <table className="w-full text-[11px]">
+          <thead>
+            <tr className="border-b" style={{ borderColor: shell.line, backgroundColor: 'rgba(28,33,43,0.3)' }}>
+              {['FIR No.', 'Crime Type', 'District', 'Status'].map((head, idx) => (
+                <th key={head} className={`whitespace-nowrap px-3.5 py-2 font-semibold uppercase tracking-wider ${idx === 3 ? 'text-right' : 'text-left'}`} style={{ color: shell.ghost }}>
+                  {head}
+                </th>
+              ))}
+            </tr>
+          </thead>
+          <tbody>
+            {message.tableData.map((row, idx) => (
+              <tr key={`${row.firNo}-${idx}`} className="border-b transition-colors hover:bg-teal-300/[0.04]" style={{ borderColor: 'rgba(27,30,38,0.6)' }}>
+                <td className="whitespace-nowrap px-3.5 py-2.5 font-medium" style={{ color: shell.teal }}>{row.firNo}</td>
+                <td className="whitespace-nowrap px-3.5 py-2.5 text-slate-300">{row.crimeType}</td>
+                <td className="whitespace-nowrap px-3.5 py-2.5 text-slate-300">{row.district}</td>
+                <td className="whitespace-nowrap px-3.5 py-2.5 text-right">
+                  <span
+                    className="inline-flex items-center gap-1 rounded border px-1.5 py-0.5 text-[10px] font-semibold"
+                    style={{
+                      color: row.status === 'ACTIVE' ? shell.red : row.status === 'INVESTIGATION' ? shell.gold : shell.green,
+                      borderColor: row.status === 'ACTIVE' ? `${shell.redMuted}99` : row.status === 'INVESTIGATION' ? `${shell.goldMuted}99` : `${shell.greenMuted}99`,
+                      backgroundColor: row.status === 'ACTIVE' ? `${shell.redMuted}55` : row.status === 'INVESTIGATION' ? `${shell.goldMuted}55` : `${shell.greenMuted}55`,
+                    }}
+                  >
+                    {row.status}
+                  </span>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  );
+}
+
+function MessageMetadata({
+  message,
+  openSqlQueryId,
+  openSourcesId,
+  setOpenSqlQueryId,
+  setOpenSourcesId,
+}: {
+  message: ChatMessage;
+  openSqlQueryId: string | null;
+  openSourcesId: string | null;
+  setOpenSqlQueryId: (id: string | null) => void;
+  setOpenSourcesId: (id: string | null) => void;
+}) {
+  if (!message.sqlQuery) return null;
+
+  const sqlOpen = openSqlQueryId === message.id;
+  const sourcesOpen = openSourcesId === message.id;
+  const sources = message.sources && message.sources.length > 0 ? message.sources : ['CaseMaster'];
+
+  return (
+    <>
+      <div className="overflow-hidden rounded-xl border shadow-[0_0_0_1px_rgba(255,255,255,0.04),0_4px_24px_rgba(0,0,0,0.4)]" style={{ backgroundColor: shell.panelRaised, borderColor: shell.line }}>
+        <button
+          type="button"
+          onClick={() => setOpenSqlQueryId(sqlOpen ? null : message.id)}
+          className="group flex w-full items-center justify-between px-3.5 py-2.5 transition-colors hover:bg-white/[0.02]"
+        >
+          <div className="flex items-center gap-2">
+            <Glyph name={sqlOpen ? 'expand_more' : 'chevron_right'} className="text-[15px] transition-colors" style={{ color: shell.ghost } as any} />
+            <Glyph name="code" className="text-[15px]" style={{ color: shell.blue } as any} />
+            <span className="text-[11px] font-semibold transition-colors" style={{ color: shell.ghost }}>Source Query</span>
+          </div>
+          <span className="font-mono text-[10px]" style={{ color: shell.ghost }}>SQL</span>
+        </button>
+        <div className={`${sqlOpen ? 'max-h-[600px] opacity-100' : 'max-h-0 opacity-0'} overflow-hidden transition-all duration-300`}>
+          <div className="px-3.5 pb-3 pt-1">
+            <div className="sentinel-scroll overflow-x-auto rounded-lg border p-3" style={{ backgroundColor: shell.obsidian, borderColor: shell.line }}>
+              <pre className="whitespace-pre-wrap font-mono text-[11px] leading-relaxed" style={{ color: shell.slate }}>
+                {message.sqlQuery}
+              </pre>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div className="overflow-hidden rounded-xl border shadow-[0_0_0_1px_rgba(255,255,255,0.04),0_4px_24px_rgba(0,0,0,0.4)]" style={{ backgroundColor: shell.panelRaised, borderColor: shell.line }}>
+        <button
+          type="button"
+          onClick={() => setOpenSourcesId(sourcesOpen ? null : message.id)}
+          className="group flex w-full items-center justify-between px-3.5 py-2.5 transition-colors hover:bg-white/[0.02]"
+        >
+          <div className="flex items-center gap-2">
+            <Glyph name={sourcesOpen ? 'expand_more' : 'chevron_right'} className="text-[15px]" style={{ color: shell.ghost } as any} />
+            <Glyph name="menu_book" className="text-[15px]" style={{ color: shell.green } as any} />
+            <span className="text-[11px] font-semibold" style={{ color: shell.ghost }}>Data Sources</span>
+          </div>
+          <span className="font-mono text-[10px]" style={{ color: shell.ghost }}>{sources.length} refs</span>
+        </button>
+        <div className={`${sourcesOpen ? 'max-h-[600px] opacity-100' : 'max-h-0 opacity-0'} overflow-hidden transition-all duration-300`}>
+          <div className="space-y-1.5 px-3.5 pb-3 pt-1">
+            {sources.map((source, idx) => (
+              <div key={`${source}-${idx}`} className="flex items-center gap-2.5 rounded-lg border px-2.5 py-2 transition-colors hover:bg-teal-300/[0.08]" style={{ backgroundColor: 'rgba(28,33,43,0.3)', borderColor: 'rgba(27,30,38,0.6)' }}>
+                <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded border" style={{ backgroundColor: `${shell.blueMuted}33`, borderColor: `${shell.blueMuted}66`, color: shell.blue }}>
+                  <Glyph name="description" className="text-[13px]" />
+                </span>
+                <div className="min-w-0">
+                  <p className="truncate text-[11px] font-medium text-slate-200">{source}</p>
+                  <p className="truncate text-[10px]" style={{ color: shell.ghost }}>PRISM records - Evidence source</p>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+    </>
+  );
+}
+
+function MessageBlock({
+  message,
+  openSqlQueryId,
+  openSourcesId,
+  setOpenSqlQueryId,
+  setOpenSourcesId,
+}: {
+  message: ChatMessage;
+  openSqlQueryId: string | null;
+  openSourcesId: string | null;
+  setOpenSqlQueryId: (id: string | null) => void;
+  setOpenSourcesId: (id: string | null) => void;
+}) {
+  if (message.sender === 'user') {
+    return (
+      <div className="sentinel-msg-in flex justify-end gap-3">
+        <div className="max-w-[75%]">
+          <div className="mb-1 flex items-center justify-end gap-2">
+            <span className="text-[10px] font-medium" style={{ color: shell.ghost }}>You</span>
+            <span className="text-[10px]" style={{ color: shell.ghost }}>{message.timestamp}</span>
+          </div>
+          <div className="rounded-2xl rounded-tr-md border px-4 py-3 shadow-[0_0_12px_rgba(94,234,212,0.08)]" style={{ backgroundColor: 'rgba(94,234,212,0.08)', borderColor: 'rgba(94,234,212,0.15)' }}>
+            <p className="text-sm leading-relaxed text-slate-200">{message.text}</p>
+          </div>
+        </div>
+        <Avatar kind="user" className="mt-5" />
+      </div>
+    );
+  }
+
+  return (
+    <div className="sentinel-msg-in flex gap-3">
+      <Avatar kind="ai" className="mt-5" />
+      <div className="max-w-[85%]">
+        <div className="mb-1.5 flex items-center gap-2">
+          <span className="text-[10px] font-semibold uppercase tracking-wider" style={{ color: shell.teal }}>Sentinel</span>
+          <span className="text-[10px]" style={{ color: shell.ghost }}>{message.timestamp}</span>
+        </div>
+        <div className="space-y-3">
+          <div className="rounded-2xl rounded-tl-md border px-4 py-3 shadow-[0_0_0_1px_rgba(255,255,255,0.04),0_4px_24px_rgba(0,0,0,0.4)]" style={{ backgroundColor: shell.panelRaised, borderColor: shell.line }}>
+            <p className="whitespace-pre-wrap text-sm leading-relaxed text-slate-300">{message.text}</p>
+          </div>
+          <ResultTable message={message} />
+          <MessageMetadata
+            message={message}
+            openSqlQueryId={openSqlQueryId}
+            openSourcesId={openSourcesId}
+            setOpenSqlQueryId={setOpenSqlQueryId}
+            setOpenSourcesId={setOpenSourcesId}
+          />
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function Avatar({ kind, className = '' }: { kind: 'ai' | 'user'; className?: string }) {
+  if (kind === 'user') {
+    return (
+      <div className={`flex h-7 w-7 shrink-0 items-center justify-center rounded-lg border ${className}`} style={{ backgroundColor: `${shell.blueMuted}33`, borderColor: `${shell.blueMuted}66` }}>
+        <span className="text-[10px] font-bold" style={{ color: shell.blue }}>JD</span>
+      </div>
+    );
+  }
+
+  return (
+    <div className={`flex h-7 w-7 shrink-0 items-center justify-center rounded-lg border ${className}`} style={{ backgroundColor: `${shell.tealMuted}33`, borderColor: `${shell.tealMuted}66` }}>
+      <Glyph name="auto_awesome" className="text-[15px]" style={{ color: shell.teal } as any} />
+    </div>
+  );
+}
+
+function TypingBlock() {
+  return (
+    <div className="sentinel-msg-in flex gap-3">
+      <Avatar kind="ai" className="mt-5" />
+      <div className="max-w-[85%]">
+        <div className="mb-1.5 flex items-center gap-2">
+          <span className="text-[10px] font-semibold uppercase tracking-wider" style={{ color: shell.teal }}>Sentinel</span>
+          <span className="text-[10px]" style={{ color: shell.ghost }}>now</span>
+        </div>
+        <div className="rounded-2xl rounded-tl-md border px-4 py-3 shadow-[0_0_0_1px_rgba(255,255,255,0.04),0_4px_24px_rgba(0,0,0,0.4)]" style={{ backgroundColor: shell.panelRaised, borderColor: shell.line }}>
+          <div className="flex items-center gap-2">
+            <div className="flex gap-1">
+              <div className="sentinel-dot h-1.5 w-1.5 rounded-full" style={{ backgroundColor: shell.teal }} />
+              <div className="sentinel-dot h-1.5 w-1.5 rounded-full" style={{ backgroundColor: shell.teal }} />
+              <div className="sentinel-dot h-1.5 w-1.5 rounded-full" style={{ backgroundColor: shell.teal }} />
+            </div>
+            <span className="text-[11px]" style={{ color: shell.ghost }}>Analyzing intelligence data...</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function EmptyTranscript({ onPrompt }: { onPrompt: (text: string) => void }) {
+  return (
+    <div className="flex h-full items-center justify-center px-5 py-8">
+      <div className="max-w-xl text-center">
+        <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-xl border rotate-45" style={{ backgroundColor: 'rgba(94,234,212,0.10)', borderColor: 'rgba(94,234,212,0.20)' }}>
+          <Glyph name="fingerprint" className="-rotate-45 text-[24px]" style={{ color: shell.teal } as any} />
+        </div>
+        <h2 className="text-xl font-semibold text-slate-100">Start an intelligence session</h2>
+        <p className="mt-2 text-sm leading-6 text-slate-400">
+          Ask about FIRs, accused networks, hotspots, or patterns. Results will appear in the same Sentinel transcript format.
+        </p>
+        <div className="mt-5 flex flex-wrap justify-center gap-2">
+          {quickActions.slice(0, 3).map(([icon, color, label, prompt]) => (
+            <button
+              key={label}
+              type="button"
+              onClick={() => onPrompt(prompt)}
+              className="sentinel-quick flex items-center gap-2 rounded-lg border px-3 py-1.5 text-[11px] whitespace-nowrap"
+              style={{ backgroundColor: shell.panelRaised, borderColor: shell.line, color: shell.slate }}
+            >
+              <Glyph name={icon} className="text-[14px]" style={{ color } as any} />
+              {label}
+            </button>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+export default function ChatScreen({ onNavigate: _onNavigate }: ChatScreenProps) {
   const {
     messages,
     isTyping,
     history,
     activeSessionId,
-    latestResponse,
     sendMessage,
     loadHistory,
     startNewConversation,
@@ -25,50 +450,43 @@ export default function ChatScreen({ onNavigate }: ChatScreenProps) {
   } = useChat();
 
   const [inputText, setInputText] = React.useState('');
+  const [historySearch, setHistorySearch] = React.useState('');
   const [openSqlQueryId, setOpenSqlQueryId] = React.useState<string | null>(null);
   const [openSourcesId, setOpenSourcesId] = React.useState<string | null>(null);
-  const [leftSidebarCollapsed, setLeftSidebarCollapsed] = React.useState(false);
-  const [rightSidebarCollapsed, setRightSidebarCollapsed] = React.useState(false);
-
   const scrollContainerRef = useRef<HTMLDivElement>(null);
+  const textareaRef = useRef<HTMLTextAreaElement>(null);
+  const historyInputRef = useRef<HTMLInputElement>(null);
 
-  // Load history on mount
   useEffect(() => {
     loadHistory();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  // Auto-scroll on new messages
   useEffect(() => {
     if (scrollContainerRef.current) {
       scrollContainerRef.current.scrollTop = scrollContainerRef.current.scrollHeight;
     }
   }, [messages, isTyping]);
 
-  const handleSendMessage = (text: string) => {
+  useEffect(() => {
+    if (textareaRef.current) {
+      textareaRef.current.style.height = 'auto';
+      textareaRef.current.style.height = `${textareaRef.current.scrollHeight}px`;
+    }
+  }, [inputText]);
+
+  const handleSendMessage = (text = inputText) => {
     if (!text.trim()) return;
     sendMessage(text);
     setInputText('');
   };
 
-  const handleNewConversation = () => {
-    startNewConversation();
-  };
-
-  const handleHistoryClick = (id: string, title: string) => {
-    selectConversation(id);
-  };
-
   const handleExportPDF = async () => {
     if (!activeSessionId) return;
-    
+
     try {
       const response = await fetch(`http://localhost:3001/api/chat/export-pdf?session_id=${activeSessionId}`);
-      
-      if (!response.ok) {
-        throw new Error('Failed to export PDF');
-      }
-      
+      if (!response.ok) throw new Error('Failed to export PDF');
       const blob = await response.blob();
       const url = window.URL.createObjectURL(blob);
       const a = document.createElement('a');
@@ -83,402 +501,208 @@ export default function ChatScreen({ onNavigate }: ChatScreenProps) {
     }
   };
 
-  return (
-    <div className="flex-1 flex overflow-hidden bg-layout-bg h-full">
-      {/* Column 1: Conversation History */}
-      <aside className={`flex-shrink-0 bg-layout-surface border-r border-layout-border flex flex-col transition-all duration-300 ease-in-out overflow-hidden ${
-        leftSidebarCollapsed ? 'w-[56px]' : 'w-[220px]'
-      } hidden lg:flex`}>
-        <div className={`p-4 border-b border-layout-border flex ${leftSidebarCollapsed ? 'flex-col gap-3 items-center justify-center' : 'items-center justify-between'}`}>
-          {!leftSidebarCollapsed && (
-            <span className="text-[#8B92A5] text-[10px] uppercase font-bold tracking-wider font-mono">
-              History
-            </span>
-          )}
-          <button
-            type="button"
-            onClick={() => setLeftSidebarCollapsed(!leftSidebarCollapsed)}
-            className="p-1.5 bg-[#1E2025] hover:bg-[#2A2D35] border border-layout-border rounded text-outline hover:text-on-surface transition-colors cursor-pointer"
-            title={leftSidebarCollapsed ? "Expand History" : "Collapse History"}
-          >
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-white/60">
-              <rect width="18" height="18" x="3" y="3" rx="2" />
-              <path d="M9 3v18" />
-            </svg>
-          </button>
-        </div>
-        <div className="p-3 border-b border-layout-border flex justify-center">
-          <button
-            onClick={handleNewConversation}
-            className={`flex items-center justify-center border border-layout-border rounded text-primary-container hover:border-primary-container transition-colors font-body-sm font-semibold cursor-pointer ${
-              leftSidebarCollapsed ? 'w-10 h-10 p-0' : 'w-full py-2 px-3 gap-2'
-            }`}
-            title="New Conversation"
-          >
-            <span className="material-symbols-outlined text-[18px]">add</span>
-            {!leftSidebarCollapsed && <span>New Conversation</span>}
-          </button>
-        </div>
-        {!leftSidebarCollapsed && (
-          <div className="flex-1 overflow-y-auto custom-scrollbar p-3 space-y-6">
-            <div>
-              <h3 className="text-[#8B92A5] text-[10px] uppercase font-bold tracking-wider mb-2 px-2 font-mono">
-                Today
-              </h3>
-              <ul className="space-y-1">
-                {history.filter(h => h.category === 'Today').map((item) => {
-                  const isActive = activeSessionId === item.session_id;
-                  return (
-                    <li key={item.session_id}>
-                      <button
-                        onClick={() => handleHistoryClick(item.session_id, item.title)}
-                        className={`w-full text-left block px-2 py-1.5 rounded text-sm truncate font-body-sm transition-colors cursor-pointer ${
-                          isActive
-                            ? 'bg-surface-container-high text-primary-fixed border-l-2 border-primary-container'
-                            : 'text-on-surface-variant hover:bg-surface-container'
-                        }`}
-                      >
-                        {item.title}
-                      </button>
-                    </li>
-                  );
-                })}
-              </ul>
-            </div>
-            <div>
-              <h3 className="text-[#8B92A5] text-[10px] uppercase font-bold tracking-wider mb-2 px-2 font-mono">
-                Previous 7 Days
-              </h3>
-              <ul className="space-y-1">
-                {history.filter(h => h.category === 'Previous 7 Days').map((item) => {
-                  const isActive = activeSessionId === item.session_id;
-                  return (
-                    <li key={item.session_id}>
-                      <button
-                        onClick={() => handleHistoryClick(item.session_id, item.title)}
-                        className={`w-full text-left block px-2 py-1.5 rounded text-sm truncate font-body-sm transition-colors cursor-pointer ${
-                          isActive
-                            ? 'bg-surface-container-high text-primary-fixed border-l-2 border-primary-container'
-                            : 'text-on-surface-variant hover:bg-surface-container'
-                        }`}
-                      >
-                        {item.title}
-                      </button>
-                    </li>
-                  );
-                })}
-              </ul>
-            </div>
-          </div>
-        )}
-      </aside>
+  const handleShareSession = async () => {
+    try {
+      await navigator.clipboard?.writeText(window.location.href);
+    } catch (error) {
+      console.error('Failed to copy session link:', error);
+    }
+  };
 
-      {/* Column 2: Center Workspace (Chat) */}
-      <section className="flex-1 flex flex-col relative bg-layout-bg min-w-0">
-        {/* Header for Mobile/Tablet */}
-        <header className="lg:hidden h-16 border-b border-layout-border flex items-center px-4 justify-between bg-layout-surface">
-          <div className="font-headline-sm text-headline-sm font-semibold text-primary">
-            Intelligence Chat
+  const filteredHistory = history.filter((item) => item.title.toLowerCase().includes(historySearch.toLowerCase()));
+  const currentConversation = history.find((item) => item.session_id === activeSessionId);
+  const activeTitle = currentConversation?.title || (messages.length > 0 ? 'Current conversation' : 'New conversation');
+
+  return (
+    <div className="sentinel-grid relative flex h-full flex-1 flex-col overflow-hidden text-slate-200">
+      <ScanStyles />
+
+      <div className="flex min-h-0 flex-1">
+        <aside className="hidden w-[260px] shrink-0 flex-col border-r md:flex" style={{ backgroundColor: 'rgba(17,19,24,0.5)', borderColor: shell.line }}>
+          <div className="p-3">
+            <div className="relative">
+              <Glyph name="search" className="absolute left-3 top-1/2 -translate-y-1/2 text-[15px]" style={{ color: shell.ghost } as any} />
+              <input
+                ref={historyInputRef}
+                type="text"
+                placeholder="Search history..."
+                value={historySearch}
+                onChange={(e) => setHistorySearch(e.target.value)}
+                className="h-9 w-full rounded-lg border py-0 pl-9 pr-3 text-xs text-slate-200 outline-none transition-all placeholder:text-slate-700 focus:ring-1"
+                style={{ backgroundColor: 'rgba(28,33,43,0.6)', borderColor: shell.line }}
+              />
+            </div>
           </div>
-          <div className="flex items-center gap-2">
-            {messages.length > 0 && (
-              <button
-                onClick={handleExportPDF}
-                className="text-on-surface-variant hover:text-primary-container cursor-pointer"
-                title="Export to PDF"
-              >
-                <span className="material-symbols-outlined">download</span>
-              </button>
+
+          <div className="px-3 pb-1.5">
+            <span className="text-[10px] font-semibold uppercase tracking-widest" style={{ color: shell.ghost }}>Today</span>
+          </div>
+          <div className="sentinel-scroll flex-1 space-y-0.5 overflow-y-auto px-2">
+            {filteredHistory.length > 0 ? (
+              filteredHistory.map((item) => (
+                <HistoryItem
+                  key={item.session_id}
+                  item={item}
+                  active={item.session_id === activeSessionId}
+                  onClick={() => selectConversation(item.session_id)}
+                />
+              ))
+            ) : (
+              <div className="rounded-lg border border-dashed px-3 py-3 text-[12px] leading-5" style={{ borderColor: shell.line, color: shell.ghost }}>
+                No previous conversations yet.
+              </div>
             )}
-            <button 
-              onClick={handleNewConversation}
-              className="text-on-surface-variant hover:text-primary-container cursor-pointer"
+          </div>
+
+          <div className="border-t p-3" style={{ borderColor: shell.line }}>
+            <button
+              type="button"
+              onClick={startNewConversation}
+              className="flex h-9 w-full items-center justify-center gap-2 rounded-lg border text-xs font-semibold transition-all hover:bg-teal-300/15"
+              style={{ backgroundColor: 'rgba(94,234,212,0.10)', borderColor: 'rgba(94,234,212,0.20)', color: shell.teal }}
             >
-              <span className="material-symbols-outlined">menu</span>
+              <Glyph name="add" className="text-[16px]" />
+              New Session
             </button>
           </div>
-        </header>
+        </aside>
 
-        {messages.length === 0 ? (
-          /* Centered Empty State like ChatGPT */
-          <div className="flex-1 flex flex-col items-center justify-center p-6 max-w-2xl mx-auto w-full select-none">
-            <h2 className="text-3xl font-semibold text-on-surface mb-8 tracking-tight text-center">
-              What's on your mind today?
-            </h2>
+        <main className="flex min-w-0 flex-1 flex-col" style={{ backgroundColor: shell.obsidian }}>
+          <div className="flex h-12 shrink-0 items-center justify-between border-b px-5" style={{ backgroundColor: 'rgba(17,19,24,0.30)', borderColor: shell.line }}>
+            <div className="flex items-center gap-3">
+              <div className="flex h-7 w-7 items-center justify-center rounded-lg border" style={{ backgroundColor: `${shell.tealMuted}33`, borderColor: `${shell.tealMuted}66` }}>
+                <Glyph name="bar_chart" className="text-[15px]" style={{ color: shell.teal } as any} />
+              </div>
+              <div>
+                <h1 className="text-sm font-semibold text-slate-100">{activeTitle}</h1>
+                <p className="text-[11px]" style={{ color: shell.ghost }}>
+                  {messages.length} messages
+                </p>
+              </div>
+            </div>
+            <div className="flex items-center gap-1">
+              <button
+                type="button"
+                onClick={handleExportPDF}
+                className="flex h-7 items-center gap-1.5 rounded-md px-2.5 text-[11px] font-medium transition-all hover:bg-white/5 hover:text-slate-300"
+                style={{ color: shell.ghost }}
+              >
+                <Glyph name="download" className="text-[14px]" />
+                Export
+              </button>
+              <button
+                type="button"
+                onClick={handleShareSession}
+                className="flex h-7 items-center gap-1.5 rounded-md px-2.5 text-[11px] font-medium transition-all hover:bg-white/5 hover:text-slate-300"
+                style={{ color: shell.ghost }}
+              >
+                <Glyph name="share" className="text-[14px]" />
+                Share
+              </button>
+            </div>
+          </div>
+
+          <div ref={scrollContainerRef} className="sentinel-scroll min-h-0 flex-1 space-y-5 overflow-y-auto px-5 py-5">
+            {messages.length === 0 ? (
+              <EmptyTranscript onPrompt={(text) => handleSendMessage(text)} />
+            ) : (
+              messages.map((message) => (
+                <MessageBlock
+                  key={message.id}
+                  message={message}
+                  openSqlQueryId={openSqlQueryId}
+                  openSourcesId={openSourcesId}
+                  setOpenSqlQueryId={setOpenSqlQueryId}
+                  setOpenSourcesId={setOpenSourcesId}
+                />
+              ))
+            )}
+            {isTyping && <TypingBlock />}
+          </div>
+
+          <div className="px-5 pb-3">
+            <div className="mb-2 flex items-center gap-2">
+              <Glyph name="bolt" className="text-[14px]" style={{ color: shell.ghost } as any} />
+              <span className="text-[10px] font-semibold uppercase tracking-widest" style={{ color: shell.ghost }}>Quick Actions</span>
+            </div>
+            <div className="sentinel-scroll flex gap-2 overflow-x-auto pb-1">
+              {quickActions.map(([icon, color, label, prompt]) => (
+                <button
+                  key={label}
+                  type="button"
+                  onClick={() => handleSendMessage(prompt)}
+                  className="sentinel-quick flex shrink-0 items-center gap-2 whitespace-nowrap rounded-lg border px-3 py-1.5 text-[11px] hover:text-slate-200"
+                  style={{ backgroundColor: shell.panelRaised, borderColor: shell.line, color: shell.slate }}
+                >
+                  <Glyph name={icon} className="text-[14px]" style={{ color } as any} />
+                  {label}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          <div className="px-5 pb-4">
             <form
               onSubmit={(e) => {
                 e.preventDefault();
-                handleSendMessage(inputText);
+                handleSendMessage();
               }}
-              className="w-full relative flex items-center mb-8"
+              className="overflow-hidden rounded-2xl border shadow-[0_0_0_1px_rgba(255,255,255,0.05),0_8px_32px_rgba(0,0,0,0.5)]"
+              style={{ backgroundColor: shell.panelRaised, borderColor: shell.line }}
             >
-              <input
-                className="w-full bg-[#1E2025] border border-layout-border rounded-xl py-4 pl-5 pr-24 text-on-surface placeholder:text-white font-body-sm focus:outline-none focus:border-primary-container focus:ring-1 focus:ring-primary-container transition-all outline-none shadow-lg"
-                placeholder="Ask anything..."
-                type="text"
-                value={inputText}
-                onChange={(e) => setInputText(e.target.value)}
-              />
-              <div className="absolute right-3 flex items-center gap-1.5">
-                <button
-                  type="button"
-                  onClick={() => setInputText('Robbery cases in Bengaluru North')}
-                  className="p-2 text-outline-variant hover:text-primary-container transition-colors rounded-lg cursor-pointer hover:bg-[#2A2D35]"
-                  title="Speak voice prompt"
-                >
-                  <span className="material-symbols-outlined text-[20px]">mic</span>
-                </button>
+              <div className="flex items-start gap-3 px-4 py-3">
+                <Avatar kind="user" className="mt-0.5" />
+                <div className="min-w-0 flex-1">
+                  <textarea
+                    ref={textareaRef}
+                    rows={1}
+                    placeholder="Enter your intelligence query..."
+                    value={inputText}
+                    onChange={(e) => setInputText(e.target.value)}
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter' && !e.shiftKey) {
+                        e.preventDefault();
+                        handleSendMessage();
+                      }
+                    }}
+                    className="sentinel-composer max-h-36 w-full resize-none bg-transparent py-1 text-sm leading-relaxed text-slate-200 outline-none placeholder:text-slate-700"
+                  />
+                </div>
+              </div>
+              <div className="flex items-center justify-between px-3 pb-2.5 pt-1">
+                <div className="flex items-center gap-1">
+                  <button
+                    type="button"
+                    onClick={() => textareaRef.current?.focus()}
+                    className="flex h-7 items-center gap-1.5 rounded-lg px-2.5 text-[11px] transition-colors hover:bg-white/5 hover:text-slate-300"
+                    style={{ color: shell.ghost }}
+                  >
+                    <Glyph name="attach_file" className="text-[15px]" />
+                    Attach
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setInputText('Use the active context to ')}
+                    className="flex h-7 items-center gap-1.5 rounded-lg px-2.5 text-[11px] transition-colors hover:bg-white/5 hover:text-slate-300"
+                    style={{ color: shell.ghost }}
+                  >
+                    <Glyph name="grid_view" className="text-[15px]" />
+                    Context
+                  </button>
+                </div>
                 <button
                   type="submit"
-                  className="p-2 bg-primary-container text-white hover:bg-inverse-primary transition-colors rounded-lg cursor-pointer shadow"
+                  className="flex h-8 items-center gap-1.5 rounded-lg border px-4 text-xs font-semibold transition-all hover:bg-teal-300/15"
+                  style={{ backgroundColor: 'rgba(94,234,212,0.10)', borderColor: 'rgba(94,234,212,0.20)', color: shell.teal }}
                 >
-                  <span className="material-symbols-outlined text-[20px]">send</span>
+                  <Glyph name="send" className="text-[15px]" />
+                  Send
                 </button>
               </div>
             </form>
-            {/* Quick Suggestions */}
-            <div className="grid grid-cols-2 gap-3 w-full">
-              <button
-                type="button"
-                onClick={() => handleSendMessage("Robbery cases in Bengaluru North")}
-                className="flex items-center gap-3 p-3 bg-[#1E2025] border border-layout-border rounded-xl text-left text-sm text-on-surface-variant hover:bg-[#2A2D35] transition-colors cursor-pointer group"
-              >
-                <span className="material-symbols-outlined text-outline group-hover:text-primary-container">explore</span>
-                <div>
-                  <div className="font-semibold text-on-surface text-[13px]">Explore crime trends</div>
-                  <div className="text-[11px] text-outline">Search cases by area</div>
-                </div>
-              </button>
-              <button
-                type="button"
-                onClick={() => handleSendMessage("List high-risk offenders in Mysuru")}
-                className="flex items-center gap-3 p-3 bg-[#1E2025] border border-layout-border rounded-xl text-left text-sm text-on-surface-variant hover:bg-[#2A2D35] transition-colors cursor-pointer group"
-              >
-                <span className="material-symbols-outlined text-outline group-hover:text-primary-container">shield</span>
-                <div>
-                  <div className="font-semibold text-on-surface text-[13px]">Analyze offender profiles</div>
-                  <div className="text-[11px] text-outline">Identify active hotspots</div>
-                </div>
-              </button>
-            </div>
           </div>
-        ) : (
-          /* Active Chat Flow */
-          <>
-            {/* Chat Scroll Area */}
-            <div
-              ref={scrollContainerRef}
-              className="flex-1 overflow-y-auto custom-scrollbar p-6 space-y-8 pb-32"
-            >
-              {messages.map((msg) => (
-                <div key={msg.id} className={`flex ${msg.sender === 'user' ? 'justify-end' : 'justify-start'}`}>
-                  {msg.sender === 'user' ? (
-                    <div className="bg-primary-container text-white px-4 py-3 rounded-lg max-w-[80%] lg:max-w-[70%] font-body-sm shadow-sm">
-                      {msg.text}
-                    </div>
-                  ) : (
-                    <div className="flex flex-col max-w-[90%] lg:max-w-[85%]">
-                      <div className="font-body-sm text-on-surface mb-4 leading-relaxed whitespace-pre-wrap">
-                        {msg.text}
-                      </div>
-
-                      {/* Data Table */}
-                      {msg.tableData && msg.tableData.length > 0 && (
-                        <div className="border border-layout-border rounded bg-layout-surface overflow-hidden mb-4">
-                          <table className="w-full text-left text-sm font-body-sm">
-                            <thead className="bg-surface-container-high border-b border-layout-border text-on-surface-variant">
-                              <tr>
-                                <th className="py-2 px-3 font-semibold">FIR No.</th>
-                                <th className="py-2 px-3 font-semibold">Crime Type</th>
-                                <th className="py-2 px-3 font-semibold">District</th>
-                                <th className="py-2 px-3 font-semibold text-right">Status</th>
-                              </tr>
-                            </thead>
-                            <tbody className="divide-y divide-layout-border text-on-surface">
-                              {msg.tableData.map((row, idx) => (
-                                <tr key={idx} className="hover:bg-surface-container-lowest transition-colors">
-                                  <td className="py-2 px-3 font-label-mono text-label-mono text-primary-fixed">
-                                    {row.firNo}
-                                  </td>
-                                  <td className="py-2 px-3">{row.crimeType}</td>
-                                  <td className="py-2 px-3">{row.district}</td>
-                                  <td className="py-2 px-3 text-right">
-                                    <span className={`inline-block px-2 py-0.5 border text-[10px] font-bold rounded tracking-wide ${
-                                      row.status === 'ACTIVE' 
-                                        ? 'border-[#ffb68c] text-[#ffb68c]' 
-                                        : row.status === 'INVESTIGATION'
-                                        ? 'border-outline text-outline'
-                                        : 'border-green-400 text-green-400'
-                                    }`}>
-                                      {row.status}
-                                    </span>
-                                  </td>
-                                </tr>
-                              ))}
-                            </tbody>
-                          </table>
-                        </div>
-                      )}
-
-                      {/* Collapsed Actions */}
-                      {msg.sqlQuery && (
-                        <div className="space-y-2">
-                          <div>
-                            <button
-                              onClick={() => setOpenSqlQueryId(openSqlQueryId === msg.id ? null : msg.id)}
-                              className="flex items-center gap-1 text-[#4A5060] hover:text-on-surface-variant font-label-mono text-[11px] transition-colors group cursor-pointer"
-                            >
-                              <span className="material-symbols-outlined text-[14px] group-hover:text-primary-container">
-                                {openSqlQueryId === msg.id ? 'arrow_drop_down' : 'arrow_right'}
-                              </span>
-                              View SQL Query
-                            </button>
-                            {openSqlQueryId === msg.id && (
-                              <div className="mt-1 bg-black border border-layout-border p-3 rounded font-mono text-[11px] text-green-400 overflow-x-auto whitespace-pre">
-                                <code>{msg.sqlQuery}</code>
-                              </div>
-                            )}
-                          </div>
-
-                          <div>
-                            <button
-                              onClick={() => setOpenSourcesId(openSourcesId === msg.id ? null : msg.id)}
-                              className="flex items-center gap-1 text-[#4A5060] hover:text-on-surface-variant font-label-mono text-[11px] transition-colors group cursor-pointer"
-                            >
-                              <span className="material-symbols-outlined text-[14px] group-hover:text-primary-container">
-                                {openSourcesId === msg.id ? 'arrow_drop_down' : 'arrow_right'}
-                              </span>
-                              Data Sources ({msg.scannedRecords || 0} records scanned)
-                            </button>
-                            {openSourcesId === msg.id && (
-                               <div className="mt-1 pl-4 text-[10px] text-outline font-mono space-y-1">
-                                 {msg.sources && msg.sources.length > 0 ? (
-                                   msg.sources.map((source, idx) => (
-                                     <div key={idx}>• {source}</div>
-                                   ))
-                                 ) : (
-                                   <div>• CaseMaster</div>
-                                 )}
-                               </div>
-                            )}
-                          </div>
-                        </div>
-                      )}
-                    </div>
-                  )}
-                </div>
-              ))}
-
-              {isTyping && (
-                <div className="flex justify-start">
-                  <div className="bg-layout-surface border border-layout-border text-white/60 px-4 py-3 text-[10px] font-mono tracking-wider flex items-center gap-2">
-                    <span className="w-2 h-2 rounded-full bg-primary-container animate-pulse"></span>
-                    <span>PRISM CORE GENERATING THREAT METRICS...</span>
-                  </div>
-                </div>
-              )}
-            </div>
-
-            {/* Input Area (Bottom) */}
-            <div className="absolute bottom-0 left-0 w-full p-4 bg-layout-bg border-t border-layout-border">
-              <form
-                onSubmit={(e) => {
-                  e.preventDefault();
-                  handleSendMessage(inputText);
-                }}
-                className="max-w-4xl mx-auto relative flex items-center"
-              >
-                <input
-                  className="w-full bg-layout-surface border border-layout-border rounded-lg py-3 pl-4 pr-24 text-on-surface placeholder:text-white font-body-sm focus:outline-none focus:border-primary-container focus:ring-1 focus:ring-primary-container transition-all outline-none"
-                  placeholder="Ask about FIRs, accused, locations, or patterns..."
-                  type="text"
-                  value={inputText}
-                  onChange={(e) => setInputText(e.target.value)}
-                />
-                <div className="absolute right-2 flex items-center gap-1">
-                  <button
-                    type="button"
-                    onClick={handleExportPDF}
-                    className="p-1.5 text-outline-variant hover:text-primary-container transition-colors rounded cursor-pointer"
-                    title="Export to PDF"
-                  >
-                    <span className="material-symbols-outlined text-[20px]">download</span>
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => setInputText('Robbery cases in Bengaluru North')}
-                    className="p-1.5 text-outline-variant hover:text-primary-container transition-colors rounded cursor-pointer"
-                  >
-                    <span className="material-symbols-outlined text-[20px]">mic</span>
-                  </button>
-                  <button
-                    type="submit"
-                    className="p-1.5 bg-primary-container text-white hover:bg-inverse-primary transition-colors rounded cursor-pointer"
-                  >
-                    <span className="material-symbols-outlined text-[20px]">send</span>
-                  </button>
-                </div>
-              </form>
-            </div>
-          </>
-        )}
-      </section>
-
-      {/* Column 3: Related Context */}
-      <aside className={`flex-shrink-0 bg-layout-surface border-l border-layout-border flex flex-col transition-all duration-300 ease-in-out overflow-hidden ${
-        rightSidebarCollapsed ? 'w-[56px]' : 'w-[260px]'
-      } hidden xl:flex`}>
-        <div className={`p-4 border-b border-layout-border flex items-center ${rightSidebarCollapsed ? 'justify-center' : 'justify-between'}`}>
-          {!rightSidebarCollapsed && (
-            <span className="text-[#8B92A5] text-[10px] uppercase font-bold tracking-wider font-mono">
-              Context
-            </span>
-          )}
-          <button
-            type="button"
-            onClick={() => setRightSidebarCollapsed(!rightSidebarCollapsed)}
-            className="p-1.5 bg-[#1E2025] hover:bg-[#2A2D35] border border-layout-border rounded text-outline hover:text-on-surface transition-colors cursor-pointer"
-            title={rightSidebarCollapsed ? "Expand Context" : "Collapse Context"}
-          >
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-white/60">
-              <rect width="18" height="18" x="3" y="3" rx="2" />
-              <path d="M15 3v18" />
-            </svg>
-          </button>
-        </div>
-        {!rightSidebarCollapsed && (
-          <div className="flex-1 overflow-y-auto custom-scrollbar p-4 space-y-6">
-            <div>
-              <h3 className="text-[#8B92A5] text-[10px] uppercase font-bold tracking-wider mb-3 font-mono">
-                Mentioned Entities
-              </h3>
-              <div className="space-y-3">
-                {latestResponse?.entities.map((entity, idx) => (
-                  <div
-                    key={idx}
-                    className="border border-layout-border rounded p-3 bg-layout-bg transition-colors group"
-                  >
-                    <div className="flex justify-between items-start mb-2">
-                      <div className="flex items-center gap-2 text-on-surface">
-                        <span className="material-symbols-outlined text-[16px] text-outline">
-                          {entity.type === 'person' ? 'person' : 'location_on'}
-                        </span>
-                        <span className="font-body-sm font-semibold">{entity.name}</span>
-                      </div>
-                    </div>
-                    <div className="text-[12px] text-on-surface-variant mb-2 font-mono">
-                      {entity.type}
-                    </div>
-                    <div className="text-[11px] font-label-mono text-outline">
-                      {entity.detail}
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-          </div>
-        )}
-      </aside>
+        </main>
+      </div>
     </div>
   );
 }

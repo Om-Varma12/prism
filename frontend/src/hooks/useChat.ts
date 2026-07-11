@@ -37,13 +37,29 @@ export const useChat = () => {
    * Send a message to the chat API
    */
   const sendMessage = async (text: string) => {
-    if (!text.trim() || !activeSessionId) return;
+    const trimmedText = text.trim();
+    if (!trimmedText) return;
+
+    let sessionId = activeSessionId;
+    if (!sessionId) {
+      try {
+        const created = await chatService.newConversation();
+        sessionId = created.session_id;
+        setActiveSessionId(sessionId);
+        isNewSession.current = true;
+      } catch (error) {
+        console.error('Failed to create session before sending message:', error);
+        sessionId = crypto.randomUUID();
+        setActiveSessionId(sessionId);
+        isNewSession.current = true;
+      }
+    }
 
     // Add user message optimistically
     const userMessage: ChatMessage = {
       id: `msg-user-${Date.now()}`,
       sender: 'user',
-      text: text,
+      text: trimmedText,
       timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
     };
 
@@ -51,7 +67,7 @@ export const useChat = () => {
     setIsTyping(true);
 
     try {
-      const response = await chatService.sendQuery(text, activeSessionId);
+      const response = await chatService.sendQuery(trimmedText, sessionId);
 
       const aiMessage: ChatMessage = {
         id: `msg-ai-${Date.now()}`,
