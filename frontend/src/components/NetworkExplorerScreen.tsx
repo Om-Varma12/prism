@@ -3,20 +3,33 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { MOCK_SUSPECTS } from '../data/mockData';
 import { SuspectProfile } from '../types';
-import { useNetworkGraph, useAccusedProfile } from '../hooks/useNetworkGraph';
+import { useNetworkGraph, useAccusedProfile, useSearchAccused } from '../hooks/useNetworkGraph';
 import { NetworkGraphFilters, NetworkGraphView, NetworkGraphNode } from '../types/network';
 import { NetworkGraph } from './network/NetworkGraph';
 
 export default function NetworkExplorerScreen() {
   const [activeSegment, setActiveSegment] = useState<NetworkGraphView>('all');
   const [searchQuery, setSearchQuery] = useState('');
+  const [debouncedSearchQuery, setDebouncedSearchQuery] = useState('');
+  const [showSearchResults, setShowSearchResults] = useState(false);
   const [selectedDistrict, setSelectedDistrict] = useState('All Districts');
   const [selectedCrimeType, setSelectedCrimeType] = useState('All Types');
   const [selectedDateRange, setSelectedDateRange] = useState('Last 30 Days');
+  
+  // Debounce search query
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setDebouncedSearchQuery(searchQuery);
+    }, 300);
+    return () => clearTimeout(timer);
+  }, [searchQuery]);
+  
+  // Search for accused
+  const { data: searchResults, isLoading: searchLoading } = useSearchAccused(debouncedSearchQuery);
   
   // Update filters when segment changes
   React.useEffect(() => {
@@ -162,15 +175,62 @@ export default function NetworkExplorerScreen() {
           </div>
           <div className="p-4 flex flex-col gap-4">
             {/* Search */}
-            <div className="relative input-border rounded-DEFAULT bg-[#0A0C10] flex items-center px-3 py-2">
-              <span className="material-symbols-outlined text-outline text-[18px] mr-2">search</span>
-              <input
-                className="bg-transparent border-none p-0 text-sm text-on-surface placeholder:text-outline w-full focus:ring-0 outline-none"
-                placeholder="Search by name, location, case..."
-                type="text"
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-              />
+            <div className="relative">
+              <div className="relative input-border rounded-DEFAULT bg-[#0A0C10] flex items-center px-3 py-2">
+                <span className="material-symbols-outlined text-outline text-[18px] mr-2">search</span>
+                <input
+                  className="bg-transparent border-none p-0 text-sm text-on-surface placeholder:text-outline w-full focus:ring-0 outline-none"
+                  placeholder="Search by name..."
+                  type="text"
+                  value={searchQuery}
+                  onChange={(e) => {
+                    setSearchQuery(e.target.value);
+                    setShowSearchResults(e.target.value.length >= 2);
+                  }}
+                  onFocus={() => setShowSearchResults(searchQuery.length >= 2)}
+                  onBlur={() => setTimeout(() => setShowSearchResults(false), 200)}
+                />
+              </div>
+              
+              {/* Search Results Dropdown */}
+              <AnimatePresence>
+                {showSearchResults && searchQuery.length >= 2 && (
+                  <motion.div
+                    initial={{ opacity: 0, y: -10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -10 }}
+                    className="absolute top-full left-0 right-0 mt-2 bg-[#111318] border border-[#252830] rounded-lg shadow-xl z-50 max-h-60 overflow-y-auto"
+                  >
+                    {searchLoading ? (
+                      <div className="p-3 text-center text-on-surface-variant text-sm">Searching...</div>
+                    ) : searchResults && searchResults.results.length > 0 ? (
+                      searchResults.results.map((result) => (
+                        <div
+                          key={result.accused_id}
+                          className="p-3 hover:bg-[#1A1D24] cursor-pointer border-b border-[#252830] last:border-b-0"
+                          onClick={() => {
+                            setSearchQuery(result.name);
+                            setShowSearchResults(false);
+                            setSelectedAccusedId(result.accused_id);
+                            // Find and select the node in the graph
+                            const node = nodes.find((n: NetworkGraphNode) => n.accused_id === result.accused_id);
+                            if (node) {
+                              setSelectedNodeId(node.id);
+                            }
+                          }}
+                        >
+                          <div className="text-sm text-on-surface font-medium">{result.name}</div>
+                          <div className="text-xs text-on-surface-variant mt-1">
+                            {result.fir_count} FIRs • Risk: {result.risk_score}
+                          </div>
+                        </div>
+                      ))
+                    ) : (
+                      <div className="p-3 text-center text-on-surface-variant text-sm">No results found</div>
+                    )}
+                  </motion.div>
+                )}
+              </AnimatePresence>
             </div>
             {/* Dropdowns */}
             <div className="flex flex-col gap-1">
