@@ -8,6 +8,7 @@ from typing import Any, Optional
 
 from schemas.network import DensestNode, GraphEdge, GraphMetadata, GraphNode, GraphResponse, GraphView
 from agents.network_agent.centrality import CentralityComputer
+from agents.network_agent.community_detection import CommunityDetector
 
 
 class NetworkGraphBuilder:
@@ -137,6 +138,9 @@ class NetworkGraphBuilder:
                 edge for edge in edges
                 if edge.source in repeat_node_ids and edge.target in repeat_node_ids
             ]
+        
+        # Assign gang clusters for all views (used in clusters view)
+        CommunityDetector.assign_clusters_to_nodes(nodes, edges)
         
         # Compute centrality metrics and attach to nodes
         CentralityComputer.attach_centrality_to_nodes(nodes, edges)
