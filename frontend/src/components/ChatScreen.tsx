@@ -59,6 +59,30 @@ export default function ChatScreen({ onNavigate }: ChatScreenProps) {
     selectConversation(id);
   };
 
+  const handleExportPDF = async () => {
+    if (!activeSessionId) return;
+    
+    try {
+      const response = await fetch(`http://localhost:3001/api/chat/export-pdf?session_id=${activeSessionId}`);
+      
+      if (!response.ok) {
+        throw new Error('Failed to export PDF');
+      }
+      
+      const blob = await response.blob();
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `chat_export_${activeSessionId.slice(0, 8)}.pdf`;
+      document.body.appendChild(a);
+      a.click();
+      window.URL.revokeObjectURL(url);
+      document.body.removeChild(a);
+    } catch (error) {
+      console.error('Failed to export PDF:', error);
+    }
+  };
+
   return (
     <div className="flex-1 flex overflow-hidden bg-layout-bg h-full">
       {/* Column 1: Conversation History */}
@@ -156,12 +180,23 @@ export default function ChatScreen({ onNavigate }: ChatScreenProps) {
           <div className="font-headline-sm text-headline-sm font-semibold text-primary">
             Intelligence Chat
           </div>
-          <button 
-            onClick={handleNewConversation}
-            className="text-on-surface-variant hover:text-primary-container cursor-pointer"
-          >
-            <span className="material-symbols-outlined">menu</span>
-          </button>
+          <div className="flex items-center gap-2">
+            {messages.length > 0 && (
+              <button
+                onClick={handleExportPDF}
+                className="text-on-surface-variant hover:text-primary-container cursor-pointer"
+                title="Export to PDF"
+              >
+                <span className="material-symbols-outlined">download</span>
+              </button>
+            )}
+            <button 
+              onClick={handleNewConversation}
+              className="text-on-surface-variant hover:text-primary-container cursor-pointer"
+            >
+              <span className="material-symbols-outlined">menu</span>
+            </button>
+          </div>
         </header>
 
         {messages.length === 0 ? (
@@ -361,6 +396,14 @@ export default function ChatScreen({ onNavigate }: ChatScreenProps) {
                   onChange={(e) => setInputText(e.target.value)}
                 />
                 <div className="absolute right-2 flex items-center gap-1">
+                  <button
+                    type="button"
+                    onClick={handleExportPDF}
+                    className="p-1.5 text-outline-variant hover:text-primary-container transition-colors rounded cursor-pointer"
+                    title="Export to PDF"
+                  >
+                    <span className="material-symbols-outlined text-[20px]">download</span>
+                  </button>
                   <button
                     type="button"
                     onClick={() => setInputText('Robbery cases in Bengaluru North')}
