@@ -647,19 +647,6 @@ async def export_chat_pdf(
                             story.append(Spacer(1, 0.1*inch))
                     except Exception as e:
                         print(f"[PDF Export] Error parsing sources: {e}")
-                
-                # Add follow-ups if available
-                follow_ups_json = r.get("follow_ups_json") or row.get("follow_ups_json")
-                if follow_ups_json:
-                    try:
-                        follow_ups = json.loads(follow_ups_json)
-                        if follow_ups:
-                            story.append(Paragraph("<b>Suggested Follow-ups:</b>", header_style))
-                            for follow_up in follow_ups:
-                                story.append(Paragraph(f"• {follow_up}", normal_style))
-                            story.append(Spacer(1, 0.1*inch))
-                    except Exception as e:
-                        print(f"[PDF Export] Error parsing follow-ups: {e}")
             
             story.append(Spacer(1, 0.2*inch))
         
@@ -673,7 +660,7 @@ async def export_chat_pdf(
         return StreamingResponse(
             buffer,
             media_type="application/pdf",
-            headers={"Content-Disposition": f"attachment; filename={filename}"}
+            headers={"Content-Disposition": f"attachment; filename=\"{filename}\""}
         )
         
     except Exception as e:
