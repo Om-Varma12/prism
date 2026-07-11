@@ -63,6 +63,7 @@ async def get_network_graph(
             district=district,
             date_from=date_from,
             date_to=date_to,
+            view=view,
         )
     except Exception as exc:
         print(f"[Warning] Failed to build network graph: {exc}")

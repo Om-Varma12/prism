@@ -6,7 +6,7 @@ from datetime import datetime, timedelta
 from itertools import combinations
 from typing import Any, Optional
 
-from schemas.network import DensestNode, GraphEdge, GraphMetadata, GraphNode, GraphResponse
+from schemas.network import DensestNode, GraphEdge, GraphMetadata, GraphNode, GraphResponse, GraphView
 from agents.network_agent.centrality import CentralityComputer
 
 
@@ -22,6 +22,7 @@ class NetworkGraphBuilder:
         district: Optional[str] = None,
         date_from: Optional[str] = None,
         date_to: Optional[str] = None,
+        view: GraphView = "all",
     ) -> GraphResponse:
         # Apply default date window if no date filters provided (last 90 days)
         if not date_from and not date_to:
@@ -125,6 +126,17 @@ class NetworkGraphBuilder:
 
         nodes = list(nodes_by_id.values())
         edges = list(edges_by_pair.values())
+        
+        # Apply view-specific filtering
+        if view == "repeat":
+            # Filter to only repeat offenders (2+ FIRs)
+            repeat_node_ids = {node.id for node in nodes if node.fir_count >= 2}
+            nodes = [node for node in nodes if node.id in repeat_node_ids]
+            # Filter edges to only connect repeat offenders
+            edges = [
+                edge for edge in edges
+                if edge.source in repeat_node_ids and edge.target in repeat_node_ids
+            ]
         
         # Compute centrality metrics and attach to nodes
         CentralityComputer.attach_centrality_to_nodes(nodes, edges)
