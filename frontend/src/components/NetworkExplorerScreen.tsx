@@ -7,82 +7,86 @@ import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { MOCK_SUSPECTS } from '../data/mockData';
 import { SuspectProfile } from '../types';
+import { useNetworkGraph } from '../hooks/useNetworkGraph';
+import { NetworkGraphFilters, NetworkGraphView } from '../types/network';
 
 export default function NetworkExplorerScreen() {
-  const [activeSegment, setActiveSegment] = useState<'all' | 'gang' | 'repeat'>('all');
+  const [activeSegment, setActiveSegment] = useState<NetworkGraphView>('all');
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedDistrict, setSelectedDistrict] = useState('All Districts');
   const [selectedCrimeType, setSelectedCrimeType] = useState('All Types');
   const [selectedDateRange, setSelectedDateRange] = useState('Last 30 Days');
   
+  // Update filters when segment changes
+  React.useEffect(() => {
+    setFilters(prev => ({ ...prev, view: activeSegment }));
+  }, [activeSegment]);
+  
   // Selected Profile state
   const [selectedProfile, setSelectedProfile] = useState<SuspectProfile | null>(MOCK_SUSPECTS[0]);
   const [showBriefingDialog, setShowBriefingDialog] = useState(false);
+  
+  // Network graph filters
+  const [filters, setFilters] = useState<NetworkGraphFilters>({
+    view: 'all',
+  });
+  
+  // Fetch live graph data
+  const { data: graphData, isLoading, error } = useNetworkGraph(filters);
 
-  // Nodes simulation positions based on segment selected
-  const getNodes = () => {
-    const baseNodes = [
-      { id: 'SP-90210', name: 'Suresh Hegde', type: 'accused', cx: 60, cy: 50, isCentral: true },
-      { id: 'SP-90211', name: 'K. Manjunath', type: 'accused', cx: 75, cy: 60 },
-      { id: 'SP-90212', name: 'R. Ravi', type: 'accused', cx: 55, cy: 70 },
-      { id: 'SP-90214', name: 'S. Kumar', type: 'accused', cx: 80, cy: 45 },
-      
-      // Crime incidents
-      { id: 'CR-001', name: 'FIR-2023-BN-0847', type: 'crime', cx: 40, cy: 45 },
-      { id: 'CR-002', name: 'FIR-2023-BN-0912', type: 'crime', cx: 70, cy: 30 },
-      
-      // Locations
-      { id: 'LO-001', name: 'Yelahanka PS', type: 'location', cx: 35, cy: 55 },
-      { id: 'LO-002', name: 'Hebbal Flyover', type: 'location', cx: 80, cy: 25 },
-      
-      // Distant Nodes
-      { id: 'SP-90213', name: 'Ramesh Gowda', type: 'accused', cx: 20, cy: 30 },
-      { id: 'CR-003', name: 'FIR-2023-MW-0502', type: 'crime', cx: 15, cy: 20 },
-      { id: 'LO-003', name: 'Mysore West', type: 'location', cx: 80, cy: 45 }
-    ];
-
-    if (activeSegment === 'gang') {
-      // Pull nodes closer into distinct cluster groups
-      return baseNodes.map(node => {
-        if (node.id === 'SP-90210' || node.id === 'SP-90211' || node.id === 'SP-90212' || node.id === 'CR-001' || node.id === 'LO-001') {
-          return { ...node, cx: node.cx * 0.9 + 5, cy: node.cy * 0.9 + 5 };
-        }
-        return node;
-      });
+  // Use live API data when available, fallback to mock for empty/error states
+  const nodes = graphData?.nodes || [];
+  const edges = graphData?.edges || [];
+  
+  // For now, keep mock positioning for visualization (will be replaced with D3 in Step 12)
+  const getVisualNodes = () => {
+    if (nodes.length === 0) {
+      // Fallback to mock nodes when no data
+      return [
+        { id: 'SP-90210', name: 'Suresh Hegde', type: 'accused', cx: 60, cy: 50, isCentral: true },
+        { id: 'SP-90211', name: 'K. Manjunath', type: 'accused', cx: 75, cy: 60 },
+        { id: 'SP-90212', name: 'R. Ravi', type: 'accused', cx: 55, cy: 70 },
+        { id: 'SP-90214', name: 'S. Kumar', type: 'accused', cx: 80, cy: 45 },
+      ];
     }
-
-    if (activeSegment === 'repeat') {
-      // Emphasize repeat offenders
-      return baseNodes.map(node => {
-        if (node.type === 'accused' && (node.id === 'SP-90210' || node.id === 'SP-90213')) {
-          return { ...node, cy: node.cy * 0.8 }; // Lift repeat offenders
-        }
-        return node;
-      });
-    }
-
-    return baseNodes;
+    
+    // Map API nodes to visual positions (simple circular layout for now)
+    return nodes.map((node, index) => {
+      const angle = (index / nodes.length) * 2 * Math.PI;
+      const radius = 30;
+      const cx = 50 + radius * Math.cos(angle);
+      const cy = 50 + radius * Math.sin(angle);
+      return {
+        id: node.id,
+        name: node.label,
+        type: node.type === 'incident' ? 'crime' : node.type, // Map incident to crime for compatibility
+        cx,
+        cy,
+        isCentral: node.centrality_score > 0.7,
+      };
+    });
   };
 
-  const nodes = getNodes();
-
-  // Draw lines connecting nodes based on relationships
-  const getConnections = () => {
-    return [
-      { from: 'SP-90210', to: 'SP-90211', thick: true },
-      { from: 'SP-90210', to: 'SP-90212', thick: true },
-      { from: 'SP-90210', to: 'SP-90214', thick: true },
-      { from: 'SP-90210', to: 'CR-001', thick: true },
-      { from: 'SP-90211', to: 'LO-001', thick: false },
-      { from: 'SP-90212', to: 'LO-001', thick: false },
-      { from: 'CR-001', to: 'LO-001', thick: true },
-      { from: 'SP-90214', to: 'CR-002', thick: false },
-      { from: 'CR-002', to: 'LO-002', thick: true },
-      { from: 'SP-90213', to: 'CR-003', thick: false }
-    ];
+  const visualNodes = getVisualNodes();
+  
+  // Map API edges to visual connections
+  const getVisualConnections = () => {
+    if (edges.length === 0) {
+      return [
+        { from: 'SP-90210', to: 'SP-90211', thick: true },
+        { from: 'SP-90210', to: 'SP-90212', thick: true },
+        { from: 'SP-90210', to: 'SP-90214', thick: true },
+      ];
+    }
+    
+    return edges.map(edge => ({
+      from: edge.source,
+      to: edge.target,
+      thick: edge.strength > 1,
+    }));
   };
 
-  const connections = getConnections();
+  const connections = getVisualConnections();
 
   const handleNodeClick = (node: any) => {
     if (node.type === 'accused') {
@@ -93,7 +97,7 @@ export default function NetworkExplorerScreen() {
     }
   };
 
-  const filteredNodes = nodes.filter(node => {
+  const filteredNodes = visualNodes.filter(node => {
     if (searchQuery) {
       return node.name.toLowerCase().includes(searchQuery.toLowerCase());
     }
@@ -107,6 +111,12 @@ export default function NetworkExplorerScreen() {
         <h2 className="font-headline-sm text-headline-sm text-on-surface">
           Network Explorer
         </h2>
+        {isLoading && (
+          <span className="text-xs text-on-surface-variant">Loading graph data...</span>
+        )}
+        {error && (
+          <span className="text-xs text-error">Error loading graph</span>
+        )}
         {/* Segmented Control */}
         <div className="flex items-center bg-[#0A0C10] p-1 rounded-DEFAULT border border-[#252830] text-sm font-medium">
           <button
@@ -120,9 +130,9 @@ export default function NetworkExplorerScreen() {
             All Connections
           </button>
           <button
-            onClick={() => setActiveSegment('gang')}
+            onClick={() => setActiveSegment('clusters')}
             className={`px-4 py-1.5 rounded-DEFAULT transition-colors cursor-pointer ${
-              activeSegment === 'gang'
+              activeSegment === 'clusters'
                 ? 'bg-[#3B6FE8] text-white'
                 : 'text-on-surface-variant hover:text-on-surface hover:bg-[#1A1D24]'
             }`}
@@ -178,7 +188,7 @@ export default function NetworkExplorerScreen() {
         </svg>
 
         {/* Cluster Annotation */}
-        {activeSegment === 'gang' && (
+        {activeSegment === 'clusters' && (
           <>
             <div
               className="cluster-boundary"
