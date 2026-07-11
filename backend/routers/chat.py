@@ -9,6 +9,7 @@ from typing import Optional
 from services.llm_client import CatalystLLMClient
 from agents.text_to_sql.agent import TextToSQLAgent
 from agents.response_structurer.agent import ResponseStructurer
+from agents.title_generator.agent import TitleGenerator
 from schemas.chat import (
     ChatQueryRequest,
     ChatQueryResponse,
@@ -20,6 +21,8 @@ from schemas.chat import (
 )
 from core.database import get_zcql
 from core.security import require_role
+from fastapi.responses import StreamingResponse
+import json
 
 
 router = APIRouter(prefix="/api/chat", tags=["chat"])
@@ -467,5 +470,214 @@ async def debug_query(zcql = Depends(get_zcql)):
         diagnostics["Victim_Where_Only_Error"] = str(e)
 
     return diagnostics
+
+
+@router.get("/export-pdf")
+async def export_chat_pdf(
+    session_id: str,
+    request: Request,
+    zcql = Depends(get_zcql)
+):
+    """
+    Export conversation to PDF with title, date/time, and all content except SQL.
+    """
+    from reportlab.lib.pagesizes import letter
+    from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
+    from reportlab.lib.units import inch
+    from reportlab.lib import colors
+    from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, Table, TableStyle, PageBreak
+    from reportlab.lib.enums import TA_CENTER, TA_LEFT
+    from io import BytesIO
+    
+    try:
+        # Fetch conversation messages
+        escaped_sid = session_id.replace("'", "''")
+        query = f"""
+        SELECT role, content, sql_generated, created_at, table_data_json, entities_json, follow_ups_json, sources_json, scanned_records
+        FROM conversations
+        WHERE session_id = '{escaped_sid}' AND user_id = 'dev_user'
+        ORDER BY created_at ASC
+        """
+        result = zcql.execute_query(query)
+        rows = result if isinstance(result, list) else []
+        
+        if not rows:
+            return {"error": "No messages found for this session"}
+        
+        # Format messages for title generation
+        messages_for_title = []
+        for row in rows:
+            r = row.get("conversations", row)
+            messages_for_title.append({
+                "role": r.get("role") or row.get("role", ""),
+                "content": r.get("content") or row.get("content", "")
+            })
+        
+        # Generate title using LLM agent
+        llm_client = CatalystLLMClient()
+        title_generator = TitleGenerator(llm_client)
+        title = title_generator.generate_title(messages_for_title)
+        
+        # Get conversation date/time (from first message)
+        first_row = rows[0]
+        r = first_row.get("conversations", first_row)
+        created_at = r.get("created_at") or first_row.get("created_at", "")
+        try:
+            conv_date = datetime.strptime(created_at.replace('T', ' ').split('+')[0].split('Z')[0].strip(), "%Y-%m-%d %H:%M:%S")
+            date_str = conv_date.strftime("%B %d, %Y at %I:%M %p")
+        except:
+            date_str = created_at
+        
+        # Create PDF
+        buffer = BytesIO()
+        doc = SimpleDocTemplate(buffer, pagesize=letter, rightMargin=72, leftMargin=72, topMargin=72, bottomMargin=18)
+        styles = getSampleStyleSheet()
+        story = []
+        
+        # Custom styles
+        title_style = ParagraphStyle(
+            'CustomTitle',
+            parent=styles['Heading1'],
+            fontSize=18,
+            textColor=colors.HexColor('#3B6FE8'),
+            spaceAfter=12,
+            alignment=TA_CENTER
+        )
+        
+        date_style = ParagraphStyle(
+            'DateStyle',
+            parent=styles['Normal'],
+            fontSize=10,
+            textColor=colors.gray,
+            alignment=TA_CENTER,
+            spaceAfter=30
+        )
+        
+        header_style = ParagraphStyle(
+            'HeaderStyle',
+            parent=styles['Heading2'],
+            fontSize=14,
+            textColor=colors.HexColor('#1E2025'),
+            spaceBefore=12,
+            spaceAfter=6
+        )
+        
+        normal_style = ParagraphStyle(
+            'NormalStyle',
+            parent=styles['Normal'],
+            fontSize=11,
+            textColor=colors.HexColor('#2A2D35'),
+            spaceAfter=12,
+            leading=14
+        )
+        
+        # Add title
+        story.append(Paragraph(title, title_style))
+        story.append(Paragraph(f"Generated on {date_str}", date_style))
+        story.append(Spacer(1, 0.2*inch))
+        
+        # Add messages
+        for row in rows:
+            r = row.get("conversations", row)
+            role = r.get("role") or row.get("role", "")
+            content = r.get("content") or row.get("content", "")
+            
+            if role == 'user':
+                story.append(Paragraph("<b>User:</b>", header_style))
+            else:
+                story.append(Paragraph("<b>Assistant:</b>", header_style))
+            
+            story.append(Paragraph(content, normal_style))
+            
+            # Add table data if available (assistant only)
+            if role == 'assistant':
+                table_data_json = r.get("table_data_json") or row.get("table_data_json")
+                if table_data_json:
+                    try:
+                        table_data = json.loads(table_data_json)
+                        if table_data:
+                            story.append(Paragraph("<b>Results:</b>", header_style))
+                            
+                            # Create table
+                            if table_data:
+                                headers = list(table_data[0].keys())
+                                data = [headers]
+                                for row_data in table_data:
+                                    data.append([str(row_data.get(h, '')) for h in headers])
+                                
+                                table = Table(data, colWidths=[1.5*inch]*len(headers))
+                                table.setStyle(TableStyle([
+                                    ('BACKGROUND', (0, 0), (-1, 0), colors.HexColor('#3B3E47')),
+                                    ('TEXTCOLOR', (0, 0), (-1, 0), colors.white),
+                                    ('ALIGN', (0, 0), (-1, -1), 'LEFT'),
+                                    ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
+                                    ('FONTSIZE', (0, 0), (-1, 0), 10),
+                                    ('BOTTOMPADDING', (0, 0), (-1, 0), 12),
+                                    ('BACKGROUND', (0, 1), (-1, -1), colors.beige),
+                                    ('GRID', (0, 0), (-1, -1), 1, colors.black),
+                                ]))
+                                story.append(table)
+                                story.append(Spacer(1, 0.1*inch))
+                    except Exception as e:
+                        print(f"[PDF Export] Error parsing table data: {e}")
+                
+                # Add entities if available
+                entities_json = r.get("entities_json") or row.get("entities_json")
+                if entities_json:
+                    try:
+                        entities = json.loads(entities_json)
+                        if entities:
+                            story.append(Paragraph("<b>Mentioned Entities:</b>", header_style))
+                            for entity in entities:
+                                entity_text = f"• {entity.get('name', '')} ({entity.get('type', '')})"
+                                story.append(Paragraph(entity_text, normal_style))
+                            story.append(Spacer(1, 0.1*inch))
+                    except Exception as e:
+                        print(f"[PDF Export] Error parsing entities: {e}")
+                
+                # Add sources if available
+                sources_json = r.get("sources_json") or row.get("sources_json")
+                if sources_json:
+                    try:
+                        sources = json.loads(sources_json)
+                        if sources:
+                            story.append(Paragraph("<b>Data Sources:</b>", header_style))
+                            for source in sources:
+                                story.append(Paragraph(f"• {source}", normal_style))
+                            story.append(Spacer(1, 0.1*inch))
+                    except Exception as e:
+                        print(f"[PDF Export] Error parsing sources: {e}")
+                
+                # Add follow-ups if available
+                follow_ups_json = r.get("follow_ups_json") or row.get("follow_ups_json")
+                if follow_ups_json:
+                    try:
+                        follow_ups = json.loads(follow_ups_json)
+                        if follow_ups:
+                            story.append(Paragraph("<b>Suggested Follow-ups:</b>", header_style))
+                            for follow_up in follow_ups:
+                                story.append(Paragraph(f"• {follow_up}", normal_style))
+                            story.append(Spacer(1, 0.1*inch))
+                    except Exception as e:
+                        print(f"[PDF Export] Error parsing follow-ups: {e}")
+            
+            story.append(Spacer(1, 0.2*inch))
+        
+        # Build PDF
+        doc.build(story)
+        
+        # Return PDF as response
+        buffer.seek(0)
+        filename = f"chat_export_{session_id[:8]}.pdf"
+        
+        return StreamingResponse(
+            buffer,
+            media_type="application/pdf",
+            headers={"Content-Disposition": f"attachment; filename={filename}"}
+        )
+        
+    except Exception as e:
+        print(f"[PDF Export] Error: {e}")
+        return {"error": f"Failed to generate PDF: {str(e)}"}
 
 
