@@ -287,3 +287,127 @@ async def new_conversation():
     Generates a new UUID for the session_id.
     """
     return NewConversationResponse(session_id=str(uuid.uuid4()))
+
+
+@router.get("/db-status")
+async def db_status(zcql = Depends(get_zcql)):
+    """Diagnostic endpoint to count rows in core tables."""
+    status = {}
+    tables = ['CaseMaster', 'Victim', 'Unit', 'CrimeSubHead', 'Accused', 'District', 'CaseStatusMaster']
+    for table in tables:
+        try:
+            res = zcql.execute_query(f"SELECT COUNT(ROWID) as count FROM {table}")
+            status[table] = res[0].get('count', 0) if res else 0
+        except Exception as e:
+            status[table] = f"Error: {str(e)}"
+    return status
+
+
+@router.get("/debug-query")
+async def debug_query(zcql = Depends(get_zcql)):
+    """Diagnose ZCQL join issues by dumping raw values."""
+    diagnostics = {}
+    
+    # 1. Dump all Victims
+    try:
+        res = zcql.execute_query("SELECT ROWID, VictimName, CaseMasterID FROM Victim LIMIT 50")
+        diagnostics["Victims_Table"] = res
+    except Exception as e:
+        diagnostics["Victims_Table_Error"] = str(e)
+        
+    # 2. Dump all CaseMaster rows
+    try:
+        res = zcql.execute_query("SELECT ROWID, CaseMasterID, CrimeNo, PoliceStationID, CrimeMinorHeadID FROM CaseMaster LIMIT 50")
+        diagnostics["CaseMaster_Table"] = res
+    except Exception as e:
+        diagnostics["CaseMaster_Table_Error"] = str(e)
+        
+    # 3. Check specific Unit ROWID
+    try:
+        res = zcql.execute_query("SELECT ROWID, UnitName FROM Unit WHERE ROWID = '46143000000055049'")
+        diagnostics["Unit_Check_46143000000055049"] = res
+    except Exception as e:
+        diagnostics["Unit_Check_Error"] = str(e)
+
+    # 4. Check specific CrimeSubHead ROWID
+    try:
+        res = zcql.execute_query("SELECT ROWID, CrimeHeadName FROM CrimeSubHead WHERE ROWID = '46143000000055176'")
+        diagnostics["CrimeSubHead_Check_46143000000055176"] = res
+    except Exception as e:
+        diagnostics["CrimeSubHead_Check_Error"] = str(e)
+        
+    # 5. Test join between CaseMaster and Victim
+    try:
+        query = "SELECT CaseMaster.CrimeNo, Victim.VictimName FROM CaseMaster INNER JOIN Victim ON CaseMaster.ROWID = Victim.CaseMasterID"
+        res = zcql.execute_query(query)
+        diagnostics["CaseMaster_Victim_Join"] = res
+    except Exception as e:
+        diagnostics["CaseMaster_Victim_Join_Error"] = str(e)
+        
+    # 6. Test 3-table join WITHOUT WHERE (does it return rows at all?)
+    try:
+        query = """
+        SELECT CaseMaster.CrimeNo, Victim.VictimName, Unit.UnitName
+        FROM CaseMaster
+        INNER JOIN Victim ON CaseMaster.ROWID = Victim.CaseMasterID
+        INNER JOIN Unit ON CaseMaster.PoliceStationID = Unit.ROWID
+        LIMIT 5
+        """
+        res = zcql.execute_query(query)
+        diagnostics["Join_3Table_No_Where"] = res
+    except Exception as e:
+        diagnostics["Join_3Table_No_Where_Error"] = str(e)
+
+    # 7. Test 3-table join with WHERE on CaseMaster column (not Victim)
+    try:
+        query = """
+        SELECT CaseMaster.CrimeNo, Victim.VictimName, Unit.UnitName
+        FROM CaseMaster
+        INNER JOIN Victim ON CaseMaster.ROWID = Victim.CaseMasterID
+        INNER JOIN Unit ON CaseMaster.PoliceStationID = Unit.ROWID
+        WHERE CaseMaster.CrimeNo = '104430100120240002'
+        """
+        res = zcql.execute_query(query)
+        diagnostics["Join_3Table_Where_On_CaseMaster"] = res
+    except Exception as e:
+        diagnostics["Join_3Table_Where_On_CaseMaster_Error"] = str(e)
+
+    # 8. Test 3-table join with WHERE on Victim column
+    try:
+        query = """
+        SELECT CaseMaster.CrimeNo, Victim.VictimName, Unit.UnitName
+        FROM CaseMaster
+        INNER JOIN Victim ON CaseMaster.ROWID = Victim.CaseMasterID
+        INNER JOIN Unit ON CaseMaster.PoliceStationID = Unit.ROWID
+        WHERE Victim.VictimName LIKE '*Lakshmi*'
+        """
+        res = zcql.execute_query(query)
+        diagnostics["Join_3Table_Where_On_Victim"] = res
+    except Exception as e:
+        diagnostics["Join_3Table_Where_On_Victim_Error"] = str(e)
+
+    # 9. Test LEFT JOIN instead of INNER JOIN with Unit
+    try:
+        query = """
+        SELECT CaseMaster.CrimeNo, Victim.VictimName, Unit.UnitName
+        FROM CaseMaster
+        INNER JOIN Victim ON CaseMaster.ROWID = Victim.CaseMasterID
+        LEFT JOIN Unit ON CaseMaster.PoliceStationID = Unit.ROWID
+        WHERE Victim.VictimName LIKE '*Lakshmi*'
+        """
+        res = zcql.execute_query(query)
+        diagnostics["Join_Left_Unit_Where_Victim"] = res
+    except Exception as e:
+        diagnostics["Join_Left_Unit_Where_Victim_Error"] = str(e)
+
+    # 10. Just victim name no join
+    try:
+        query = "SELECT ROWID, VictimName, CaseMasterID FROM Victim WHERE VictimName LIKE '*Lakshmi*'"
+        res = zcql.execute_query(query)
+        diagnostics["Victim_Where_Only"] = res
+    except Exception as e:
+        diagnostics["Victim_Where_Only_Error"] = str(e)
+
+    return diagnostics
+
+

@@ -101,7 +101,7 @@ export default function NetworkExplorerScreen() {
   });
 
   return (
-    <div className="flex-1 flex flex-col relative h-screen bg-[#0A0C10] select-none">
+    <div className="flex-1 flex flex-col relative h-screen bg-[#0A0C10]">
       {/* Header */}
       <header className="h-16 border-b border-[#252830] bg-[#111318] flex items-center justify-between px-lg shrink-0 z-40">
         <h2 className="font-headline-sm text-headline-sm text-on-surface">
