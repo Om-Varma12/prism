@@ -54,11 +54,16 @@ async def get_network_graph(
     """
     Return the co-accused network graph.
 
-    Builds the first live co-accused graph from Catalyst data. Later steps will
-    apply the query parameters above as filters and alternate graph views.
+    Builds the co-accused graph from Catalyst data with optional filters.
+    Filters are applied as ZCQL WHERE clauses to limit the result set.
     """
     try:
-        return NetworkGraphBuilder(zcql).build_graph()
+        return NetworkGraphBuilder(zcql).build_graph(
+            crime_type=crime_type,
+            district=district,
+            date_from=date_from,
+            date_to=date_to,
+        )
     except Exception as exc:
         print(f"[Warning] Failed to build network graph: {exc}")
         return _empty_graph_response()
