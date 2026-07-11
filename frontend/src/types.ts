@@ -110,6 +110,11 @@ export interface SessionMessage {
   content: string;
   sql_generated?: string | null;
   created_at: string;
+  table_data_json?: string | null;
+  entities_json?: string | null;
+  follow_ups_json?: string | null;
+  sources_json?: string | null;
+  scanned_records?: number | null;
 }
 
 export interface SessionMessagesResponse {

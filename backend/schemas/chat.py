@@ -64,6 +64,11 @@ class SessionMessage(BaseModel):
     content: str
     sql_generated: Optional[str] = None
     created_at: str
+    table_data_json: Optional[str] = None
+    entities_json: Optional[str] = None
+    follow_ups_json: Optional[str] = None
+    sources_json: Optional[str] = None
+    scanned_records: Optional[int] = None
 
 
 class SessionMessagesResponse(BaseModel):

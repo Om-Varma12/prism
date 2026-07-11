@@ -127,20 +127,68 @@ export const useChat = () => {
     try {
       const { messages: rows } = await chatService.getSessionMessages(sessionId);
 
-      const restored: ChatMessage[] = rows.map((row, idx) => ({
-        id: `msg-restored-${idx}-${Date.now()}`,
-        sender: row.role === 'user' ? 'user' : 'ai',
-        text: row.content,
-        timestamp: row.created_at
-          ? new Date(row.created_at.replace(' ', 'T')).toLocaleTimeString([], {
-              hour: '2-digit',
-              minute: '2-digit',
-            })
-          : '',
-        sqlQuery: row.sql_generated ?? undefined,
-      }));
+      const restored: ChatMessage[] = rows.map((row, idx) => {
+        const message: ChatMessage = {
+          id: `msg-restored-${idx}-${Date.now()}`,
+          sender: row.role === 'user' ? 'user' : 'ai',
+          text: row.content,
+          timestamp: row.created_at
+            ? new Date(row.created_at.replace(' ', 'T')).toLocaleTimeString([], {
+                hour: '2-digit',
+                minute: '2-digit',
+              })
+            : '',
+          sqlQuery: row.sql_generated ?? undefined,
+        };
+
+        // Restore table data if available
+        if (row.table_data_json) {
+          try {
+            message.tableData = JSON.parse(row.table_data_json);
+          } catch (e) {
+            console.error('Failed to parse table_data_json:', e);
+          }
+        }
+
+        // Restore sources if available
+        if (row.sources_json) {
+          try {
+            message.sources = JSON.parse(row.sources_json);
+          } catch (e) {
+            console.error('Failed to parse sources_json:', e);
+          }
+        }
+
+        // Restore scanned records if available
+        if (row.scanned_records !== null && row.scanned_records !== undefined) {
+          message.scannedRecords = row.scanned_records;
+        }
+
+        return message;
+      });
 
       setMessages(restored);
+
+      // Restore latestResponse from the last assistant message
+      const lastAssistantMessage = rows.filter(r => r.role === 'assistant').pop();
+      if (lastAssistantMessage) {
+        try {
+          const latestResponseData: ChatQueryResponse = {
+            message_id: '',
+            response_text: lastAssistantMessage.content,
+            table_data: lastAssistantMessage.table_data_json ? JSON.parse(lastAssistantMessage.table_data_json) : [],
+            sql_query: lastAssistantMessage.sql_generated || '',
+            scanned_records: lastAssistantMessage.scanned_records || 0,
+            sources: lastAssistantMessage.sources_json ? JSON.parse(lastAssistantMessage.sources_json) : [],
+            entities: lastAssistantMessage.entities_json ? JSON.parse(lastAssistantMessage.entities_json) : [],
+            follow_ups: lastAssistantMessage.follow_ups_json ? JSON.parse(lastAssistantMessage.follow_ups_json) : [],
+            timestamp: lastAssistantMessage.created_at,
+          };
+          setLatestResponse(latestResponseData);
+        } catch (e) {
+          console.error('Failed to restore latestResponse:', e);
+        }
+      }
     } catch (error) {
       console.error('Failed to load conversation messages:', error);
     }

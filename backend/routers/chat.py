@@ -193,19 +193,27 @@ async def chat_query(
         user_conv_id = random.randint(1, 2147483647)
         asst_conv_id = random.randint(1, 2147483647)
 
-        # Escape single quotes in content
+        # Escape single quotes in content and JSON strings
         user_content = request.query.replace("'", "''")
         asst_content = structured_response["response_text"].replace("'", "''")
         sql_escaped = zcql_query.replace("'", "''") if zcql_query else ""
+        
+        # Convert response metadata to JSON strings and escape
+        import json
+        table_data_json = json.dumps(structured_response["table_data"]).replace("'", "''")
+        entities_json = json.dumps(structured_response["entities"]).replace("'", "''")
+        follow_ups_json = json.dumps(structured_response["follow_ups"]).replace("'", "''")
+        sources_json = json.dumps(tables_accessed).replace("'", "''")
+        scanned_records = len(flat_results)
 
         zcql.execute_query(f"""
-            INSERT INTO conversations (conversation_id, user_id, session_id, role, content, sql_generated, created_at)
-            VALUES ({user_conv_id}, 'dev_user', '{request.session_id}', 'user', '{user_content}', '{sql_escaped}', '{ts}')
+            INSERT INTO conversations (conversation_id, user_id, session_id, role, content, sql_generated, created_at, table_data_json, entities_json, follow_ups_json, sources_json, scanned_records)
+            VALUES ({user_conv_id}, 'dev_user', '{request.session_id}', 'user', '{user_content}', '{sql_escaped}', '{ts}', NULL, NULL, NULL, NULL, NULL)
         """)
 
         zcql.execute_query(f"""
-            INSERT INTO conversations (conversation_id, user_id, session_id, role, content, sql_generated, created_at)
-            VALUES ({asst_conv_id}, 'dev_user', '{request.session_id}', 'assistant', '{asst_content}', '{sql_escaped}', '{ts}')
+            INSERT INTO conversations (conversation_id, user_id, session_id, role, content, sql_generated, created_at, table_data_json, entities_json, follow_ups_json, sources_json, scanned_records)
+            VALUES ({asst_conv_id}, 'dev_user', '{request.session_id}', 'assistant', '{asst_content}', '{sql_escaped}', '{ts}', '{table_data_json}', '{entities_json}', '{follow_ups_json}', '{sources_json}', {scanned_records})
         """)
     except Exception as e:
         print(f"[Warning] Failed to save to conversations table: {e}")
@@ -298,7 +306,7 @@ async def get_session_messages(
     try:
         escaped_sid = session_id.replace("'", "''")
         query = f"""
-        SELECT role, content, sql_generated, created_at
+        SELECT role, content, sql_generated, created_at, table_data_json, entities_json, follow_ups_json, sources_json, scanned_records
         FROM conversations
         WHERE session_id = '{escaped_sid}' AND user_id = 'dev_user'
         ORDER BY created_at ASC
@@ -315,6 +323,11 @@ async def get_session_messages(
                 content=r.get("content") or row.get("content", ""),
                 sql_generated=r.get("sql_generated") or row.get("sql_generated"),
                 created_at=r.get("created_at") or row.get("created_at", ""),
+                table_data_json=r.get("table_data_json") or row.get("table_data_json"),
+                entities_json=r.get("entities_json") or row.get("entities_json"),
+                follow_ups_json=r.get("follow_ups_json") or row.get("follow_ups_json"),
+                sources_json=r.get("sources_json") or row.get("sources_json"),
+                scanned_records=r.get("scanned_records") or row.get("scanned_records"),
             ))
 
         return SessionMessagesResponse(session_id=session_id, messages=messages)
