@@ -14,6 +14,7 @@ from tests.db.insert_derived_data import router as derived_insertion_router
 from tests.db.truncate_derived import router as derived_truncate_router
 from tests.db.add_conversation_metadata_columns import router as schema_columns_router
 from routers.dashboard import router as dashboard_router
+from routers.network import router as network_router
 from tests.db.insert_recent_cases import router as recent_cases_router
 from tests.db.update_alerts_acknowledgment import router as alerts_ack_router
 from tests.db.update_dashboard_stats import router as dashboard_stats_router
@@ -71,6 +72,7 @@ app.include_router(router=derived_insertion_router)
 app.include_router(router=derived_truncate_router)
 app.include_router(router=schema_columns_router)
 app.include_router(router=dashboard_router)
+app.include_router(router=network_router)
 app.include_router(router=recent_cases_router)
 app.include_router(router=alerts_ack_router)
 app.include_router(router=dashboard_stats_router)
