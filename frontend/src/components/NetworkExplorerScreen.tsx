@@ -22,6 +22,40 @@ export default function NetworkExplorerScreen() {
   React.useEffect(() => {
     setFilters(prev => ({ ...prev, view: activeSegment }));
   }, [activeSegment]);
+
+  // Convert date range to actual dates
+  const getDateRange = () => {
+    const now = new Date();
+    const toDate = now.toISOString().split('T')[0];
+    
+    let fromDate: string | null = null;
+    
+    if (selectedDateRange === 'Last 30 Days') {
+      const thirtyDaysAgo = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000);
+      fromDate = thirtyDaysAgo.toISOString().split('T')[0];
+    } else if (selectedDateRange === 'Last 6 Months') {
+      const sixMonthsAgo = new Date(now.getTime() - 180 * 24 * 60 * 60 * 1000);
+      fromDate = sixMonthsAgo.toISOString().split('T')[0];
+    } else if (selectedDateRange === 'Year to Date') {
+      const yearStart = new Date(now.getFullYear(), 0, 1);
+      fromDate = yearStart.toISOString().split('T')[0];
+    }
+    
+    return { date_from: fromDate, date_to: toDate };
+  };
+
+  // Update filters when filter values change
+  React.useEffect(() => {
+    const { date_from, date_to } = getDateRange();
+    
+    setFilters({
+      view: activeSegment,
+      crime_type: selectedCrimeType === 'All Types' ? null : selectedCrimeType,
+      district: selectedDistrict === 'All Districts' ? null : selectedDistrict,
+      date_from,
+      date_to,
+    });
+  }, [selectedDistrict, selectedCrimeType, selectedDateRange, activeSegment]);
   
   // Selected Profile state
   const [selectedProfile, setSelectedProfile] = useState<SuspectProfile | null>(MOCK_SUSPECTS[0]);
