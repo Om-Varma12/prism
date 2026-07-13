@@ -111,6 +111,7 @@ class NetworkGraphBuilder:
         case_groups: dict[str, list[str]] = defaultdict(list)
         case_incidents: dict[str, tuple[int, str | None]] = {}  # case_row_id -> (case_master_id, crime_no)
         absconding_by_resolved_id: dict[str, bool] = {}
+        crime_types_by_resolved_id: dict[str, set[int]] = defaultdict(set)  # Track crime types per node
 
         for row in rows:
             accused_id = self._to_int(
@@ -137,6 +138,9 @@ class NetworkGraphBuilder:
             # Check absconding status via presence of ArrestSurrender
             arrest_id = self._value(row, "ArrestSurrender", "ArrestSurrenderID", "ArrestSurrenderID")
             is_row_absconding = arrest_id is None
+
+            # Get crime type ID for filtering
+            crime_type_id = self._to_int(self._value(row, "CaseMaster", "CrimeMinorHeadID", "CrimeMinorHeadID"))
 
             if not case_row_id:
                 continue
@@ -189,6 +193,10 @@ class NetworkGraphBuilder:
                 matched_node.primary_district = str(district)
 
             absconding_by_resolved_id[resolved_id] = absconding_by_resolved_id.get(resolved_id, False) or is_row_absconding
+
+            # Track crime types for this node
+            if crime_type_id:
+                crime_types_by_resolved_id[resolved_id].add(crime_type_id)
 
             if resolved_id not in case_groups[case_row_id]:
                 case_groups[case_row_id].append(resolved_id)
@@ -244,6 +252,39 @@ class NetworkGraphBuilder:
                 edge for edge in edges
                 if edge.source in repeat_node_ids and edge.target in repeat_node_ids
             ]
+        
+        # Apply crime type filtering (client-side, since we can't join CrimeSubHead in main query)
+        if crime_type:
+            # Get CrimeMinorHeadID values for the specified crime type
+            crime_type_query = f"""
+                SELECT CrimeSubHead.CrimeSubHeadID
+                FROM CrimeSubHead
+                WHERE CrimeSubHead.CrimeHeadName = '{crime_type}'
+                LIMIT 100
+            """
+            try:
+                crime_type_result = self.zcql.execute_query(crime_type_query)
+                target_crime_type_ids = [
+                    self._to_int(self._value(row, "CrimeSubHead", "CrimeSubHeadID", "CrimeSubHeadID"))
+                    for row in (crime_type_result if isinstance(crime_type_result, list) else [])
+                ]
+                target_crime_type_ids = [cid for cid in target_crime_type_ids if cid is not None]
+                
+                if target_crime_type_ids:
+                    # Filter nodes by crime type using tracked crime_types_by_resolved_id
+                    nodes = [
+                        node for node in nodes
+                        if node.id in crime_types_by_resolved_id
+                        and any(ctid in target_crime_type_ids for ctid in crime_types_by_resolved_id[node.id])
+                    ]
+                    # Filter edges to only include connections between filtered nodes
+                    node_ids_set = {node.id for node in nodes}
+                    edges = [
+                        edge for edge in edges
+                        if edge.source in node_ids_set and edge.target in node_ids_set
+                    ]
+            except Exception as exc:
+                print(f"[Warning] Failed to filter by crime type: {exc}")
         
         # Assign gang clusters for all views (used in clusters view)
         CommunityDetector.assign_clusters_to_nodes(nodes, edges)

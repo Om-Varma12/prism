@@ -94,17 +94,6 @@ function paintNode(
     ctx.stroke();
   }
 
-  // ── Absconding indicator (dashed outline) ──────────────────
-  if (nodeData.is_absconding && !dimmed) {
-    ctx.beginPath();
-    ctx.arc(x, y, baseRadius + (isSelected ? 6 : 4), 0, 2 * Math.PI);
-    ctx.strokeStyle = '#FF6B6B';
-    ctx.lineWidth = 1 / globalScale;
-    ctx.setLineDash([2, 2]);
-    ctx.stroke();
-    ctx.setLineDash([]);
-  }
-
   // ── Label — always visible, font shrinks as user zooms in ──────────
   const fontSize = Math.max(4, 10 / globalScale);
   ctx.font = `${isSelected ? '600' : '400'} ${fontSize}px Inter, sans-serif`;
@@ -159,6 +148,8 @@ export function NetworkGraph({ nodes, edges, selectedNodeId, onNodeClick }: Netw
         thickness: Math.max(0.5, e.thickness),
         strength: e.strength,
         incidents: e.incidents,
+        // Stronger connections (more FIRs together) = shorter distance = tighter clusters
+        distance: Math.max(50, 200 - (e.strength * 30)),
       }));
 
     return { nodes: fgNodes, links: fgLinks };
@@ -290,11 +281,39 @@ export function NetworkGraph({ nodes, edges, selectedNodeId, onNodeClick }: Netw
         linkDirectionalParticleColor={() => '#ffffff'}
         linkDirectionalParticleSpeed={0.004}
         cooldownTicks={120}
-        d3AlphaDecay={0.02}
-        d3VelocityDecay={0.3}
+        d3AlphaDecay={0.01}
+        d3VelocityDecay={0.2}
         enableNodeDrag
         enableZoomInteraction
         enablePanInteraction
+        onEngineStop={() => {
+          if (fgRef.current) {
+            try {
+              // Access the internal simulation
+              const simulation = (fgRef.current as any)._simulation;
+              if (simulation) {
+                // Configure link distance from data
+                const linkForce = simulation.force('link');
+                if (linkForce) {
+                  linkForce.distance((link: any) => link.distance || 150);
+                }
+                // Add centering forces to pull clusters toward graph center
+                const chargeForce = simulation.force('charge');
+                if (chargeForce) {
+                  chargeForce.strength(-200);
+                }
+                simulation.force('x', simulation.forceX().strength(0.05));
+                simulation.force('y', simulation.forceY().strength(0.05));
+                // Add collision force to prevent node overlap
+                simulation.force('collide', simulation.forceCollide().radius((node: any) => node.size * 1.5 + 10).strength(0.7));
+                // Reheat simulation to apply new forces
+                simulation.alpha(0.3).restart();
+              }
+            } catch (e) {
+              console.warn('Failed to configure D3 forces:', e);
+            }
+          }
+        }}
       />
 
       {/* Hovered node tooltip */}
