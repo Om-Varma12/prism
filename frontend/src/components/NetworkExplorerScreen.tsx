@@ -29,7 +29,7 @@ export default function NetworkExplorerScreen() {
   }, [searchQuery]);
   
   // Search for accused
-  const { data: searchResults, isLoading: searchLoading } = useSearchAccused(debouncedSearchQuery);
+  const { data: searchResults, isLoading: searchLoading, error: searchError } = useSearchAccused(debouncedSearchQuery);
 
   // Convert date range to actual dates
   const getDateRange = () => {
@@ -198,6 +198,10 @@ export default function NetworkExplorerScreen() {
                   >
                     {searchLoading ? (
                       <div className="p-3 text-center text-on-surface-variant text-sm">Searching...</div>
+                    ) : searchError ? (
+                      <div className="p-3 text-center text-error text-sm">
+                        Error: {String(searchError)}
+                      </div>
                     ) : searchResults && searchResults.results.length > 0 ? (
                       searchResults.results.map((result: any) => (
                         <div

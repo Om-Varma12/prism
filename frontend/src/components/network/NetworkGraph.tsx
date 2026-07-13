@@ -5,7 +5,7 @@
 
 import React, { useRef, useCallback, useEffect, useState } from 'react';
 import ForceGraph2D, { ForceGraphMethods, NodeObject, LinkObject } from 'react-force-graph-2d';
-import { NetworkGraphNode, NetworkGraphEdge } from '../../types/network';
+import { NetworkGraphNode, NetworkGraphEdge, EdgeIncident } from '../../types/network';
 
 // ─── Types ───────────────────────────────────────────────────────────────────
 
@@ -23,7 +23,7 @@ interface FGLink extends LinkObject {
   color: string;
   thickness: number;
   strength: number;
-  incidents: number[];
+  incidents: EdgeIncident[];
 }
 
 interface NetworkGraphProps {
@@ -177,6 +177,33 @@ export function NetworkGraph({ nodes, edges, selectedNodeId, onNodeClick }: Netw
     return s;
   }, [selectedNodeId, graphData.links]);
 
+  // Compute cluster centroids and sizes for gang highlights
+  const clusterInfo = React.useMemo(() => {
+    const clusters: Record<number, { nodes: FGNode[]; centroid: { x: number; y: number } }> = {};
+    
+    graphData.nodes.forEach(node => {
+      const cluster = node.nodeData.gang_cluster;
+      if (cluster != null && node.x != null && node.y != null) {
+        if (!clusters[cluster]) {
+          clusters[cluster] = { nodes: [], centroid: { x: 0, y: 0 } };
+        }
+        clusters[cluster].nodes.push(node);
+      }
+    });
+
+    // Calculate centroids
+    Object.values(clusters).forEach(cluster => {
+      const n = cluster.nodes.length;
+      if (n > 0) {
+        const sumX = cluster.nodes.reduce((sum, node) => sum + (node.x || 0), 0);
+        const sumY = cluster.nodes.reduce((sum, node) => sum + (node.y || 0), 0);
+        cluster.centroid = { x: sumX / n, y: sumY / n };
+      }
+    });
+
+    return clusters;
+  }, [graphData.nodes]);
+
   // Node painter
   const nodeCanvasObject = useCallback((node: object, ctx: CanvasRenderingContext2D, globalScale: number) => {
     const n = node as FGNode;
@@ -198,7 +225,8 @@ export function NetworkGraph({ nodes, edges, selectedNodeId, onNodeClick }: Netw
       (srcId === selectedNodeId || tgtId === selectedNodeId ||
        connectedIds.has(srcId) || connectedIds.has(tgtId));
 
-    const alpha = selectedNodeId ? (isHighlighted ? 0.9 : 0.08) : 0.35;
+    // Brighter edges: increased alpha and line width
+    const alpha = selectedNodeId ? (isHighlighted ? 0.95 : 0.15) : 0.55;
 
     ctx.save();
     ctx.globalAlpha = alpha;
@@ -208,13 +236,13 @@ export function NetworkGraph({ nodes, edges, selectedNodeId, onNodeClick }: Netw
 
     if (isHighlighted) {
       // Glowing link
-      ctx.shadowBlur = 6;
+      ctx.shadowBlur = 8;
       ctx.shadowColor = getClusterColor(src.nodeData.gang_cluster);
       ctx.strokeStyle = '#ffffff';
-      ctx.lineWidth = l.thickness + 0.5;
+      ctx.lineWidth = l.thickness + 1;
     } else {
-      ctx.strokeStyle = '#3A4560';
-      ctx.lineWidth = l.thickness * 0.5;
+      ctx.strokeStyle = '#5A6478';
+      ctx.lineWidth = l.thickness;
     }
     ctx.stroke();
     ctx.restore();
@@ -272,7 +300,7 @@ export function NetworkGraph({ nodes, edges, selectedNodeId, onNodeClick }: Netw
       {/* Hovered node tooltip */}
       {hoveredNode && (
         <div
-          className="absolute top-4 left-4 pointer-events-none z-10"
+          className="absolute top-4 right-4 pointer-events-none z-10"
           style={{
             background: 'rgba(10, 12, 18, 0.92)',
             border: `1px solid ${getClusterColor(hoveredNode.nodeData.gang_cluster)}55`,
@@ -317,7 +345,7 @@ export function NetworkGraph({ nodes, edges, selectedNodeId, onNodeClick }: Netw
       {/* Hovered link tooltip */}
       {hoveredLink && !hoveredNode && (
         <div
-          className="absolute top-4 left-4 pointer-events-none z-10"
+          className="absolute top-20 left-4 pointer-events-none z-10"
           style={{
             background: 'rgba(10,12,18,0.92)',
             border: '1px solid #252830',
@@ -325,13 +353,66 @@ export function NetworkGraph({ nodes, edges, selectedNodeId, onNodeClick }: Netw
             padding: '8px 12px',
             fontSize: 11,
             color: '#8A909E',
+            maxWidth: 280,
           }}
         >
-          <span style={{ color: '#E8EAF0' }}>Shared FIRs: </span>{hoveredLink.incidents.length}
-          <span style={{ marginLeft: 12, color: '#E8EAF0' }}>Strength: </span>
-          {(hoveredLink.strength * 100).toFixed(0)}%
+          <div style={{ marginBottom: 4 }}>
+            <span style={{ color: '#E8EAF0' }}>Shared FIRs: </span>
+            {hoveredLink.incidents.length}
+            <span style={{ marginLeft: 12, color: '#E8EAF0' }}>Strength: </span>
+            {(hoveredLink.strength * 100).toFixed(0)}%
+          </div>
+          {hoveredLink.incidents.length > 0 && (
+            <div style={{ fontSize: 10, color: '#5A6478', marginTop: 4, maxHeight: 80, overflow: 'auto' }}>
+              {hoveredLink.incidents.map((inc, idx) => (
+                <div key={idx} style={{ marginBottom: 2 }}>
+                  <span style={{ color: '#4ECDC4' }}>•</span>
+                  <span style={{ marginLeft: 4, color: '#B3C5FF' }}>
+                    {inc.crime_no || `Case #${inc.case_master_id}`}
+                  </span>
+                </div>
+              ))}
+            </div>
+          )}
         </div>
       )}
+
+      {/* Gang cluster boundary highlights (size >= 3) */}
+      <svg className="absolute inset-0 pointer-events-none" style={{ zIndex: 5 }}>
+        {Object.entries(clusterInfo).map(([clusterId, info]) => {
+          if (info.nodes.length < 3) return null;
+          const color = getClusterColor(parseInt(clusterId));
+          // Calculate bounding polygon
+          const points = info.nodes
+            .map(n => `${(n.x || 0) + dimensions.width / 2},${(n.y || 0) + dimensions.height / 2}`)
+            .join(' ');
+          return (
+            <g key={clusterId}>
+              {/* Glowing boundary polygon */}
+              <polygon
+                points={points}
+                fill="none"
+                stroke={color}
+                strokeWidth={1.5}
+                strokeOpacity={0.3}
+                style={{ filter: `drop-shadow(0 0 8px ${color})` }}
+              />
+              {/* Cluster label */}
+              <text
+                x={info.centroid.x + dimensions.width / 2}
+                y={info.centroid.y + dimensions.height / 2 - 20}
+                fill={color}
+                fontSize={12}
+                fontWeight="600"
+                textAnchor="middle"
+                style={{ pointerEvents: 'none' }}
+              >
+                Suspected Gang #{clusterId}
+              </text>
+            </g>
+          );
+        })}
+      </svg>
 
       {/* Legend */}
       <div
@@ -355,7 +436,7 @@ export function NetworkGraph({ nodes, edges, selectedNodeId, onNodeClick }: Netw
             <span>Absconding</span>
           </div>
           <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-            <div style={{ width: 12, height: 2, background: 'rgba(255,255,255,0.3)' }} />
+            <div style={{ width: 12, height: 2, background: '#5A6478' }} />
             <span>Shared FIR link</span>
           </div>
         </div>
