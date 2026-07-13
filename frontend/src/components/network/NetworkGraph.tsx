@@ -3,8 +3,28 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import React, { useState, useRef } from 'react';
+import React, { useRef, useCallback, useEffect, useState } from 'react';
+import ForceGraph2D, { ForceGraphMethods, NodeObject, LinkObject } from 'react-force-graph-2d';
 import { NetworkGraphNode, NetworkGraphEdge } from '../../types/network';
+
+// ─── Types ───────────────────────────────────────────────────────────────────
+
+interface FGNode extends NodeObject {
+  id: string;
+  label: string;
+  size: number;
+  color: string;
+  nodeData: NetworkGraphNode;
+}
+
+interface FGLink extends LinkObject {
+  source: string | FGNode;
+  target: string | FGNode;
+  color: string;
+  thickness: number;
+  strength: number;
+  incidents: number[];
+}
 
 interface NetworkGraphProps {
   nodes: NetworkGraphNode[];
@@ -13,242 +33,358 @@ interface NetworkGraphProps {
   onNodeClick?: (nodeId: string) => void;
 }
 
-export function NetworkGraph({ nodes, edges, selectedNodeId, onNodeClick }: NetworkGraphProps) {
-  const svgRef = useRef<SVGSVGElement>(null);
-  const [hoveredEdge, setHoveredEdge] = useState<NetworkGraphEdge | null>(null);
-  const [transform, setTransform] = useState({ x: 0, y: 0, scale: 1 });
-  const [isDragging, setIsDragging] = useState(false);
-  const [dragStart, setDragStart] = useState({ x: 0, y: 0 });
+// ─── Gang cluster colour palette (Obsidian-inspired) ─────────────────────────
+const CLUSTER_COLORS: Record<number, string> = {
+  0:  '#7B61FF', // violet
+  1:  '#FF6B6B', // coral
+  2:  '#4ECDC4', // teal
+  3:  '#FFE66D', // gold
+  4:  '#A8FF78', // lime
+  5:  '#FF8B94', // pink
+  6:  '#00D2FF', // cyan
+  7:  '#FF9A3C', // orange
+};
 
-  // Calculate node positions using simple force-directed layout simulation
-  const nodePositions = React.useMemo(() => {
-    const positions: Record<string, { x: number; y: number }> = {};
-    
-    // Initialize positions in a circle
-    const centerX = 400;
-    const centerY = 300;
-    const radius = 200;
-    
-    nodes.forEach((node, index) => {
-      const angle = (index / nodes.length) * 2 * Math.PI;
-      positions[node.id] = {
-        x: centerX + radius * Math.cos(angle),
-        y: centerY + radius * Math.sin(angle),
-      };
-    });
-    
-    // Simple force simulation (run for a few iterations)
-    for (let iter = 0; iter < 50; iter++) {
-      // Repulsion between nodes
-      nodes.forEach((node1, i) => {
-        nodes.forEach((node2, j) => {
-          if (i >= j) return;
-          const pos1 = positions[node1.id];
-          const pos2 = positions[node2.id];
-          if (!pos1 || !pos2) return;
-          const dx = pos2.x - pos1.x;
-          const dy = pos2.y - pos1.y;
-          const dist = Math.sqrt(dx * dx + dy * dy) || 1;
-          const force = 500 / (dist * dist);
-          const fx = (dx / dist) * force;
-          const fy = (dy / dist) * force;
-          pos1.x -= fx;
-          pos1.y -= fy;
-          pos2.x += fx;
-          pos2.y += fy;
-        });
-      });
+const getClusterColor = (cluster: number | null | undefined): string =>
+  cluster != null ? (CLUSTER_COLORS[cluster % 8] ?? '#7B61FF') : '#5A6478';
 
-      
-      // Attraction along edges
-      edges.forEach(edge => {
-        const pos1 = positions[edge.source];
-        const pos2 = positions[edge.target];
-        if (!pos1 || !pos2) return;
-        const dx = pos2.x - pos1.x;
-        const dy = pos2.y - pos1.y;
-        const dist = Math.sqrt(dx * dx + dy * dy) || 1;
-        const force = (dist - 100) * 0.01;
-        const fx = (dx / dist) * force;
-        const fy = (dy / dist) * force;
-        pos1.x += fx;
-        pos1.y += fy;
-        pos2.x -= fx;
-        pos2.y -= fy;
-      });
-      
-      // Center gravity
-      nodes.forEach(node => {
-        const pos = positions[node.id];
-        const dx = centerX - pos.x;
-        const dy = centerY - pos.y;
-        pos.x += dx * 0.01;
-        pos.y += dy * 0.01;
-      });
+// ─── Canvas node painter (Obsidian glow style) ────────────────────────────────
+function paintNode(
+  node: FGNode,
+  ctx: CanvasRenderingContext2D,
+  globalScale: number,
+  isSelected: boolean,
+  isConnected: boolean,
+  hasSelection: boolean,
+) {
+  const { x = 0, y = 0, nodeData } = node;
+  // Base radius scaled inversely to globalScale so they look larger when zoomed out
+  const baseRadius = Math.max(4, (node.size * 0.6) / Math.sqrt(globalScale));
+  const dimmed = hasSelection && !isSelected && !isConnected;
+  const color = getClusterColor(nodeData.gang_cluster);
+
+  ctx.save();
+  ctx.globalAlpha = dimmed ? 0.15 : 1;
+
+  // ── Glow rings ─────────────────────────────────────────────
+  if (!dimmed) {
+    const glowLayers = isSelected ? 4 : 2;
+    for (let i = glowLayers; i > 0; i--) {
+      ctx.beginPath();
+      ctx.arc(x, y, baseRadius + i * 4, 0, 2 * Math.PI);
+      ctx.fillStyle = color;
+      ctx.globalAlpha = (isSelected ? 0.12 : 0.05) / i;
+      ctx.fill();
     }
-    
-    return positions;
+    ctx.globalAlpha = dimmed ? 0.15 : 1;
+  }
+
+  // ── Core circle ────────────────────────────────────────────
+  ctx.beginPath();
+  ctx.arc(x, y, baseRadius, 0, 2 * Math.PI);
+  ctx.fillStyle = color;
+  ctx.fill();
+
+  // ── White ring for selected ────────────────────────────────
+  if (isSelected) {
+    ctx.beginPath();
+    ctx.arc(x, y, baseRadius + 3, 0, 2 * Math.PI);
+    ctx.strokeStyle = '#ffffff';
+    ctx.lineWidth = 1.5 / globalScale;
+    ctx.stroke();
+  }
+
+  // ── Absconding indicator (dashed outline) ──────────────────
+  if (nodeData.is_absconding && !dimmed) {
+    ctx.beginPath();
+    ctx.arc(x, y, baseRadius + (isSelected ? 6 : 4), 0, 2 * Math.PI);
+    ctx.strokeStyle = '#FF6B6B';
+    ctx.lineWidth = 1 / globalScale;
+    ctx.setLineDash([2, 2]);
+    ctx.stroke();
+    ctx.setLineDash([]);
+  }
+
+  // ── Label — always visible, font shrinks as user zooms in ──────────
+  const fontSize = Math.max(4, 10 / globalScale);
+  ctx.font = `${isSelected ? '600' : '400'} ${fontSize}px Inter, sans-serif`;
+  ctx.fillStyle = dimmed ? 'rgba(255,255,255,0.2)' : '#E8EAF0';
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'top';
+  ctx.fillText(node.label, x, y + baseRadius + 3 / globalScale);
+
+  ctx.restore();
+}
+
+// ─── Component ────────────────────────────────────────────────────────────────
+
+export function NetworkGraph({ nodes, edges, selectedNodeId, onNodeClick }: NetworkGraphProps) {
+  const fgRef = useRef<ForceGraphMethods<FGNode, FGLink> | undefined>(undefined);
+  const containerRef = useRef<HTMLDivElement>(null);
+  const [dimensions, setDimensions] = useState({ width: 800, height: 600 });
+  const [hoveredNode, setHoveredNode] = useState<FGNode | null>(null);
+  const [hoveredLink, setHoveredLink] = useState<FGLink | null>(null);
+
+  // Measure container
+  useEffect(() => {
+    const el = containerRef.current;
+    if (!el) return;
+    const obs = new ResizeObserver(entries => {
+      const { width, height } = entries[0].contentRect;
+      setDimensions({ width, height });
+    });
+    obs.observe(el);
+    setDimensions({ width: el.clientWidth, height: el.clientHeight });
+    return () => obs.disconnect();
+  }, []);
+
+  // Build force-graph data from props
+  const graphData = React.useMemo(() => {
+    const fgNodes: FGNode[] = nodes.map(n => ({
+      id: n.id,
+      label: n.label,
+      size: Math.max(6, Math.min(20, 6 + n.fir_count * 1.5)),
+      color: getClusterColor(n.gang_cluster),
+      nodeData: n,
+    }));
+
+    const nodeSet = new Set(fgNodes.map(n => n.id));
+
+    const fgLinks: FGLink[] = edges
+      .filter(e => nodeSet.has(e.source) && nodeSet.has(e.target))
+      .map(e => ({
+        source: e.source,
+        target: e.target,
+        color: e.color || '#3A3F4E',
+        thickness: Math.max(0.5, e.thickness),
+        strength: e.strength,
+        incidents: e.incidents,
+      }));
+
+    return { nodes: fgNodes, links: fgLinks };
   }, [nodes, edges]);
 
-  // Pan and zoom handlers
-  const handleMouseDown = (e: React.MouseEvent) => {
-    if (e.button === 0) {
-      setIsDragging(true);
-      setDragStart({ x: e.clientX - transform.x, y: e.clientY - transform.y });
-    }
-  };
-
-  const handleMouseMove = (e: React.MouseEvent) => {
-    if (isDragging) {
-      setTransform({
-        x: e.clientX - dragStart.x,
-        y: e.clientY - dragStart.y,
-        scale: transform.scale,
-      });
-    }
-  };
-
-  const handleMouseUp = () => {
-    setIsDragging(false);
-  };
-
-  const handleWheel = (e: React.WheelEvent) => {
-    e.preventDefault();
-    const zoomFactor = e.deltaY > 0 ? 0.9 : 1.1;
-    const newScale = Math.max(0.1, Math.min(5, transform.scale * zoomFactor));
-    setTransform({ ...transform, scale: newScale });
-  };
-
-  const handleNodeClick = (nodeId: string) => {
-    if (onNodeClick) {
-      onNodeClick(nodeId);
-    }
-  };
-
-  // Get connected node IDs for highlighting
-  const getConnectedNodeIds = (nodeId: string): Set<string> => {
-    const connected = new Set<string>();
-    edges.forEach(edge => {
-      if (edge.source === nodeId) connected.add(edge.target);
-      if (edge.target === nodeId) connected.add(edge.source);
+  // Connected node IDs for highlight
+  const connectedIds = React.useMemo<Set<string>>(() => {
+    if (!selectedNodeId) return new Set();
+    const s = new Set<string>();
+    graphData.links.forEach(l => {
+      const src = typeof l.source === 'object' ? (l.source as FGNode).id : l.source as string;
+      const tgt = typeof l.target === 'object' ? (l.target as FGNode).id : l.target as string;
+      if (src === selectedNodeId) s.add(tgt);
+      if (tgt === selectedNodeId) s.add(src);
     });
-    return connected;
-  };
+    return s;
+  }, [selectedNodeId, graphData.links]);
 
-  const connectedNodeIds = selectedNodeId ? getConnectedNodeIds(selectedNodeId) : new Set();
+  // Node painter
+  const nodeCanvasObject = useCallback((node: object, ctx: CanvasRenderingContext2D, globalScale: number) => {
+    const n = node as FGNode;
+    const isSelected = n.id === selectedNodeId;
+    const isConnected = connectedIds.has(n.id);
+    paintNode(n, ctx, globalScale, isSelected, isConnected, !!selectedNodeId);
+  }, [selectedNodeId, connectedIds]);
+
+  // Link painter
+  const linkCanvasObject = useCallback((link: object, ctx: CanvasRenderingContext2D) => {
+    const l = link as FGLink;
+    const src = typeof l.source === 'object' ? l.source as FGNode : null;
+    const tgt = typeof l.target === 'object' ? l.target as FGNode : null;
+    if (!src || !tgt || src.x == null || src.y == null || tgt.x == null || tgt.y == null) return;
+
+    const srcId = src.id;
+    const tgtId = tgt.id;
+    const isHighlighted = selectedNodeId &&
+      (srcId === selectedNodeId || tgtId === selectedNodeId ||
+       connectedIds.has(srcId) || connectedIds.has(tgtId));
+
+    const alpha = selectedNodeId ? (isHighlighted ? 0.9 : 0.08) : 0.35;
+
+    ctx.save();
+    ctx.globalAlpha = alpha;
+    ctx.beginPath();
+    ctx.moveTo(src.x!, src.y!);
+    ctx.lineTo(tgt.x!, tgt.y!);
+
+    if (isHighlighted) {
+      // Glowing link
+      ctx.shadowBlur = 6;
+      ctx.shadowColor = getClusterColor(src.nodeData.gang_cluster);
+      ctx.strokeStyle = '#ffffff';
+      ctx.lineWidth = l.thickness + 0.5;
+    } else {
+      ctx.strokeStyle = '#3A4560';
+      ctx.lineWidth = l.thickness * 0.5;
+    }
+    ctx.stroke();
+    ctx.restore();
+  }, [selectedNodeId, connectedIds]);
+
+  const handleNodeClick = useCallback((node: object) => {
+    const n = node as FGNode;
+    if (onNodeClick) onNodeClick(n.id);
+    // Smoothly zoom/center on clicked node
+    if (fgRef.current && n.x != null && n.y != null) {
+      fgRef.current.centerAt(n.x, n.y, 600);
+      fgRef.current.zoom(3, 600);
+    }
+  }, [onNodeClick]);
+
+  const handleBackgroundClick = useCallback(() => {
+    if (onNodeClick && selectedNodeId) onNodeClick('');
+  }, [onNodeClick, selectedNodeId]);
 
   return (
-    <div className="w-full h-full relative overflow-hidden bg-[#050608]">
-      <svg
-        ref={svgRef}
-        className="w-full h-full cursor-grab"
-        onMouseDown={handleMouseDown}
-        onMouseMove={handleMouseMove}
-        onMouseUp={handleMouseUp}
-        onMouseLeave={handleMouseUp}
-        onWheel={handleWheel}
-        style={{ cursor: isDragging ? 'grabbing' : 'grab' }}
-      >
-        <g transform={`translate(${transform.x}, ${transform.y}) scale(${transform.scale})`}>
-          {/* Render edges */}
-          {edges.map((edge, index) => {
-            const sourcePos = nodePositions[edge.source];
-            const targetPos = nodePositions[edge.target];
-            if (!sourcePos || !targetPos) return null;
-            
-            const isConnectedToSelected = selectedNodeId && 
-              (edge.source === selectedNodeId || edge.target === selectedNodeId);
-            
-            return (
-              <line
-                key={index}
-                x1={sourcePos.x}
-                y1={sourcePos.y}
-                x2={targetPos.x}
-                y2={targetPos.y}
-                stroke={edge.color}
-                strokeWidth={edge.thickness}
-                strokeOpacity={isConnectedToSelected ? 1 : 0.3}
-                onMouseEnter={() => setHoveredEdge(edge)}
-                onMouseLeave={() => setHoveredEdge(null)}
-              />
-            );
-          })}
-          
-          {/* Render nodes */}
-          {nodes.map((node) => {
-            const pos = nodePositions[node.id];
-            if (!pos) return null;
-            
-            const isSelected = node.id === selectedNodeId;
-            const isConnected = connectedNodeIds.has(node.id);
-            const isDimmed = selectedNodeId && !isSelected && !isConnected;
-            
-            return (
-              <g
-                key={node.id}
-                onClick={(e) => {
-                  e.stopPropagation();
-                  handleNodeClick(node.id);
-                }}
-                style={{ cursor: 'pointer' }}
-              >
-                {/* Node circle */}
-                <circle
-                  cx={pos.x}
-                  cy={pos.y}
-                  r={node.size}
-                  fill={node.color}
-                  stroke={isSelected ? '#fff' : 'none'}
-                  strokeWidth={isSelected ? 2 : 0}
-                  opacity={isDimmed ? 0.3 : 1}
-                />
-                
-                {/* Node label */}
-                <text
-                  x={pos.x}
-                  y={pos.y + node.size + 15}
-                  textAnchor="middle"
-                  fill="#fff"
-                  fontSize="10"
-                  opacity={isDimmed ? 0.3 : 1}
-                >
-                  {node.label}
-                </text>
-              </g>
-            );
-          })}
-        </g>
-      </svg>
-      
-      {/* Edge tooltip */}
-      {hoveredEdge && (
-        <div className="absolute top-4 left-4 bg-[#111318] border border-[#252830] px-3 py-2 rounded text-xs text-on-surface pointer-events-none">
-          <div>Strength: {hoveredEdge.strength}</div>
-          <div>Incidences: {hoveredEdge.incidents.length}</div>
+    <div ref={containerRef} className="w-full h-full relative overflow-hidden" style={{ background: '#050608' }}>
+      <ForceGraph2D<FGNode, FGLink>
+        ref={fgRef}
+        width={dimensions.width}
+        height={dimensions.height}
+        graphData={graphData}
+        nodeId="id"
+        nodeLabel={() => ''}
+        nodeCanvasObject={nodeCanvasObject}
+        nodeCanvasObjectMode={() => 'replace'}
+        linkCanvasObject={linkCanvasObject}
+        linkCanvasObjectMode={() => 'replace'}
+        onNodeClick={handleNodeClick}
+        onBackgroundClick={handleBackgroundClick}
+        onNodeHover={node => setHoveredNode(node as FGNode | null)}
+        onLinkHover={link => setHoveredLink(link as FGLink | null)}
+        backgroundColor="#050608"
+        linkDirectionalParticles={3}
+        linkDirectionalParticleWidth={(link: object) => {
+          const l = link as FGLink;
+          const src = typeof l.source === 'object' ? (l.source as FGNode).id : l.source as string;
+          const tgt = typeof l.target === 'object' ? (l.target as FGNode).id : l.target as string;
+          return (selectedNodeId && (src === selectedNodeId || tgt === selectedNodeId)) ? 2 : 0;
+        }}
+        linkDirectionalParticleColor={() => '#ffffff'}
+        linkDirectionalParticleSpeed={0.004}
+        cooldownTicks={120}
+        d3AlphaDecay={0.02}
+        d3VelocityDecay={0.3}
+        enableNodeDrag
+        enableZoomInteraction
+        enablePanInteraction
+      />
+
+      {/* Hovered node tooltip */}
+      {hoveredNode && (
+        <div
+          className="absolute top-4 left-4 pointer-events-none z-10"
+          style={{
+            background: 'rgba(10, 12, 18, 0.92)',
+            border: `1px solid ${getClusterColor(hoveredNode.nodeData.gang_cluster)}55`,
+            borderRadius: 10,
+            padding: '10px 14px',
+            boxShadow: `0 0 20px ${getClusterColor(hoveredNode.nodeData.gang_cluster)}33`,
+            minWidth: 200,
+          }}
+        >
+          <div style={{ fontSize: 13, fontWeight: 600, color: '#E8EAF0', marginBottom: 6 }}>
+            {hoveredNode.nodeData.label}
+          </div>
+          <div style={{ fontSize: 11, color: '#8A909E', display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '3px 12px' }}>
+            <span>FIRs</span>
+            <span style={{ color: '#E8EAF0' }}>{hoveredNode.nodeData.fir_count}</span>
+            <span>Risk Score</span>
+            <span style={{ color: hoveredNode.nodeData.risk_score > 0.7 ? '#FF6B6B' : '#4ECDC4' }}>
+              {(hoveredNode.nodeData.risk_score * 100).toFixed(0)}
+            </span>
+            {hoveredNode.nodeData.gang_cluster != null && (
+              <>
+                <span>Cluster</span>
+                <span style={{ color: getClusterColor(hoveredNode.nodeData.gang_cluster) }}>
+                  Gang #{hoveredNode.nodeData.gang_cluster}
+                </span>
+              </>
+            )}
+            <span>Status</span>
+            <span style={{ color: hoveredNode.nodeData.is_absconding ? '#FF6B6B' : '#4ECDC4' }}>
+              {hoveredNode.nodeData.is_absconding ? 'Absconding' : 'Arrested'}
+            </span>
+            {hoveredNode.nodeData.primary_district && (
+              <>
+                <span>District</span>
+                <span style={{ color: '#E8EAF0' }}>{hoveredNode.nodeData.primary_district}</span>
+              </>
+            )}
+          </div>
         </div>
       )}
-      
+
+      {/* Hovered link tooltip */}
+      {hoveredLink && !hoveredNode && (
+        <div
+          className="absolute top-4 left-4 pointer-events-none z-10"
+          style={{
+            background: 'rgba(10,12,18,0.92)',
+            border: '1px solid #252830',
+            borderRadius: 10,
+            padding: '8px 12px',
+            fontSize: 11,
+            color: '#8A909E',
+          }}
+        >
+          <span style={{ color: '#E8EAF0' }}>Shared FIRs: </span>{hoveredLink.incidents.length}
+          <span style={{ marginLeft: 12, color: '#E8EAF0' }}>Strength: </span>
+          {(hoveredLink.strength * 100).toFixed(0)}%
+        </div>
+      )}
+
+      {/* Legend */}
+      <div
+        className="absolute bottom-4 left-4 z-10 pointer-events-none"
+        style={{
+          background: 'rgba(10,12,18,0.85)',
+          border: '1px solid #1E2130',
+          borderRadius: 8,
+          padding: '8px 12px',
+          fontSize: 10,
+          color: '#5A6478',
+        }}
+      >
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+            <div style={{ width: 8, height: 8, borderRadius: '50%', background: '#7B61FF' }} />
+            <span>Gang cluster node</span>
+          </div>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+            <div style={{ width: 8, height: 8, borderRadius: '50%', border: '1px dashed #FF6B6B', background: 'transparent' }} />
+            <span>Absconding</span>
+          </div>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+            <div style={{ width: 12, height: 2, background: 'rgba(255,255,255,0.3)' }} />
+            <span>Shared FIR link</span>
+          </div>
+        </div>
+      </div>
+
       {/* Zoom controls */}
-      <div className="absolute bottom-4 right-4 flex flex-col gap-2">
-        <button
-          onClick={() => setTransform({ ...transform, scale: Math.min(5, transform.scale * 1.2) })}
-          className="bg-[#111318] border border-[#252830] w-8 h-8 rounded text-on-surface hover:bg-[#1A1D24]"
-        >
-          +
-        </button>
-        <button
-          onClick={() => setTransform({ ...transform, scale: Math.max(0.1, transform.scale / 1.2) })}
-          className="bg-[#111318] border border-[#252830] w-8 h-8 rounded text-on-surface hover:bg-[#1A1D24]"
-        >
-          -
-        </button>
-        <button
-          onClick={() => setTransform({ x: 0, y: 0, scale: 1 })}
-          className="bg-[#111318] border border-[#252830] w-8 h-8 rounded text-on-surface hover:bg-[#1A1D24]"
-        >
-          ⟲
-        </button>
+      <div className="absolute bottom-4 right-4 flex flex-col gap-2 z-10">
+        {[
+          { label: '+', action: () => fgRef.current?.zoom(1.4, 300) },
+          { label: '−', action: () => fgRef.current?.zoom(0.7, 300) },
+          { label: '⟳', action: () => { fgRef.current?.centerAt(0, 0, 400); fgRef.current?.zoom(1, 400); } },
+        ].map(({ label, action }) => (
+          <button
+            key={label}
+            onClick={action}
+            style={{
+              width: 32, height: 32,
+              background: 'rgba(10,12,18,0.9)',
+              border: '1px solid #252830',
+              borderRadius: 6,
+              color: '#8A909E',
+              fontSize: 14,
+              cursor: 'pointer',
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+            }}
+          >
+            {label}
+          </button>
+        ))}
       </div>
     </div>
   );
