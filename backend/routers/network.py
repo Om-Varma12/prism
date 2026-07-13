@@ -87,21 +87,20 @@ async def get_accused_profile(
                 Accused.AccusedName,
                 Accused.AgeYear,
                 Accused.GenderID,
-                CaseMaster.ROWID as CaseMaster_ROWID,
                 CaseMaster.CaseMasterID,
                 CaseMaster.CrimeNo,
                 CaseMaster.IncidentFromDate,
                 CrimeSubHead.CrimeHeadName,
                 District.DistrictName,
-                ArrestSurrender.ROWID as Arrest_ROWID
-            FROM Accused
-            INNER JOIN CaseMaster ON Accused.CaseMasterID = CaseMaster.ROWID
+                ArrestSurrender.ArrestSurrenderID
+            FROM CaseMaster
+            INNER JOIN Accused ON CaseMaster.ROWID = Accused.CaseMasterID
             LEFT JOIN CrimeSubHead ON CaseMaster.CrimeMinorHeadID = CrimeSubHead.ROWID
             LEFT JOIN Unit ON CaseMaster.PoliceStationID = Unit.ROWID
             LEFT JOIN District ON Unit.DistrictID = District.ROWID
-            LEFT JOIN ArrestSurrender ON Accused.ROWID = ArrestSurrender.AccusedID
+            LEFT JOIN ArrestSurrender ON Accused.ROWID = ArrestSurrender.AccusedMasterID
             WHERE Accused.AccusedMasterID = {accused_id}
-            LIMIT 1000
+            LIMIT 300
         """
         accused_result = zcql.execute_query(accused_query)
         accused_rows = accused_result if isinstance(accused_result, list) else []
@@ -126,7 +125,7 @@ async def get_accused_profile(
         gender = _gender_label(gender_id)
         
         # Check if absconding (no arrest record)
-        is_absconding = _value(first_row, "ArrestSurrender", "ROWID", "Arrest_ROWID") is None
+        is_absconding = _value(first_row, "ArrestSurrender", "ArrestSurrenderID", "ArrestSurrenderID") is None
         
         # Build FIR summary list
         firs = []
@@ -163,32 +162,39 @@ async def get_accused_profile(
         ]
         
         # Query co-accused with times together
-        co_accused_query = f"""
-            SELECT
-                a2.AccusedMasterID,
-                a2.AccusedName,
-                COUNT(DISTINCT cm.CaseMasterID) as times_together
-            FROM Accused a1
-            INNER JOIN CaseMaster cm ON a1.CaseMasterID = cm.ROWID
-            INNER JOIN Accused a2 ON cm.ROWID = a2.CaseMasterID
-            WHERE a1.AccusedMasterID = {accused_id}
-            AND a2.AccusedMasterID != {accused_id}
-            GROUP BY a2.AccusedMasterID, a2.AccusedName
-            ORDER BY times_together DESC
-            LIMIT 10
-        """
-        co_accused_result = zcql.execute_query(co_accused_query)
-        co_accused_rows = co_accused_result if isinstance(co_accused_result, list) else []
-        
-        co_accused = []
-        for row in co_accused_rows:
-            co_name = _value(row, "a2", "AccusedName", "AccusedName") or "Unknown"
-            times_together = _to_int(_value(row, "", "times_together", "times_together")) or 0
-            co_accused.append({
-                "name": co_name,
-                "times_together": times_together,
-                "risk_score": min(100, times_together * 20)  # Simple risk based on co-appearances
-            })
+        # ZCQL does not support table aliases in FROM/JOIN — get all case IDs for this accused
+        # then fetch co-accused for each case separately to avoid alias syntax errors
+        case_ids = list({r_fir["case_master_id"] for r_fir in firs if r_fir.get("case_master_id")})
+        co_accused_counts: dict = {}
+        for cid in case_ids[:20]:  # cap at 20 cases to stay within ZCQL limits
+            try:
+                co_q = f"""
+                    SELECT Accused.AccusedMasterID, Accused.AccusedName
+                    FROM CaseMaster
+                    INNER JOIN Accused ON CaseMaster.ROWID = Accused.CaseMasterID
+                    WHERE CaseMaster.CaseMasterID = {cid}
+                    LIMIT 50
+                """
+                co_rows = zcql.execute_query(co_q)
+                for co_row in (co_rows if isinstance(co_rows, list) else []):
+                    co_id = _to_int(_value(co_row, "Accused", "AccusedMasterID", "AccusedMasterID"))
+                    co_name = _value(co_row, "Accused", "AccusedName", "AccusedName") or "Unknown"
+                    if co_id and co_id != accused_id:
+                        if co_id not in co_accused_counts:
+                            co_accused_counts[co_id] = {"name": co_name, "count": 0}
+                        co_accused_counts[co_id]["count"] += 1
+            except Exception:
+                pass
+        co_accused_query = None  # signal that we've already built co_accused below
+        # Build co_accused list from the co_accused_counts dict populated above
+        co_accused = [
+            {
+                "name": info["name"],
+                "times_together": info["count"],
+                "risk_score": min(100, info["count"] * 20),
+            }
+            for info in sorted(co_accused_counts.values(), key=lambda x: x["count"], reverse=True)[:10]
+        ]
         
         # Calculate risk score (fallback: based on FIR count and absconding status)
         fir_count = len(firs)
@@ -275,41 +281,54 @@ async def search_accused(
         search_term = q.strip()
         
         # Query accused with FIR count and latest FIR date
+        # ZCQL: use * wildcard (not %), no complex aggregates in search
+        safe_term = search_term.replace("'", "''")
         search_query = f"""
             SELECT
                 Accused.AccusedMasterID,
                 Accused.AccusedName,
-                COUNT(DISTINCT CaseMaster.CaseMasterID) as fir_count,
-                MAX(CaseMaster.IncidentFromDate) as last_fir_date
-            FROM Accused
-            INNER JOIN CaseMaster ON Accused.CaseMasterID = CaseMaster.ROWID
-            WHERE Accused.AccusedName LIKE '%{search_term}%'
-            GROUP BY Accused.AccusedMasterID, Accused.AccusedName
-            ORDER BY fir_count DESC, last_fir_date DESC
-            LIMIT {limit}
+                Accused.AgeYear,
+                CaseMaster.IncidentFromDate
+            FROM CaseMaster
+            INNER JOIN Accused ON CaseMaster.ROWID = Accused.CaseMasterID
+            WHERE Accused.AccusedName LIKE '*{safe_term}*'
+            LIMIT {min(limit * 20, 300)}
         """
         
         result = zcql.execute_query(search_query)
         rows = result if isinstance(result, list) else []
         
-        results = []
+        # Deduplicate rows by AccusedMasterID and aggregate FIR count client-side
+        seen_ids: dict = {}
         for row in rows:
-            accused_id = _to_int(_value(row, "Accused", "AccusedMasterID", "AccusedMasterID"))
+            acc_id = _to_int(_value(row, "Accused", "AccusedMasterID", "AccusedMasterID"))
             name = _value(row, "Accused", "AccusedName", "AccusedName") or "Unknown"
-            fir_count = _to_int(_value(row, "", "fir_count", "fir_count")) or 0
-            last_fir_date = _value(row, "", "last_fir_date", "last_fir_date")
-            
-            # Calculate simple risk score based on FIR count
-            risk_score = min(100, fir_count * 15)
-            
-            results.append({
-                "accused_id": accused_id,
-                "name": name,
-                "fir_count": fir_count,
-                "risk_score": risk_score,
-                "last_fir_date": last_fir_date
-            })
-        
+            incident_date = _value(row, "CaseMaster", "IncidentFromDate", "IncidentFromDate")
+            if acc_id is None:
+                continue
+            if acc_id not in seen_ids:
+                seen_ids[acc_id] = {"name": name, "fir_count": 0, "last_fir_date": None}
+            seen_ids[acc_id]["fir_count"] += 1
+            if incident_date and (
+                not seen_ids[acc_id]["last_fir_date"]
+                or str(incident_date) > str(seen_ids[acc_id]["last_fir_date"])
+            ):
+                seen_ids[acc_id]["last_fir_date"] = incident_date
+
+        # Sort by fir_count descending, take top `limit`
+        sorted_results = sorted(seen_ids.items(), key=lambda kv: kv[1]["fir_count"], reverse=True)[:limit]
+
+        results = [
+            {
+                "accused_id": acc_id,
+                "name": info["name"],
+                "fir_count": info["fir_count"],
+                "risk_score": min(100, info["fir_count"] * 15),
+                "last_fir_date": info["last_fir_date"],
+            }
+            for acc_id, info in sorted_results
+        ]
+
         return SearchResponse(results=results)
     except Exception as exc:
         print(f"[Warning] Failed to search accused: {exc}")

@@ -30,11 +30,6 @@ export default function NetworkExplorerScreen() {
   
   // Search for accused
   const { data: searchResults, isLoading: searchLoading } = useSearchAccused(debouncedSearchQuery);
-  
-  // Update filters when segment changes
-  React.useEffect(() => {
-    setFilters(prev => ({ ...prev, view: activeSegment }));
-  }, [activeSegment]);
 
   // Convert date range to actual dates
   const getDateRange = () => {
@@ -57,6 +52,11 @@ export default function NetworkExplorerScreen() {
     return { date_from: fromDate, date_to: toDate };
   };
 
+  // Network graph filters
+  const [filters, setFilters] = useState<NetworkGraphFilters>({
+    view: 'all',
+  });
+
   // Update filters when filter values change
   React.useEffect(() => {
     const { date_from, date_to } = getDateRange();
@@ -71,15 +71,10 @@ export default function NetworkExplorerScreen() {
   }, [selectedDistrict, selectedCrimeType, selectedDateRange, activeSegment]);
   
   // Selected Profile state
-  const [selectedProfile, setSelectedProfile] = useState<SuspectProfile | null>(MOCK_SUSPECTS[0]);
+  const [selectedProfile, setSelectedProfile] = useState<SuspectProfile | null>(null);
   const [showBriefingDialog, setShowBriefingDialog] = useState(false);
   const [selectedNodeId, setSelectedNodeId] = useState<string | null>(null);
   const [selectedAccusedId, setSelectedAccusedId] = useState<number | null>(null);
-  
-  // Network graph filters
-  const [filters, setFilters] = useState<NetworkGraphFilters>({
-    view: 'all',
-  });
   
   // Fetch live graph data
   const { data: graphData, isLoading, error } = useNetworkGraph(filters);
@@ -204,7 +199,7 @@ export default function NetworkExplorerScreen() {
                     {searchLoading ? (
                       <div className="p-3 text-center text-on-surface-variant text-sm">Searching...</div>
                     ) : searchResults && searchResults.results.length > 0 ? (
-                      searchResults.results.map((result) => (
+                      searchResults.results.map((result: any) => (
                         <div
                           key={result.accused_id}
                           className="p-3 hover:bg-[#1A1D24] cursor-pointer border-b border-[#252830] last:border-b-0"
@@ -232,6 +227,7 @@ export default function NetworkExplorerScreen() {
                 )}
               </AnimatePresence>
             </div>
+
             {/* Dropdowns */}
             <div className="flex flex-col gap-1">
               <label className="text-xs font-medium text-on-surface-variant">District</label>
@@ -241,11 +237,15 @@ export default function NetworkExplorerScreen() {
                 className="bg-[#0A0C10] input-border text-sm text-on-surface rounded-DEFAULT p-2 focus:ring-0 focus:border-[#3b6fe8] outline-none"
               >
                 <option>All Districts</option>
-                <option>Central</option>
-                <option>North</option>
-                <option>South</option>
+                <option>Bengaluru North</option>
+                <option>Bengaluru South</option>
+                <option>Mysuru Central</option>
+                <option>Belagavi</option>
+                <option>Mangalore</option>
+                <option>Dharwad</option>
               </select>
             </div>
+            
             <div className="flex flex-col gap-1">
               <label className="text-xs font-medium text-on-surface-variant">Crime Type</label>
               <select
@@ -254,11 +254,13 @@ export default function NetworkExplorerScreen() {
                 className="bg-[#0A0C10] input-border text-sm text-on-surface rounded-DEFAULT p-2 focus:ring-0 focus:border-[#3b6fe8] outline-none"
               >
                 <option>All Types</option>
-                <option>Assault</option>
-                <option>Theft</option>
+                <option>Murder</option>
                 <option>Robbery</option>
+                <option>Chain Snatching</option>
+                <option>Vehicle Theft</option>
               </select>
             </div>
+
             <div className="flex flex-col gap-1">
               <label className="text-xs font-medium text-on-surface-variant">Date Range</label>
               <select
@@ -272,6 +274,7 @@ export default function NetworkExplorerScreen() {
               </select>
             </div>
           </div>
+
           {/* Legend */}
           <div className="mt-auto p-4 border-t border-[#252830] bg-[#0c0e15]">
             <h4 className="text-xs font-semibold text-on-surface-variant mb-3 uppercase tracking-wider">
@@ -353,7 +356,7 @@ export default function NetworkExplorerScreen() {
                       {' '}across{' '}
                       {profileData?.firs && profileData.firs.length > 0 && (
                         <span className="font-data-mono-bold text-primary">
-                          {new Set(profileData.firs.map(f => f.district)).size} districts
+                          {new Set(profileData.firs.map((f: any) => f.district)).size} districts
                         </span>
                       )}
                       {!profileData?.firs && selectedProfile && (
@@ -370,7 +373,7 @@ export default function NetworkExplorerScreen() {
                     </h4>
                     <ul className="flex flex-col gap-2">
                       {profileData?.co_accused && profileData.co_accused.length > 0 ? (
-                        profileData.co_accused.map((conn, idx) => (
+                        profileData.co_accused.map((conn: any, idx: number) => (
                           <li key={idx} className="flex items-center justify-between text-sm">
                             <div className="flex items-center gap-2">
                               <div className="w-2 h-2 rounded-full bg-[#ffb4ab]"></div>
@@ -405,7 +408,7 @@ export default function NetworkExplorerScreen() {
                         Crime Types
                       </h4>
                       <ul className="flex flex-col gap-2">
-                        {profileData.crime_types.map((ct, idx) => (
+                        {profileData.crime_types.map((ct: any, idx: number) => (
                           <li key={idx} className="flex items-center justify-between text-sm">
                             <span className="text-on-surface">{ct.name}</span>
                             <span className="text-xs text-outline font-label-mono">{ct.count}</span>
