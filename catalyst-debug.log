@@ -95,3 +95,112 @@ Search for the keywords to learn more about each warning.
 [info] [2026-07-13T11:39:15.753Z] : [1783942755753]  Appsail[backend]  "GET"  "/api/dashboard/trends"
 [info] [2026-07-13T11:39:16.010Z] : [1783942756010]  "GET"  "/app/favicon.ico"
 [info] [2026-07-13T11:39:16.074Z] : [1783942756073]  "GET"  "/app/logo192.png"
+[info] [2026-07-13T11:39:44.040Z] : [react-plugin]: Compiling...
+[info] [2026-07-13T11:39:45.548Z] : [1783942785547]  Appsail[backend]  "GET"  "/api/chat/history"
+[info] [2026-07-13T11:39:45.857Z] : [1783942785857]  Appsail[backend]  "OPTIONS"  "/api/chat/new"
+[info] [2026-07-13T11:39:46.472Z] : [1783942786471]  Appsail[backend]  "POST"  "/api/chat/new"
+[info] [2026-07-13T11:39:46.744Z] : [1783942786743]  Appsail[backend]  "GET"  "/api/chat/history"
+[info] [2026-07-13T11:39:46.859Z] : [1783942786858]  Appsail[backend]  "GET"  "/api/chat/messages?session_id=6cfd636e-7149-42ca-a9bd-d4e706664e34"
+[info] [2026-07-13T11:39:47.089Z] : [1783942787089]  Appsail[backend]  "GET"  "/api/chat/messages?session_id=a5228731-c4b0-49f0-a983-9a0a90d9141a"
+[info] [2026-07-13T11:39:47.967Z] : [react-plugin]: Compiled with warnings.
+
+[info] [2026-07-13T11:39:47.967Z] : [react-plugin]: [eslint] 
+src\components\NetworkExplorerScreen.tsx
+  Line 71:6:    React Hook React.useEffect has a missing dependency: 'getDateRange'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+  Line 468:52:  Comments inside children section of tag should be placed inside braces                                                 react/jsx-no-comment-textnodes
+
+src\hooks\useChat.ts
+  Line 7:42:  'ConversationItem' is defined but never used                                                                                @typescript-eslint/no-unused-vars
+  Line 43:6:  React Hook useEffect has a missing dependency: 'newConversationMutation'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+[info] [2026-07-13T11:39:47.967Z] : [react-plugin]: 
+Search for the keywords to learn more about each warning.
+[info] [2026-07-13T11:39:47.967Z] : [react-plugin]: To ignore, add // eslint-disable-next-line to the line before.
+
+[info] [2026-07-13T11:39:48.086Z] : [1783942788086]  "GET"  "/app/main.36d9e1ef231fd4deaa65.hot-update.json"
+[info] [2026-07-13T11:39:48.422Z] : [1783942788421]  "GET"  "/app/main.36d9e1ef231fd4deaa65.hot-update.js"
+[info] [2026-07-13T11:41:32.707Z] : [react-plugin]: Compiling...
+[info] [2026-07-13T11:41:33.548Z] : [react-plugin]: Compiled with warnings.
+
+[info] [2026-07-13T11:41:33.548Z] : [react-plugin]: [eslint] 
+src\components\NetworkExplorerScreen.tsx
+  Line 71:6:    React Hook React.useEffect has a missing dependency: 'getDateRange'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+  Line 468:52:  Comments inside children section of tag should be placed inside braces                                                 react/jsx-no-comment-textnodes
+
+src\hooks\useChat.ts
+  Line 7:42:  'ConversationItem' is defined but never used                                                                                @typescript-eslint/no-unused-vars
+  Line 43:6:  React Hook useEffect has a missing dependency: 'newConversationMutation'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+[info] [2026-07-13T11:41:33.548Z] : [react-plugin]: 
+Search for the keywords to learn more about each warning.
+[info] [2026-07-13T11:41:33.549Z] : [react-plugin]: To ignore, add // eslint-disable-next-line to the line before.
+
+[info] [2026-07-13T11:41:33.859Z] : [1783942893859]  "GET"  "/app/main.8dc6d15bf578d10d2a5a.hot-update.json"
+[info] [2026-07-13T11:41:34.122Z] : [1783942894122]  "GET"  "/app/main.8dc6d15bf578d10d2a5a.hot-update.js"
+[info] [2026-07-13T11:42:04.081Z] : [react-plugin]: Compiling...
+[info] [2026-07-13T11:42:04.622Z] : [react-plugin]: Compiled with warnings.
+
+[info] [2026-07-13T11:42:04.622Z] : [react-plugin]: [eslint] 
+src\components\NetworkExplorerScreen.tsx
+  Line 71:6:    React Hook React.useEffect has a missing dependency: 'getDateRange'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+  Line 468:52:  Comments inside children section of tag should be placed inside braces                                                 react/jsx-no-comment-textnodes
+
+src\hooks\useChat.ts
+  Line 7:42:  'ConversationItem' is defined but never used                                                                                @typescript-eslint/no-unused-vars
+  Line 43:6:  React Hook useEffect has a missing dependency: 'newConversationMutation'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+[info] [2026-07-13T11:42:04.622Z] : [react-plugin]: 
+Search for the keywords to learn more about each warning.
+[info] [2026-07-13T11:42:04.623Z] : [react-plugin]: To ignore, add // eslint-disable-next-line to the line before.
+
+[info] [2026-07-13T11:42:04.660Z] : [1783942924659]  "GET"  "/app/main.bd936fc953750739362f.hot-update.json"
+[info] [2026-07-13T11:42:04.984Z] : [1783942924984]  "GET"  "/app/main.bd936fc953750739362f.hot-update.js"
+[info] [2026-07-13T11:44:52.116Z] : [1783943092116]  Appsail[backend]  "GET"  "/api/network/graph?view=all"
+[info] [2026-07-13T11:44:52.119Z] : [1783943092119]  Appsail[backend]  "GET"  "/api/network/graph?date_from=2026-06-13&date_to=2026-07-13&view=all"
+[info] [2026-07-13T11:45:09.438Z] : [1783943109438]  Appsail[backend]  "GET"  "/api/network/profile/46143000000062140"
+[info] [2026-07-13T11:45:15.559Z] : [1783943115559]  Appsail[backend]  "GET"  "/api/network/graph?date_from=2026-06-13&date_to=2026-07-13&view=clusters"
+[info] [2026-07-13T11:45:22.129Z] : [1783943122129]  Appsail[backend]  "GET"  "/api/network/graph?date_from=2026-06-13&date_to=2026-07-13&view=repeat"
+[info] [2026-07-13T11:46:34.800Z] : [react-plugin]: Compiling...
+[info] [2026-07-13T11:46:35.279Z] : [react-plugin]: Compiled with warnings.
+
+[info] [2026-07-13T11:46:35.279Z] : [react-plugin]: [eslint] 
+src\components\NetworkExplorerScreen.tsx
+  Line 71:6:    React Hook React.useEffect has a missing dependency: 'getDateRange'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+  Line 468:52:  Comments inside children section of tag should be placed inside braces                                                 react/jsx-no-comment-textnodes
+
+src\hooks\useChat.ts
+  Line 7:42:  'ConversationItem' is defined but never used                                                                                @typescript-eslint/no-unused-vars
+  Line 43:6:  React Hook useEffect has a missing dependency: 'newConversationMutation'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+[info] [2026-07-13T11:46:35.279Z] : [react-plugin]: 
+Search for the keywords to learn more about each warning.
+[info] [2026-07-13T11:46:35.279Z] : [react-plugin]: To ignore, add // eslint-disable-next-line to the line before.
+
+[info] [2026-07-13T11:46:35.598Z] : [1783943195598]  "GET"  "/app/main.36300f6a8f36af9d02dc.hot-update.json"
+[info] [2026-07-13T11:46:35.856Z] : [1783943195856]  "GET"  "/app/main.36300f6a8f36af9d02dc.hot-update.js"
+[info] [2026-07-13T11:47:17.268Z] : [1783943237267]  Appsail[backend]  "GET"  "/api/network/profile/3"
+[info] [2026-07-13T11:47:48.796Z] : [react-plugin]: Compiling...
+[info] [2026-07-13T11:47:49.489Z] : [react-plugin]: Compiled with warnings.
+
+[info] [2026-07-13T11:47:49.489Z] : [react-plugin]: [eslint] 
+src\components\NetworkExplorerScreen.tsx
+  Line 71:6:    React Hook React.useEffect has a missing dependency: 'getDateRange'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+  Line 468:52:  Comments inside children section of tag should be placed inside braces                                                 react/jsx-no-comment-textnodes
+
+src\hooks\useChat.ts
+  Line 7:42:  'ConversationItem' is defined but never used                                                                                @typescript-eslint/no-unused-vars
+  Line 43:6:  React Hook useEffect has a missing dependency: 'newConversationMutation'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+[info] [2026-07-13T11:47:49.489Z] : [react-plugin]: 
+Search for the keywords to learn more about each warning.
+[info] [2026-07-13T11:47:49.489Z] : [react-plugin]: To ignore, add // eslint-disable-next-line to the line before.
+
+[info] [2026-07-13T11:47:49.798Z] : [1783943269798]  "GET"  "/app/main.dff0b0376a4c19c56d27.hot-update.json"
+[info] [2026-07-13T11:47:50.063Z] : [1783943270063]  "GET"  "/app/main.dff0b0376a4c19c56d27.hot-update.js"
+[info] [2026-07-13T11:48:37.953Z] : [1783943317952]  Appsail[backend]  "GET"  "/api/network/search?q=san&limit=10"
+[info] [2026-07-13T11:48:38.500Z] : [1783943318500]  Appsail[backend]  "GET"  "/api/network/search?q=sanjay&limit=10"
+[info] [2026-07-13T11:48:40.368Z] : [1783943320368]  Appsail[backend]  "GET"  "/api/network/search?q=sanj&limit=10"
+[info] [2026-07-13T11:48:41.489Z] : [1783943321488]  Appsail[backend]  "GET"  "/api/network/search?q=sanja&limit=10"
+[info] [2026-07-13T11:48:46.576Z] : [1783943326575]  Appsail[backend]  "GET"  "/api/network/graph?district=Mangalore&date_from=2026-06-13&date_to=2026-07-13&view=all"
+[info] [2026-07-13T11:48:47.790Z] : [1783943327790]  Appsail[backend]  "GET"  "/api/network/graph?district=Bengaluru+North&date_from=2026-06-13&date_to=2026-07-13&view=all"
+[info] [2026-07-13T11:48:49.959Z] : [1783943329958]  Appsail[backend]  "GET"  "/api/network/graph?district=Bengaluru+South&date_from=2026-06-13&date_to=2026-07-13&view=all"
+[info] [2026-07-13T11:48:51.545Z] : [1783943331545]  Appsail[backend]  "GET"  "/api/network/graph?district=Mysuru+Central&date_from=2026-06-13&date_to=2026-07-13&view=all"
+[info] [2026-07-13T11:48:53.909Z] : [1783943333909]  Appsail[backend]  "GET"  "/api/network/graph?district=Belagavi&date_from=2026-06-13&date_to=2026-07-13&view=all"
+[info] [2026-07-13T11:49:01.190Z] : [1783943341190]  Appsail[backend]  "GET"  "/api/network/graph?district=Dharwad&date_from=2026-06-13&date_to=2026-07-13&view=all"
+[info] [2026-07-13T11:49:10.696Z] : [1783943350696]  Appsail[backend]  "GET"  "/api/network/graph?date_from=2026-01-14&date_to=2026-07-13&view=all"
+[info] [2026-07-13T11:49:17.965Z] : [1783943357965]  Appsail[backend]  "GET"  "/api/network/graph?crime_type=Murder&date_from=2026-01-14&date_to=2026-07-13&view=all"
