@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef } from 'react';
 import { NetworkGraphNode, NetworkGraphEdge } from '../../types/network';
 
 interface NetworkGraphProps {
@@ -45,6 +45,7 @@ export function NetworkGraph({ nodes, edges, selectedNodeId, onNodeClick }: Netw
           if (i >= j) return;
           const pos1 = positions[node1.id];
           const pos2 = positions[node2.id];
+          if (!pos1 || !pos2) return;
           const dx = pos2.x - pos1.x;
           const dy = pos2.y - pos1.y;
           const dist = Math.sqrt(dx * dx + dy * dy) || 1;
@@ -57,6 +58,7 @@ export function NetworkGraph({ nodes, edges, selectedNodeId, onNodeClick }: Netw
           pos2.y += fy;
         });
       });
+
       
       // Attraction along edges
       edges.forEach(edge => {

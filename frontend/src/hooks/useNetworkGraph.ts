@@ -3,9 +3,9 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { networkService } from '../services/network.service';
-import { NetworkGraphFilters, NetworkGraphResponse } from '../types/network';
+import { NetworkGraphFilters } from '../types/network';
 
 /**
  * Hook for fetching the network graph with filters

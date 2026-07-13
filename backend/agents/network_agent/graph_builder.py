@@ -186,13 +186,13 @@ class NetworkGraphBuilder:
         
         query = f"""
             SELECT
-                Accused.ROWID,
+                Accused.ROWID as Accused_ROWID,
                 Accused.AccusedMasterID,
                 Accused.AccusedName,
                 Accused.AgeYear,
                 Accused.GenderID,
                 Accused.CaseMasterID,
-                CaseMaster.ROWID,
+                CaseMaster.ROWID as CaseMaster_ROWID,
                 CaseMaster.CaseMasterID,
                 CaseMaster.CrimeNo,
                 CaseMaster.IncidentFromDate,
@@ -205,7 +205,7 @@ class NetworkGraphBuilder:
             LEFT JOIN Unit ON CaseMaster.PoliceStationID = Unit.ROWID
             LEFT JOIN District ON Unit.DistrictID = District.ROWID
             {where_sql}
-            LIMIT 1000
+            LIMIT 300
         """
         result = self.zcql.execute_query(query)
         return result if isinstance(result, list) else []
@@ -263,28 +263,6 @@ class NetworkGraphBuilder:
         if not current:
             return True
         return candidate > current
-
-    def _attach_degree_scores(self, nodes: list[GraphNode], edges: list[GraphEdge]) -> None:
-        degree_by_id: dict[str, int] = defaultdict(int)
-        for edge in edges:
-            degree_by_id[edge.source] += edge.strength
-            degree_by_id[edge.target] += edge.strength
-
-        max_degree = max(degree_by_id.values(), default=1)
-        for node in nodes:
-            degree = degree_by_id.get(node.id, 0)
-            node.centrality_score = round(degree / max_degree, 3) if max_degree else 0
-            node.size = max(node.size, min(28, 8 + degree * 2))
-
-    def _densest_node(self, nodes: list[GraphNode]) -> DensestNode | None:
-        if not nodes:
-            return None
-        node = max(nodes, key=lambda item: item.centrality_score)
-        return DensestNode(
-            id=node.id,
-            name=node.label,
-            centrality_score=node.centrality_score,
-        )
 
     def _connected_component_count(
         self, nodes: list[GraphNode], edges: list[GraphEdge]
