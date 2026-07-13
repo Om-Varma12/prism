@@ -86,23 +86,25 @@ export default function NetworkExplorerScreen() {
   // Fetch accused profile when a node is selected
   const { data: profileData, isLoading: profileLoading, error: profileError } = useAccusedProfile(selectedAccusedId);
 
-  const handleNodeClick = (nodeId: string) => {
-    setSelectedNodeId(nodeId);
-    // Find corresponding node data
-    const node = nodes.find((n: NetworkGraphNode) => n.id === nodeId);
-    if (node && node.type === 'accused') {
-      // Extract accused_id from node and fetch real profile
-      if (node.accused_id) {
-        setSelectedAccusedId(node.accused_id);
-      } else {
-        // Fallback to mock if no accused_id
-        const suspect = MOCK_SUSPECTS.find(s => s.name === node.label);
-        if (suspect) {
-          setSelectedProfile(suspect);
-        }
-      }
-    }
-  };
+   const handleNodeClick = (nodeId: string) => {
+     setSelectedNodeId(nodeId);
+     // Find corresponding node data
+     const node = nodes.find((n: NetworkGraphNode) => n.id === nodeId);
+     if (node && node.type === 'accused') {
+       // Extract accused_id from node and fetch real profile
+       if (node.accused_id) {
+         setSelectedAccusedId(node.accused_id);
+       } else {
+         // Fallback to mock if no accused_id
+         const suspect = MOCK_SUSPECTS.find(s => s.name === node.label);
+         if (suspect) {
+           setSelectedProfile(suspect);
+         }
+       }
+       // Show the briefing dialog immediately on node click
+       setShowBriefingDialog(true);
+     }
+   };
 
   return (
     <div className="flex-1 flex flex-col relative h-screen bg-[#0A0C10]">
@@ -216,6 +218,8 @@ export default function NetworkExplorerScreen() {
                             if (node) {
                               setSelectedNodeId(node.id);
                             }
+                            // Show the briefing dialog
+                            setShowBriefingDialog(true);
                           }}
                         >
                           <div className="text-sm text-on-surface font-medium">{result.name}</div>
@@ -440,7 +444,7 @@ export default function NetworkExplorerScreen() {
 
       {/* DETAILED BRIEFING DIALOG */}
       <AnimatePresence>
-        {showBriefingDialog && selectedProfile && (
+        {showBriefingDialog && (selectedProfile || profileData) && (
           <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm">
             <motion.div
               initial={{ scale: 0.95, opacity: 0 }}
@@ -466,10 +470,10 @@ export default function NetworkExplorerScreen() {
               <div className="p-5 space-y-4">
                 <div>
                   <h4 className="text-xl font-black text-white uppercase tracking-tight">
-                    {selectedProfile.name}
+                    {profileData?.name || selectedProfile?.name}
                   </h4>
                   <div className="text-[10px] text-white/40 font-mono mt-1.5 uppercase tracking-wider">
-                    TARGET ID: {selectedProfile.id} // Status: {selectedProfile.status}
+                    TARGET ID: {profileData?.accused_id || selectedProfile?.id} // Status: {profileData?.is_absconding ? 'Absconding' : 'Charge Sheeted'}
                   </div>
                 </div>
 
@@ -478,7 +482,11 @@ export default function NetworkExplorerScreen() {
                     EXECUTIVE PROFILE SUMMARY
                   </h5>
                   <p className="text-xs text-white/80 leading-relaxed font-mono bg-black p-3.5 border border-white/10">
-                    {selectedProfile.bio || 'No executive brief logs on file for target ID.'}
+                    {profileData ? 
+                      `${profileData.name} is a ${profileData.age || 'unknown age'} year old ${profileData.gender || 'unknown gender'} accused with ${profileData.fir_count} FIRs. ` +
+                      `Risk score: ${profileData.risk_score}. ` +
+                      (profileData.is_absconding ? 'Currently absconding.' : 'Arrest status confirmed.')
+                      : (selectedProfile?.bio || 'No executive brief logs on file for target ID.')}
                   </p>
                 </div>
 
@@ -490,7 +498,7 @@ export default function NetworkExplorerScreen() {
                         RISK INDEX
                       </div>
                       <div className="font-black text-white font-mono mt-1 text-sm">
-                        {selectedProfile.riskScore}%
+                        {profileData?.risk_score || selectedProfile?.riskScore}%
                       </div>
                     </div>
                   </div>
@@ -501,11 +509,46 @@ export default function NetworkExplorerScreen() {
                         PRIMARY FOCUS
                       </div>
                       <div className="font-black text-white font-mono mt-1 text-sm uppercase">
-                        {selectedProfile.recentCrime}
+                        {profileData?.crime_types?.[0]?.name || selectedProfile?.recentCrime || 'N/A'}
                       </div>
                     </div>
                   </div>
                 </div>
+
+                {/* FIR History */}
+                {profileData?.firs && profileData.firs.length > 0 && (
+                  <div className="space-y-2">
+                    <h5 className="text-[9px] font-mono font-black text-white/40 uppercase tracking-[0.2em]">
+                      FIR HISTORY
+                    </h5>
+                    <div className="max-h-32 overflow-y-auto">
+                      {profileData.firs.slice(0, 5).map((fir: any, idx: number) => (
+                        <div key={idx} className="text-[10px] text-white/60 font-mono border-b border-white/5 py-1">
+                          <span className="text-primary">#{fir.crime_no || fir.case_master_id}</span>
+                          {' — '}{fir.crime_type || 'Unknown'}
+                          {fir.date && ` (${fir.date})`}
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {/* Co-accused */}
+                {profileData?.co_accused && profileData.co_accused.length > 0 && (
+                  <div className="space-y-2">
+                    <h5 className="text-[9px] font-mono font-black text-white/40 uppercase tracking-[0.2em]">
+                      ASSOCIATES
+                    </h5>
+                    <div className="max-h-24 overflow-y-auto">
+                      {profileData.co_accused.slice(0, 5).map((co: any, idx: number) => (
+                        <div key={idx} className="text-[10px] text-white/60 font-mono">
+                          <span className="text-primary">{co.name}</span>
+                          {' — '}{co.times_together} shared FIR{co.times_together > 1 ? 's' : ''}
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
               </div>
 
               <div className="p-4 border-t border-white/10 bg-black flex justify-end gap-2">
