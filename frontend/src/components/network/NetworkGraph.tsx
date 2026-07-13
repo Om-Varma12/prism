@@ -225,7 +225,8 @@ export function NetworkGraph({ nodes, edges, selectedNodeId, onNodeClick }: Netw
       (srcId === selectedNodeId || tgtId === selectedNodeId ||
        connectedIds.has(srcId) || connectedIds.has(tgtId));
 
-    const alpha = selectedNodeId ? (isHighlighted ? 0.9 : 0.08) : 0.35;
+    // Brighter edges: increased alpha and line width
+    const alpha = selectedNodeId ? (isHighlighted ? 0.95 : 0.15) : 0.55;
 
     ctx.save();
     ctx.globalAlpha = alpha;
@@ -235,13 +236,13 @@ export function NetworkGraph({ nodes, edges, selectedNodeId, onNodeClick }: Netw
 
     if (isHighlighted) {
       // Glowing link
-      ctx.shadowBlur = 6;
+      ctx.shadowBlur = 8;
       ctx.shadowColor = getClusterColor(src.nodeData.gang_cluster);
       ctx.strokeStyle = '#ffffff';
-      ctx.lineWidth = l.thickness + 0.5;
+      ctx.lineWidth = l.thickness + 1;
     } else {
-      ctx.strokeStyle = '#3A4560';
-      ctx.lineWidth = l.thickness * 0.5;
+      ctx.strokeStyle = '#5A6478';
+      ctx.lineWidth = l.thickness;
     }
     ctx.stroke();
     ctx.restore();
@@ -299,7 +300,7 @@ export function NetworkGraph({ nodes, edges, selectedNodeId, onNodeClick }: Netw
       {/* Hovered node tooltip */}
       {hoveredNode && (
         <div
-          className="absolute top-4 left-4 pointer-events-none z-10"
+          className="absolute top-4 right-4 pointer-events-none z-10"
           style={{
             background: 'rgba(10, 12, 18, 0.92)',
             border: `1px solid ${getClusterColor(hoveredNode.nodeData.gang_cluster)}55`,
@@ -344,7 +345,7 @@ export function NetworkGraph({ nodes, edges, selectedNodeId, onNodeClick }: Netw
       {/* Hovered link tooltip */}
       {hoveredLink && !hoveredNode && (
         <div
-          className="absolute top-4 left-4 pointer-events-none z-10"
+          className="absolute top-20 left-4 pointer-events-none z-10"
           style={{
             background: 'rgba(10,12,18,0.92)',
             border: '1px solid #252830',
@@ -435,7 +436,7 @@ export function NetworkGraph({ nodes, edges, selectedNodeId, onNodeClick }: Netw
             <span>Absconding</span>
           </div>
           <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-            <div style={{ width: 12, height: 2, background: 'rgba(255,255,255,0.3)' }} />
+            <div style={{ width: 12, height: 2, background: '#5A6478' }} />
             <span>Shared FIR link</span>
           </div>
         </div>
