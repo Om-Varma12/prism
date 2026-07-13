@@ -31,12 +31,17 @@ export interface NetworkGraphNode {
   centrality_score: number;
 }
 
+export interface EdgeIncident {
+  case_master_id: number;
+  crime_no?: string | null;
+}
+
 export interface NetworkGraphEdge {
   source: string;
   target: string;
   type: NetworkEdgeType;
   strength: number;
-  incidents: number[];
+  incidents: EdgeIncident[];
   thickness: number;
   color: string;
 }

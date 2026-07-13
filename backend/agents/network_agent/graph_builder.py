@@ -6,7 +6,7 @@ from datetime import datetime, timedelta
 from itertools import combinations
 from typing import Any, Optional
 
-from schemas.network import DensestNode, GraphEdge, GraphMetadata, GraphNode, GraphResponse, GraphView
+from schemas.network import DensestNode, EdgeIncident, GraphEdge, GraphMetadata, GraphNode, GraphResponse, GraphView
 from agents.network_agent.centrality import CentralityComputer
 from agents.network_agent.community_detection import CommunityDetector
 
@@ -109,7 +109,7 @@ class NetworkGraphBuilder:
             return None
 
         case_groups: dict[str, list[str]] = defaultdict(list)
-        case_incidents: dict[str, int] = {}
+        case_incidents: dict[str, tuple[int, str | None]] = {}  # case_row_id -> (case_master_id, crime_no)
         absconding_by_resolved_id: dict[str, bool] = {}
 
         for row in rows:
@@ -192,8 +192,9 @@ class NetworkGraphBuilder:
 
             if resolved_id not in case_groups[case_row_id]:
                 case_groups[case_row_id].append(resolved_id)
-            if case_master_id:
-                case_incidents[case_row_id] = case_master_id
+            if case_master_id and case_row_id not in case_incidents:
+                crime_no = str(self._value(row, "CaseMaster", "CrimeNo", "CrimeNo") or "")
+                case_incidents[case_row_id] = (case_master_id, crime_no or None)
 
         # Update node summaries
         for node in resolved_nodes:
@@ -208,7 +209,7 @@ class NetworkGraphBuilder:
             if len(node_ids) < 2:
                 continue
 
-            incident_id = case_incidents.get(case_id)
+            incident_tuple = case_incidents.get(case_id)
             for source, target in combinations(sorted(node_ids), 2):
                 pair = (source, target)
                 if pair not in edges_by_pair:
@@ -226,8 +227,11 @@ class NetworkGraphBuilder:
                 edge.strength += 1
                 edge.thickness = min(5, 1 + edge.strength)
                 edge.color = "#ffb4ab" if edge.strength > 1 else "#44474f"
-                if incident_id and incident_id not in edge.incidents:
-                    edge.incidents.append(incident_id)
+                if incident_tuple:
+                    case_master_id, crime_no = incident_tuple
+                    existing_ids = {inc.case_master_id for inc in edge.incidents}
+                    if case_master_id not in existing_ids:
+                        edge.incidents.append(EdgeIncident(case_master_id=case_master_id, crime_no=crime_no))
 
         nodes = resolved_nodes
         edges = list(edges_by_pair.values())
@@ -276,8 +280,8 @@ class NetworkGraphBuilder:
     ) -> list[dict[str, Any]]:
         where_clauses = []
         
-        if crime_type:
-            where_clauses.append(f"CrimeSubHead.CrimeHeadName = '{crime_type}'")
+        # Note: crime_type filtering removed due to ZCQL 4-join limit
+        # Crime type can be filtered client-side or via a separate query
         
         if district:
             where_clauses.append(f"District.DistrictName = '{district}'")
@@ -304,13 +308,12 @@ class NetworkGraphBuilder:
                 CaseMaster.CaseMasterID,
                 CaseMaster.CrimeNo,
                 CaseMaster.IncidentFromDate,
-                CrimeSubHead.CrimeHeadName,
+                CaseMaster.CrimeMinorHeadID,
                 Unit.UnitName,
                 District.DistrictName,
                 ArrestSurrender.ROWID as ArrestSurrenderID
             FROM CaseMaster
             INNER JOIN Accused ON CaseMaster.ROWID = Accused.CaseMasterID
-            LEFT JOIN CrimeSubHead ON CaseMaster.CrimeMinorHeadID = CrimeSubHead.ROWID
             LEFT JOIN Unit ON CaseMaster.PoliceStationID = Unit.ROWID
             LEFT JOIN District ON Unit.DistrictID = District.ROWID
             LEFT JOIN ArrestSurrender ON Accused.ROWID = ArrestSurrender.AccusedMasterID

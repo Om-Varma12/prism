@@ -43,6 +43,13 @@ class GraphNode(BaseModel):
     centrality_score: float = 0
 
 
+class EdgeIncident(BaseModel):
+    """A single FIR that justifies a co-accused edge connection."""
+
+    case_master_id: int
+    crime_no: Optional[str] = None
+
+
 class GraphEdge(BaseModel):
     """Serializable edge between two graph nodes."""
 
@@ -50,7 +57,7 @@ class GraphEdge(BaseModel):
     target: str
     type: EdgeType = "co_accused"
     strength: int = 1
-    incidents: list[int] = Field(default_factory=list)
+    incidents: list[EdgeIncident] = Field(default_factory=list)
     thickness: float = 1
     color: str = "#44474f"
 
