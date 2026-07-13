@@ -247,6 +247,12 @@ class NetworkGraphBuilder:
         # Compute centrality metrics and attach to nodes
         CentralityComputer.attach_centrality_to_nodes(nodes, edges)
 
+        # Update risk scores based on crime count, flight risk (absconding), and network centrality
+        for node in nodes:
+            centrality = getattr(node, "centrality_score", 0.0) or 0.0
+            node.risk_score = min(100, (node.fir_count * 15) + (35 if node.is_absconding else 0) + int(centrality * 50))
+            node.color = self._risk_color(node.risk_score)
+
         return GraphResponse(
             nodes=nodes,
             edges=edges,
