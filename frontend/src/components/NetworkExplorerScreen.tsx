@@ -94,15 +94,9 @@ export default function NetworkExplorerScreen() {
        // Extract accused_id from node and fetch real profile
        if (node.accused_id) {
          setSelectedAccusedId(node.accused_id);
-         setShowProfilePanel(true);
-       } else {
-         // Fallback to mock if no accused_id
-         const suspect = MOCK_SUSPECTS.find(s => s.name === node.label);
-         if (suspect) {
-           setSelectedProfile(suspect);
-           setShowProfilePanel(true);
-         }
        }
+       // Always show the profile panel with available node data
+       setShowProfilePanel(true);
      }
    };
 
@@ -317,10 +311,10 @@ export default function NetworkExplorerScreen() {
                       Selected Profile
                     </div>
                     <h3 className="font-headline-md text-[20px] font-bold text-on-surface leading-tight">
-                      {profileData?.name || selectedProfile?.name}
+                      {profileData?.name || selectedProfile?.name || (selectedNodeId ? nodes.find((n: NetworkGraphNode) => n.id === selectedNodeId)?.label : 'Unknown')}
                     </h3>
                     <p className="text-sm text-on-surface-variant mt-1">
-                      Age: {profileData?.age || selectedProfile?.age} | Gender: {profileData?.gender || selectedProfile?.gender}
+                      Age: {profileData?.age ?? selectedProfile?.age ?? nodes.find((n: NetworkGraphNode) => n.id === selectedNodeId)?.age ?? 'Unknown'} | Gender: {profileData?.gender ?? selectedProfile?.gender ?? nodes.find((n: NetworkGraphNode) => n.id === selectedNodeId)?.gender ?? 'Unknown'}
                     </p>
                   </div>
                   <button 
@@ -340,13 +334,13 @@ export default function NetworkExplorerScreen() {
                     <div className="flex justify-between text-sm mb-2">
                       <span className="text-on-surface-variant">Risk Score</span>
                       <span className="text-error font-data-mono-bold">
-                        {profileData?.risk_score || selectedProfile?.riskScore}/100
+                        {profileData?.risk_score ?? selectedProfile?.riskScore ?? nodes.find((n: NetworkGraphNode) => n.id === selectedNodeId)?.risk_score ?? 0}/100
                       </span>
                     </div>
                     <div className="h-1.5 w-full bg-[#0A0C10] rounded-full overflow-hidden">
                       <div
                         className="h-full bg-error rounded-full"
-                        style={{ width: `${profileData?.risk_score || selectedProfile?.riskScore}%` }}
+                        style={{ width: `${profileData?.risk_score ?? selectedProfile?.riskScore ?? nodes.find((n: NetworkGraphNode) => n.id === selectedNodeId)?.risk_score ?? 0}%` }}
                       ></div>
                     </div>
                   </div>
@@ -355,19 +349,8 @@ export default function NetworkExplorerScreen() {
                     <p className="text-sm text-on-surface">
                       Appears in{' '}
                       <span className="font-data-mono-bold text-primary">
-                        {profileData?.fir_count || selectedProfile?.firsCount} FIRs
+                        {profileData?.fir_count ?? selectedProfile?.firsCount ?? nodes.find((n: NetworkGraphNode) => n.id === selectedNodeId)?.fir_count ?? 0} FIRs
                       </span>
-                      {' '}across{' '}
-                      {profileData?.firs && profileData.firs.length > 0 && (
-                        <span className="font-data-mono-bold text-primary">
-                          {new Set(profileData.firs.map((f: any) => f.district)).size} districts
-                        </span>
-                      )}
-                      {!profileData?.firs && selectedProfile && (
-                        <span className="font-data-mono-bold text-primary">
-                          {selectedProfile.districtsCount} districts
-                        </span>
-                      )}
                     </p>
                   </div>
                   {/* Connections */}

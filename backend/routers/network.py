@@ -316,7 +316,7 @@ async def search_accused(
                 pass
         
         if district:
-            where_clauses.append(f"Unit.UnitName = '{district}'")
+            where_clauses.append(f"District.DistrictName = '{district}'")
         
         if date_from:
             where_clauses.append(f"CaseMaster.IncidentFromDate >= '{date_from}'")
@@ -343,6 +343,7 @@ async def search_accused(
             FROM CaseMaster
             INNER JOIN Accused ON CaseMaster.ROWID = Accused.CaseMasterID
             LEFT JOIN Unit ON CaseMaster.PoliceStationID = Unit.ROWID
+            LEFT JOIN District ON Unit.DistrictID = District.ROWID
             {where_sql}
             LIMIT {min(limit * 20, 300)}
         """

@@ -163,7 +163,7 @@ class NetworkGraphBuilder:
                 incident_date = self._value(
                     row, "CaseMaster", "IncidentFromDate", "IncidentFromDate"
                 )
-                unit_name = self._value(row, "Unit", "UnitName", "UnitName")
+                district_name = self._value(row, "District", "DistrictName", "DistrictName")
                 
                 matched_node = GraphNode(
                     id=resolved_id,
@@ -175,7 +175,7 @@ class NetworkGraphBuilder:
                     fir_count=0,
                     is_absconding=False,
                     risk_score=0,
-                    primary_district=str(unit_name) if unit_name else None,
+                    primary_district=str(district_name) if district_name else None,
                     last_seen_date=str(incident_date) if incident_date else None,
                     size=8,
                     color="#3B6FE8",
@@ -189,9 +189,9 @@ class NetworkGraphBuilder:
             if incident_date and self._is_newer_date(str(incident_date), matched_node.last_seen_date):
                 matched_node.last_seen_date = str(incident_date)
             
-            unit_name = self._value(row, "Unit", "UnitName", "UnitName")
-            if unit_name and not matched_node.primary_district:
-                matched_node.primary_district = str(unit_name)
+            district_name = self._value(row, "District", "DistrictName", "DistrictName")
+            if district_name and not matched_node.primary_district:
+                matched_node.primary_district = str(district_name)
 
             absconding_by_resolved_id[resolved_id] = absconding_by_resolved_id.get(resolved_id, False) or is_row_absconding
 
@@ -326,8 +326,8 @@ class NetworkGraphBuilder:
         # Crime type can be filtered client-side or via a separate query
         
         if district:
-            # Filter by Unit.UnitName since we don't join District
-            where_clauses.append(f"Unit.UnitName = '{district}'")
+            # Filter by District.DistrictName
+            where_clauses.append(f"District.DistrictName = '{district}'")
         
         if date_from:
             where_clauses.append(f"CaseMaster.IncidentFromDate >= '{date_from}'")
@@ -352,10 +352,12 @@ class NetworkGraphBuilder:
                 CaseMaster.CrimeNo,
                 CaseMaster.IncidentFromDate,
                 CaseMaster.CrimeMinorHeadID,
-                Unit.UnitName
+                Unit.UnitName,
+                District.DistrictName
             FROM CaseMaster
             INNER JOIN Accused ON CaseMaster.ROWID = Accused.CaseMasterID
             LEFT JOIN Unit ON CaseMaster.PoliceStationID = Unit.ROWID
+            LEFT JOIN District ON Unit.DistrictID = District.ROWID
             {where_sql}
             LIMIT 300
         """
