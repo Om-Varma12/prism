@@ -22,3 +22,14 @@ def get_zcql(request: Request):
     except Exception:
         app = zcatalyst_sdk.initialize()
     return app.zcql()
+
+def get_cache(request: Request):
+    """
+    FastAPI dependency that initializes the Zoho Catalyst SDK
+    and returns the cache service instance.
+    """
+    try:
+        app = zcatalyst_sdk.initialize(req=request)
+    except Exception:
+        app = zcatalyst_sdk.initialize()
+    return app.cache()

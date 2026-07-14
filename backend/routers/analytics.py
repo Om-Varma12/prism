@@ -9,7 +9,7 @@ from typing import Optional
 
 from fastapi import APIRouter, Depends
 
-from core.database import get_zcql
+from core.database import get_zcql, get_cache
 from core.security import require_role
 from schemas.analytics import (
     CrimeAlertResponse,
@@ -65,16 +65,103 @@ async def get_hotspots(
     date_to: Optional[str] = None,
     district: Optional[str] = None,
     zcql=Depends(get_zcql),
+    cache=Depends(get_cache),
     user=Depends(require_role(["investigator", "analyst", "supervisor"])),
 ):
     """
     Get spatial crime hotspots using DBSCAN clustering.
     
     Returns cluster centroids, point counts, bounding radius, and dominant crime type.
+    Results are cached for 5 minutes based on filter combination.
     """
     try:
-        # TODO: Implement hotspot clustering logic in Step 2
-        return _empty_hotspot_response()
+        from analytics.hotspot import HotspotAnalyzer
+        from schemas.analytics import HotspotFilters
+        
+        # Build cache key from filter combination
+        cache_key = f"hotspots:{date_from or 'all'}:{date_to or 'all'}:{district or 'all'}"
+        
+        # Try to get from cache first
+        cached_data = cache.get(cache_key)
+        if cached_data:
+            import json
+            return HotspotClusterResponse(**json.loads(cached_data))
+        
+        # Build ZCQL query to fetch incident data
+        # Note: Using LIMIT to respect 300-row limit
+        query = """
+            SELECT
+                CaseMaster.latitude,
+                CaseMaster.longitude,
+                CrimeSubHead.CrimeHeadName as crime_type,
+                District.DistrictName as district
+            FROM CaseMaster
+            LEFT JOIN CrimeSubHead ON CaseMaster.CrimeMinorHeadID = CrimeSubHead.ROWID
+            LEFT JOIN Unit ON CaseMaster.PoliceStationID = Unit.ROWID
+            LEFT JOIN District ON Unit.DistrictID = District.ROWID
+            WHERE CaseMaster.latitude IS NOT NULL
+            AND CaseMaster.longitude IS NOT NULL
+        """
+        
+        # Add optional filters
+        if date_from:
+            query += f" AND CaseMaster.IncidentFromDate >= '{date_from}'"
+        if date_to:
+            query += f" AND CaseMaster.IncidentFromDate <= '{date_to}'"
+        if district:
+            query += f" AND District.DistrictName = '{district}'"
+        
+        query += " LIMIT 300"
+        
+        # Execute query
+        result = zcql.execute_query(query)
+        rows = result if isinstance(result, list) else []
+        
+        # Convert to incident data format
+        incident_data = []
+        for row in rows:
+            incident_data.append({
+                "latitude": row.get("latitude"),
+                "longitude": row.get("longitude"),
+                "crime_type": row.get("crime_type"),
+                "district": row.get("district"),
+            })
+        
+        # Perform DBSCAN clustering
+        analyzer = HotspotAnalyzer(eps_km=1.0, min_samples=5)
+        clusters = analyzer.analyze_hotspots(incident_data)
+        
+        # Convert to response format
+        from schemas.analytics import HotspotCluster
+        cluster_objects = [
+            HotspotCluster(
+                cluster_id=c["cluster_id"],
+                centroid_lat=c["centroid_lat"],
+                centroid_lng=c["centroid_lng"],
+                point_count=c["point_count"],
+                radius_km=c["radius_km"],
+                dominant_crime_type=c["dominant_crime_type"],
+                district=c["district"],
+            )
+            for c in clusters
+        ]
+        
+        response = HotspotClusterResponse(
+            clusters=cluster_objects,
+            total_incidents=len(incident_data),
+            filters=HotspotFilters(
+                date_from=date_from,
+                date_to=date_to,
+                district=district,
+            ),
+            generated_at=datetime.utcnow(),
+        )
+        
+        # Cache the response for 5 minutes (300 seconds)
+        import json
+        cache.set(cache_key, json.dumps(response.model_dump()), 300)
+        
+        return response
     except Exception as exc:
         print(f"[Warning] Failed to get hotspots: {exc}")
         return _empty_hotspot_response()
