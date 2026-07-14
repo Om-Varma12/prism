@@ -92,7 +92,7 @@ export default function HotspotMap() {
 
     // Add tile layer
     L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
-      attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+      attribution: ''
     }).addTo(map);
 
     mapInstanceRef.current = map;
@@ -166,20 +166,6 @@ export default function HotspotMap() {
               className="h-full w-full z-0"
               style={{ height: '100%', width: '100%' }}
             />
-
-            {/* Map Controls Placeholder */}
-            <div className="absolute top-sm right-sm flex flex-col gap-xs z-20">
-              <button className="w-8 h-8 bg-surface border border-outline-variant flex items-center justify-center text-on-surface hover:border-primary transition-colors cursor-pointer">
-                <span className="material-symbols-outlined text-[18px]">add</span>
-              </button>
-              <button className="w-8 h-8 bg-surface border border-outline-variant flex items-center justify-center text-on-surface hover:border-primary transition-colors cursor-pointer">
-                <span className="material-symbols-outlined text-[18px]">remove</span>
-              </button>
-            </div>
-
-            <div className="absolute top-4 left-4 bg-black border border-white/10 p-2.5 rounded-none font-mono text-[9px] font-black text-white/40 tracking-[0.15em] uppercase">
-              CAMERA GRID ACTIVE // ANPR_LINKED
-            </div>
           </div>
 
           {/* Timeline Slider */}
