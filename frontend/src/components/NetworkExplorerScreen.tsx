@@ -20,17 +20,6 @@ export default function NetworkExplorerScreen() {
   const [selectedCrimeType, setSelectedCrimeType] = useState('All Types');
   const [selectedDateRange, setSelectedDateRange] = useState('Last 30 Days');
   
-  // Debounce search query
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      setDebouncedSearchQuery(searchQuery);
-    }, 300);
-    return () => clearTimeout(timer);
-  }, [searchQuery]);
-  
-  // Search for accused
-  const { data: searchResults, isLoading: searchLoading, error: searchError } = useSearchAccused(debouncedSearchQuery);
-
   // Convert date range to actual dates
   const getDateRange = () => {
     const now = new Date();
@@ -69,12 +58,23 @@ export default function NetworkExplorerScreen() {
       date_to,
     });
   }, [selectedDistrict, selectedCrimeType, selectedDateRange, activeSegment]);
+
+  // Debounce search query
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setDebouncedSearchQuery(searchQuery);
+    }, 300);
+    return () => clearTimeout(timer);
+  }, [searchQuery]);
+  
+  // Search for accused (pass current filters to search)
+  const { data: searchResults, isLoading: searchLoading, error: searchError } = useSearchAccused(debouncedSearchQuery, filters);
   
   // Selected Profile state
   const [selectedProfile, setSelectedProfile] = useState<SuspectProfile | null>(null);
-  const [showBriefingDialog, setShowBriefingDialog] = useState(false);
   const [selectedNodeId, setSelectedNodeId] = useState<string | null>(null);
   const [selectedAccusedId, setSelectedAccusedId] = useState<number | null>(null);
+  const [showProfilePanel, setShowProfilePanel] = useState(false);
   
   // Fetch live graph data
   const { data: graphData, isLoading, error } = useNetworkGraph(filters);
@@ -94,15 +94,15 @@ export default function NetworkExplorerScreen() {
        // Extract accused_id from node and fetch real profile
        if (node.accused_id) {
          setSelectedAccusedId(node.accused_id);
+         setShowProfilePanel(true);
        } else {
          // Fallback to mock if no accused_id
          const suspect = MOCK_SUSPECTS.find(s => s.name === node.label);
          if (suspect) {
            setSelectedProfile(suspect);
+           setShowProfilePanel(true);
          }
        }
-       // Show the briefing dialog immediately on node click
-       setShowBriefingDialog(true);
      }
    };
 
@@ -213,13 +213,8 @@ export default function NetworkExplorerScreen() {
                             setSearchQuery(result.name);
                             setShowSearchResults(false);
                             setSelectedAccusedId(result.accused_id);
-                            // Find and select the node in the graph
-                            const node = nodes.find((n: NetworkGraphNode) => n.accused_id === result.accused_id);
-                            if (node) {
-                              setSelectedNodeId(node.id);
-                            }
-                            // Show the briefing dialog
-                            setShowBriefingDialog(true);
+                            setSelectedNodeId(null);
+                            setShowProfilePanel(true);
                           }}
                         >
                           <div className="text-sm text-on-surface font-medium">{result.name}</div>
@@ -306,7 +301,7 @@ export default function NetworkExplorerScreen() {
         </div>
 
         {/* RIGHT FLOATING PANEL: Entity Details */}
-        {(selectedProfile || profileData) && (
+        {showProfilePanel && (
           <div className="absolute right-lg top-lg w-80 bg-[#111318] panel-border rounded-lg shadow-xl flex flex-col z-20">
             {profileLoading && (
               <div className="p-4 text-center text-on-surface-variant text-sm">Loading profile...</div>
@@ -332,6 +327,7 @@ export default function NetworkExplorerScreen() {
                     onClick={() => {
                       setSelectedProfile(null);
                       setSelectedAccusedId(null);
+                      setShowProfilePanel(false);
                     }}
                     className="text-outline hover:text-on-surface cursor-pointer"
                   >
@@ -428,141 +424,9 @@ export default function NetworkExplorerScreen() {
                 </div>
               </>
             )}
-            {/* Footer Action */}
-            <div className="p-4 border-t border-[#252830] bg-[#0c0e15] rounded-b-lg">
-              <button
-                onClick={() => setShowBriefingDialog(true)}
-                className="w-full py-2 bg-transparent border border-[#252830] text-on-surface font-semibold text-sm hover:bg-[#191b23] transition-colors rounded-DEFAULT flex items-center justify-center gap-2 cursor-pointer"
-              >
-                <span>View Full Profile</span>
-                <span className="material-symbols-outlined text-[16px]">arrow_forward</span>
-              </button>
-            </div>
           </div>
         )}
       </div>
-
-      {/* DETAILED BRIEFING DIALOG */}
-      <AnimatePresence>
-        {showBriefingDialog && (selectedProfile || profileData) && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm">
-            <motion.div
-              initial={{ scale: 0.95, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              exit={{ scale: 0.95, opacity: 0 }}
-              className="bg-[#050505] border border-white/10 rounded-none shadow-2xl max-w-md w-full overflow-hidden"
-            >
-              <div className="p-4 border-b border-white/10 bg-black flex justify-between items-center select-none">
-                <div className="flex items-center gap-2">
-                  <span className="material-symbols-outlined text-[#ff4d4d] text-[18px]">warning</span>
-                  <span className="text-xs font-mono font-black tracking-[0.2em] text-[#ff4d4d] uppercase">
-                    INTELLIGENCE BRIEFING
-                  </span>
-                </div>
-                <button
-                  onClick={() => setShowBriefingDialog(false)}
-                  className="text-white/40 hover:text-white transition-colors cursor-pointer"
-                >
-                  <span className="material-symbols-outlined text-[18px]">close</span>
-                </button>
-              </div>
-
-              <div className="p-5 space-y-4">
-                <div>
-                  <h4 className="text-xl font-black text-white uppercase tracking-tight">
-                    {profileData?.name || selectedProfile?.name}
-                  </h4>
-                  <div className="text-[10px] text-white/40 font-mono mt-1.5 uppercase tracking-wider">
-                    TARGET ID: {profileData?.accused_id || selectedProfile?.id} // Status: {profileData?.is_absconding ? 'Absconding' : 'Charge Sheeted'}
-                  </div>
-                </div>
-
-                <div className="space-y-2">
-                  <h5 className="text-[9px] font-mono font-black text-white/40 uppercase tracking-[0.2em]">
-                    EXECUTIVE PROFILE SUMMARY
-                  </h5>
-                  <p className="text-xs text-white/80 leading-relaxed font-mono bg-black p-3.5 border border-white/10">
-                    {profileData ? 
-                      `${profileData.name} is a ${profileData.age || 'unknown age'} year old ${profileData.gender || 'unknown gender'} accused with ${profileData.fir_count} FIRs. ` +
-                      `Risk score: ${profileData.risk_score}. ` +
-                      (profileData.is_absconding ? 'Currently absconding.' : 'Arrest status confirmed.')
-                      : (selectedProfile?.bio || 'No executive brief logs on file for target ID.')}
-                  </p>
-                </div>
-
-                <div className="grid grid-cols-2 gap-3 text-xs">
-                  <div className="p-3 border border-white/10 bg-black flex items-center gap-2">
-                    <span className="material-symbols-outlined text-primary text-[18px]">analytics</span>
-                    <div>
-                      <div className="text-[9px] text-white/40 font-mono leading-none uppercase tracking-wider">
-                        RISK INDEX
-                      </div>
-                      <div className="font-black text-white font-mono mt-1 text-sm">
-                        {profileData?.risk_score || selectedProfile?.riskScore}%
-                      </div>
-                    </div>
-                  </div>
-                  <div className="p-3 border border-white/10 bg-black flex items-center gap-2">
-                    <span className="material-symbols-outlined text-primary text-[18px]">menu_book</span>
-                    <div>
-                      <div className="text-[9px] text-white/40 font-mono leading-none uppercase tracking-wider">
-                        PRIMARY FOCUS
-                      </div>
-                      <div className="font-black text-white font-mono mt-1 text-sm uppercase">
-                        {profileData?.crime_types?.[0]?.name || selectedProfile?.recentCrime || 'N/A'}
-                      </div>
-                    </div>
-                  </div>
-                </div>
-
-                {/* FIR History */}
-                {profileData?.firs && profileData.firs.length > 0 && (
-                  <div className="space-y-2">
-                    <h5 className="text-[9px] font-mono font-black text-white/40 uppercase tracking-[0.2em]">
-                      FIR HISTORY
-                    </h5>
-                    <div className="max-h-32 overflow-y-auto">
-                      {profileData.firs.slice(0, 5).map((fir: any, idx: number) => (
-                        <div key={idx} className="text-[10px] text-white/60 font-mono border-b border-white/5 py-1">
-                          <span className="text-primary">#{fir.crime_no || fir.case_master_id}</span>
-                          {' — '}{fir.crime_type || 'Unknown'}
-                          {fir.date && ` (${fir.date})`}
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                )}
-
-                {/* Co-accused */}
-                {profileData?.co_accused && profileData.co_accused.length > 0 && (
-                  <div className="space-y-2">
-                    <h5 className="text-[9px] font-mono font-black text-white/40 uppercase tracking-[0.2em]">
-                      ASSOCIATES
-                    </h5>
-                    <div className="max-h-24 overflow-y-auto">
-                      {profileData.co_accused.slice(0, 5).map((co: any, idx: number) => (
-                        <div key={idx} className="text-[10px] text-white/60 font-mono">
-                          <span className="text-primary">{co.name}</span>
-                          {' — '}{co.times_together} shared FIR{co.times_together > 1 ? 's' : ''}
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                )}
-              </div>
-
-              <div className="p-4 border-t border-white/10 bg-black flex justify-end gap-2">
-                <button
-                  onClick={() => setShowBriefingDialog(false)}
-                  className="px-5 py-3 bg-[#3B6FE8] hover:bg-[#2b5bc2] text-white text-xs font-black font-mono transition-colors uppercase tracking-[0.2em] cursor-pointer"
-                >
-                  ACKNOWLEDGE BRIEFING
-                </button>
-              </div>
-            </motion.div>
-          </div>
-        )}
-      </AnimatePresence>
     </div>
   );
 }

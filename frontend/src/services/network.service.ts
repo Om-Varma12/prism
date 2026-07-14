@@ -41,11 +41,20 @@ export const networkService = {
   },
 
   /**
-   * Search accused persons by name
+   * Search accused persons by name with optional filters
    */
-  search: async (query: string, limit = 10): Promise<NetworkSearchResponse> => {
+  search: async (query: string, limit = 10, filters?: NetworkGraphFilters): Promise<NetworkSearchResponse> => {
+    const params = new URLSearchParams();
+    params.append('q', query);
+    params.append('limit', limit.toString());
+    
+    if (filters?.crime_type) params.append('crime_type', filters.crime_type);
+    if (filters?.district) params.append('district', filters.district);
+    if (filters?.date_from) params.append('date_from', filters.date_from);
+    if (filters?.date_to) params.append('date_to', filters.date_to);
+    
     const response = await apiClient.get<NetworkSearchResponse>(
-      `/api/network/search?q=${encodeURIComponent(query)}&limit=${limit}`
+      `/api/network/search?${params.toString()}`
     );
     return response.data;
   },

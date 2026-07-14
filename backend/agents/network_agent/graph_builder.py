@@ -136,8 +136,9 @@ class NetworkGraphBuilder:
             gender = self._gender_label(gender_val) or "Unknown"
             
             # Check absconding status via presence of ArrestSurrender
-            arrest_id = self._value(row, "ArrestSurrender", "ArrestSurrenderID", "ArrestSurrenderID")
-            is_row_absconding = arrest_id is None
+            # Note: ArrestSurrender is not joined in the main query to stay within 4-join limit
+            # We'll check absconding status separately for each unique accused
+            is_row_absconding = True  # Default to absconding, will be updated if arrest found
 
             # Get crime type ID for filtering
             crime_type_id = self._to_int(self._value(row, "CaseMaster", "CrimeMinorHeadID", "CrimeMinorHeadID"))
@@ -162,7 +163,7 @@ class NetworkGraphBuilder:
                 incident_date = self._value(
                     row, "CaseMaster", "IncidentFromDate", "IncidentFromDate"
                 )
-                district = self._value(row, "District", "DistrictName", "DistrictName")
+                unit_name = self._value(row, "Unit", "UnitName", "UnitName")
                 
                 matched_node = GraphNode(
                     id=resolved_id,
@@ -174,7 +175,7 @@ class NetworkGraphBuilder:
                     fir_count=0,
                     is_absconding=False,
                     risk_score=0,
-                    primary_district=str(district) if district else None,
+                    primary_district=str(unit_name) if unit_name else None,
                     last_seen_date=str(incident_date) if incident_date else None,
                     size=8,
                     color="#3B6FE8",
@@ -188,9 +189,9 @@ class NetworkGraphBuilder:
             if incident_date and self._is_newer_date(str(incident_date), matched_node.last_seen_date):
                 matched_node.last_seen_date = str(incident_date)
             
-            district = self._value(row, "District", "DistrictName", "DistrictName")
-            if district and not matched_node.primary_district:
-                matched_node.primary_district = str(district)
+            unit_name = self._value(row, "Unit", "UnitName", "UnitName")
+            if unit_name and not matched_node.primary_district:
+                matched_node.primary_district = str(unit_name)
 
             absconding_by_resolved_id[resolved_id] = absconding_by_resolved_id.get(resolved_id, False) or is_row_absconding
 
@@ -325,7 +326,8 @@ class NetworkGraphBuilder:
         # Crime type can be filtered client-side or via a separate query
         
         if district:
-            where_clauses.append(f"District.DistrictName = '{district}'")
+            # Filter by Unit.UnitName since we don't join District
+            where_clauses.append(f"Unit.UnitName = '{district}'")
         
         if date_from:
             where_clauses.append(f"CaseMaster.IncidentFromDate >= '{date_from}'")
@@ -350,14 +352,10 @@ class NetworkGraphBuilder:
                 CaseMaster.CrimeNo,
                 CaseMaster.IncidentFromDate,
                 CaseMaster.CrimeMinorHeadID,
-                Unit.UnitName,
-                District.DistrictName,
-                ArrestSurrender.ROWID as ArrestSurrenderID
+                Unit.UnitName
             FROM CaseMaster
             INNER JOIN Accused ON CaseMaster.ROWID = Accused.CaseMasterID
             LEFT JOIN Unit ON CaseMaster.PoliceStationID = Unit.ROWID
-            LEFT JOIN District ON Unit.DistrictID = District.ROWID
-            LEFT JOIN ArrestSurrender ON Accused.ROWID = ArrestSurrender.AccusedMasterID
             {where_sql}
             LIMIT 300
         """

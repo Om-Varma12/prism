@@ -33,12 +33,12 @@ export function useAccusedProfile(accusedId: number | null) {
 }
 
 /**
- * Hook for searching accused persons
+ * Hook for searching accused persons with optional filters
  */
-export function useSearchAccused(query: string) {
+export function useSearchAccused(query: string, filters?: NetworkGraphFilters) {
   return useQuery({
-    queryKey: ['accused-search', query],
-    queryFn: () => networkService.search(query),
+    queryKey: ['accused-search', query, filters],
+    queryFn: () => networkService.search(query, 10, filters),
     enabled: query.length >= 2,
     staleTime: 2 * 60 * 1000, // 2 minutes
     gcTime: 5 * 60 * 1000, // 5 minutes
