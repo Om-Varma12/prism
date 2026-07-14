@@ -193,20 +193,30 @@ async def get_hotspots(
         # Execute query
         result = zcql.execute_query(query)
         rows = result if isinstance(result, list) else []
+        print(f"[DEBUG] ZCQL returned {len(rows)} rows")
         
+        # if rows:
+        #     print("[DEBUG] FIRST RAW ROW:", rows[0])
+            
         # Convert to incident data format
         incident_data = []
         for row in rows:
+            case_master = row.get("CaseMaster", {})
+            crime_sub_head = row.get("CrimeSubHead", {})
+            district_data = row.get("District", {})
+
             incident_data.append({
-                "latitude": row.get("latitude"),
-                "longitude": row.get("longitude"),
-                "crime_type": row.get("crime_type"),
-                "district": row.get("district"),
+                "latitude": case_master.get("latitude"),
+                "longitude": case_master.get("longitude"),
+                "crime_type": crime_sub_head.get("CrimeHeadName"),
+                "district": district_data.get("DistrictName"),
             })
+        print(f"[DEBUG] Incident data: {len(incident_data)} records")
         
         # Perform DBSCAN clustering
-        analyzer = HotspotAnalyzer(eps_km=1.0, min_samples=5)
+        analyzer = HotspotAnalyzer(eps_km=10.0, min_samples=2)
         clusters = analyzer.analyze_hotspots(incident_data)
+        print(f"[DEBUG] DBSCAN generated {len(clusters)} clusters")
         
         # Convert to response format
         from schemas.analytics import HotspotCluster

@@ -29,6 +29,9 @@ export default function HotspotMap() {
   // Selected cluster for details panel
   const [selectedCluster, setSelectedCluster] = useState<HotspotCluster | null>(null);
 
+  // Debounce timeout ref for slider
+  const debounceTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+
   // Fetch hotspots data
   const { data: hotspotsData, isLoading: hotspotsLoading } = useQuery({
     queryKey: ['hotspots', filters],
@@ -43,11 +46,19 @@ export default function HotspotMap() {
 
   // Handle date range slider change (debounced)
   const handleDateChange = useCallback((dateFrom: string, dateTo: string) => {
-    setFilters(prev => ({
-      ...prev,
-      date_from: dateFrom,
-      date_to: dateTo,
-    }));
+    // Clear existing timeout
+    if (debounceTimeoutRef.current) {
+      clearTimeout(debounceTimeoutRef.current);
+    }
+
+    // Set new timeout
+    debounceTimeoutRef.current = setTimeout(() => {
+      setFilters(prev => ({
+        ...prev,
+        date_from: dateFrom,
+        date_to: dateTo,
+      }));
+    }, 1000); // 1 second debounce
   }, []);
 
   // Handle district filter change
@@ -55,6 +66,15 @@ export default function HotspotMap() {
     setFilters(prev => ({
       ...prev,
       district: district || undefined,
+    }));
+  }, []);
+
+  // Handle show all time (reset date filters)
+  const handleShowAllTime = useCallback(() => {
+    setFilters(prev => ({
+      ...prev,
+      date_from: undefined,
+      date_to: undefined,
     }));
   }, []);
 
@@ -72,9 +92,8 @@ export default function HotspotMap() {
 
   // Get cluster radius based on point count
   const getClusterRadius = (pointCount: number) => {
-    return Math.min(Math.max(pointCount * 500, 2000), 15000); // Scale between 2km and 15km
+    return Math.min(Math.max(pointCount * 1.5, 8), 40);
   };
-
   // Initialize map on mount
   useEffect(() => {
     if (!mapContainerRef.current) return;
@@ -148,6 +167,15 @@ export default function HotspotMap() {
     });
   }, [hotspotsData, handleClusterClick]);
 
+  // Cleanup debounce timeout on unmount
+  useEffect(() => {
+    return () => {
+      if (debounceTimeoutRef.current) {
+        clearTimeout(debounceTimeoutRef.current);
+      }
+    };
+  }, []);
+
   return (
     <div className="flex flex-col xl:flex-row gap-lg h-full">
       {/* LEFT SIDE (70%) - Map */}
@@ -170,11 +198,19 @@ export default function HotspotMap() {
 
           {/* Timeline Slider */}
           <div className="p-md border-t border-outline-variant bg-surface">
-            <div className="flex justify-between font-label-mono text-label-mono text-on-surface-variant mb-xs">
+            <div className="flex justify-between items-center font-label-mono text-label-mono text-on-surface-variant mb-xs">
               <span>JAN 2023</span>
-              <span className="text-primary font-bold">
-                CURRENT WINDOW: {filters.date_from || 'ALL TIME'}
-              </span>
+              <div className="flex items-center gap-sm">
+                <span className="text-primary font-bold">
+                  CURRENT WINDOW: {filters.date_from || 'ALL TIME'}
+                </span>
+                <button
+                  onClick={handleShowAllTime}
+                  className="px-xs py-xs bg-primary text-on-primary font-label-mono text-label-mono hover:bg-primary-hover transition-colors"
+                >
+                  ALL TIME
+                </button>
+              </div>
               <span>JUL 2026</span>
             </div>
             <div className="relative w-full h-4">
@@ -183,7 +219,7 @@ export default function HotspotMap() {
                 max="43"
                 min="1"
                 type="range"
-                defaultValue="22"
+                defaultValue="31"
                 onChange={(e) => {
                   // TODO: Convert slider value to date range
                   const val = Number(e.target.value);
