@@ -17,7 +17,7 @@ import Sidebar from './components/Sidebar';
 import CommandDashboardScreen from './components/CommandDashboardScreen';
 import ChatScreen from './components/ChatScreen';
 import NetworkExplorerScreen from './components/NetworkExplorerScreen';
-import AnalyticsScreen from './components/AnalyticsScreen';
+import AnalyticsPage from './pages/Analytics';
 
 // Create QueryClient with default options
 const queryClient = new QueryClient({
@@ -87,7 +87,7 @@ function App() {
       case Screen.NETWORK:
         return <NetworkExplorerScreen />;
       case Screen.ANALYTICS:
-        return <AnalyticsScreen />;
+        return <AnalyticsPage />;
       default:
         return <CommandDashboardScreen />;
     }
