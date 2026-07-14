@@ -322,7 +322,7 @@ async def get_trends(
         aggregator = TrendAggregator()
         aggregated_data = aggregator.aggregate_trends(incident_data, granularity)
         
-        # Convert to response format (without forecast for now - Step 6)
+        # Convert historical data to response format
         from schemas.analytics import TrendPoint
         trend_points = [
             TrendPoint(
@@ -332,6 +332,52 @@ async def get_trends(
             )
             for d in aggregated_data
         ]
+        
+        # Fetch forecast data from crime_forecasts table
+        forecast_query = """
+            SELECT
+                crime_category,
+                forecast_date,
+                predicted_value,
+                lower_bound,
+                upper_bound
+            FROM crime_forecasts
+            ORDER BY forecast_date ASC
+            LIMIT 150
+        """
+        
+        forecast_result = zcql.execute_query(forecast_query)
+        forecast_rows = forecast_result if isinstance(forecast_result, list) else []
+        
+        # Convert forecast data to response format
+        for row in forecast_rows:
+            # Only include forecasts that match the crime_type filter (if specified)
+            if crime_type and row.get("crime_category") != crime_type:
+                continue
+            
+            # Format date based on granularity
+            forecast_date = row.get("forecast_date")
+            if forecast_date:
+                try:
+                    from datetime import datetime
+                    date_obj = datetime.strptime(forecast_date, "%Y-%m-%d")
+                    if granularity == "month":
+                        period_key = date_obj.strftime("%Y-%m")
+                    else:  # week
+                        period_key = f"{date_obj.year}-W{date_obj.isocalendar()[1]:02d}"
+                    
+                    trend_points.append(TrendPoint(
+                        date=period_key,
+                        count=row.get("predicted_value", 0),
+                        is_forecast=True,
+                        lower_bound=row.get("lower_bound"),
+                        upper_bound=row.get("upper_bound"),
+                    ))
+                except ValueError:
+                    continue
+        
+        # Sort all points by date
+        trend_points.sort(key=lambda x: x.date)
         
         response = TrendDataResponse(
             data=trend_points,
