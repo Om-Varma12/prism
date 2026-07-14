@@ -82,10 +82,14 @@ async def get_hotspots(
         cache_key = f"hotspots:{date_from or 'all'}:{date_to or 'all'}:{district or 'all'}"
         
         # Try to get from cache first
-        cached_data = cache.get(cache_key)
-        if cached_data:
-            import json
-            return HotspotClusterResponse(**json.loads(cached_data))
+        try:
+            cached_data = cache.get(cache_key)
+            if cached_data:
+                import json
+                return HotspotClusterResponse(**json.loads(cached_data))
+        except AttributeError:
+            # Cache.get() not available, proceed without caching
+            pass
         
         # Build ZCQL query to fetch incident data
         # Note: Using LIMIT to respect 300-row limit
@@ -158,8 +162,12 @@ async def get_hotspots(
         )
         
         # Cache the response for 5 minutes (300 seconds)
-        import json
-        cache.set(cache_key, json.dumps(response.model_dump()), 300)
+        try:
+            import json
+            cache.set(cache_key, json.dumps(response.model_dump()), 300)
+        except AttributeError:
+            # Cache.set() not available, proceed without caching
+            pass
         
         return response
     except Exception as exc:
@@ -171,14 +179,13 @@ async def get_hotspots(
 async def get_emerging_clusters(
     zcql=Depends(get_zcql),
     cache=Depends(get_cache),
-    user=Depends(require_role(["analyst", "supervisor"])),
+    user=Depends(require_role(["investigator", "analyst", "supervisor"])),
 ):
     """
     Get emerging crime clusters from the crime_alerts table.
     
     Returns unacknowledged, high-severity alerts where crime rate is significantly
     above historical baseline (spike_ratio > 2.0). Results are cached for 5 minutes.
-    Role-gated to Analyst/Supervisor only.
     """
     try:
         from schemas.analytics import CrimeAlert
@@ -187,10 +194,14 @@ async def get_emerging_clusters(
         cache_key = "emerging-clusters:unacknowledged:high-severity"
         
         # Try to get from cache first
-        cached_data = cache.get(cache_key)
-        if cached_data:
-            import json
-            return CrimeAlertResponse(**json.loads(cached_data))
+        try:
+            cached_data = cache.get(cache_key)
+            if cached_data:
+                import json
+                return CrimeAlertResponse(**json.loads(cached_data))
+        except AttributeError:
+            # Cache.get() not available, proceed without caching
+            pass
         
         # Query crime_alerts table for unacknowledged, high-severity alerts
         query = """
@@ -237,8 +248,12 @@ async def get_emerging_clusters(
         )
         
         # Cache the response for 5 minutes (300 seconds)
-        import json
-        cache.set(cache_key, json.dumps(response.model_dump()), 300)
+        try:
+            import json
+            cache.set(cache_key, json.dumps(response.model_dump()), 300)
+        except AttributeError:
+            # Cache.set() not available, proceed without caching
+            pass
         
         return response
     except Exception as exc:
@@ -279,10 +294,14 @@ async def get_trends(
         cache_key = f"trends:{granularity}:{crime_type or 'all'}:{district or 'all'}"
         
         # Try to get from cache first
-        cached_data = cache.get(cache_key)
-        if cached_data:
-            import json
-            return TrendDataResponse(**json.loads(cached_data))
+        try:
+            cached_data = cache.get(cache_key)
+            if cached_data:
+                import json
+                return TrendDataResponse(**json.loads(cached_data))
+        except AttributeError:
+            # Cache.get() not available, proceed without caching
+            pass
         
         # Build ZCQL query to fetch incident data
         query = """
@@ -391,8 +410,12 @@ async def get_trends(
         )
         
         # Cache the response for 5 minutes (300 seconds)
-        import json
-        cache.set(cache_key, json.dumps(response.model_dump()), 300)
+        try:
+            import json
+            cache.set(cache_key, json.dumps(response.model_dump()), 300)
+        except AttributeError:
+            # Cache.set() not available, proceed without caching
+            pass
         
         return response
     except Exception as exc:
@@ -420,10 +443,14 @@ async def get_festival_calendar(
         cache_key = "festival-calendar:seasonal-comparisons"
         
         # Try to get from cache first
-        cached_data = cache.get(cache_key)
-        if cached_data:
-            import json
-            return FestivalCalendarResponse(**json.loads(cached_data))
+        try:
+            cached_data = cache.get(cache_key)
+            if cached_data:
+                import json
+                return FestivalCalendarResponse(**json.loads(cached_data))
+        except AttributeError:
+            # Cache.get() not available, proceed without caching
+            pass
         
         # Fetch incident data for the current year
         query = """
@@ -470,8 +497,12 @@ async def get_festival_calendar(
         )
         
         # Cache the response for 1 hour (3600 seconds) since festival dates are static
-        import json
-        cache.set(cache_key, json.dumps(response.model_dump()), 3600)
+        try:
+            import json
+            cache.set(cache_key, json.dumps(response.model_dump()), 3600)
+        except AttributeError:
+            # Cache.set() not available, proceed without caching
+            pass
         
         return response
     except Exception as exc:
@@ -513,10 +544,14 @@ async def get_offender_risk(
         cache_key = f"offender-risk:{district or 'all'}:{min_risk_score or 'all'}:{is_absconding or 'all'}:{page}:{page_size}"
         
         # Try to get from cache first
-        cached_data = cache.get(cache_key)
-        if cached_data:
-            import json
-            return OffenderRiskResponse(**json.loads(cached_data))
+        try:
+            cached_data = cache.get(cache_key)
+            if cached_data:
+                import json
+                return OffenderRiskResponse(**json.loads(cached_data))
+        except AttributeError:
+            # Cache.get() not available, proceed without caching
+            pass
         
         # Build ZCQL query to fetch risk_scores data
         query = """
@@ -607,8 +642,12 @@ async def get_offender_risk(
         )
         
         # Cache the response for 10 minutes (600 seconds)
-        import json
-        cache.set(cache_key, json.dumps(response.model_dump()), 600)
+        try:
+            import json
+            cache.set(cache_key, json.dumps(response.model_dump()), 600)
+        except AttributeError:
+            # Cache.set() not available, proceed without caching
+            pass
         
         return response
     except Exception as exc:
@@ -639,9 +678,13 @@ async def get_socioeconomic(
         cache_key = "socioeconomic:district-data"
         
         # Try to get from cache first
-        cached_data = cache.get(cache_key)
-        if cached_data:
-            return SocioeconomicResponse(**json.loads(cached_data))
+        try:
+            cached_data = cache.get(cache_key)
+            if cached_data:
+                return SocioeconomicResponse(**json.loads(cached_data))
+        except AttributeError:
+            # Cache.get() not available, proceed without caching
+            pass
         
         # Load static socioeconomic data from JSON file
         json_path = os.path.join(os.path.dirname(__file__), "..", "data", "district_socioeconomic.json")
@@ -673,7 +716,11 @@ async def get_socioeconomic(
         )
         
         # Cache the response for 1 hour (3600 seconds) since data is static
-        cache.set(cache_key, json.dumps(response.model_dump()), 3600)
+        try:
+            cache.set(cache_key, json.dumps(response.model_dump()), 3600)
+        except AttributeError:
+            # Cache.set() not available, proceed without caching
+            pass
         
         return response
     except Exception as exc:
