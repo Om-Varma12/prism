@@ -619,6 +619,7 @@ async def get_offender_risk(
 @router.get("/socioeconomic", response_model=SocioeconomicResponse)
 async def get_socioeconomic(
     zcql=Depends(get_zcql),
+    cache=Depends(get_cache),
     user=Depends(require_role(["analyst", "supervisor"])),
 ):
     """
@@ -626,13 +627,55 @@ async def get_socioeconomic(
     
     Returns literacy rate, urbanization percentage, and population
     for Karnataka districts. Role-gated to Analyst/Supervisor only.
+    Server-side enforcement - Investigators receive 403.
+    Results are cached for 1 hour since data is static.
     """
     try:
-        # TODO: Implement socioeconomic data logic in Step 8
-        return SocioeconomicResponse(
-            districts=[],
+        from schemas.analytics import DistrictSocioeconomic
+        import json
+        import os
+        
+        # Build cache key
+        cache_key = "socioeconomic:district-data"
+        
+        # Try to get from cache first
+        cached_data = cache.get(cache_key)
+        if cached_data:
+            return SocioeconomicResponse(**json.loads(cached_data))
+        
+        # Load static socioeconomic data from JSON file
+        json_path = os.path.join(os.path.dirname(__file__), "..", "data", "district_socioeconomic.json")
+        
+        try:
+            with open(json_path, "r") as f:
+                data = json.load(f)
+        except FileNotFoundError:
+            print(f"[Warning] Socioeconomic data file not found at {json_path}")
+            return SocioeconomicResponse(
+                districts=[],
+                generated_at=datetime.utcnow(),
+            )
+        
+        # Convert to response format
+        districts = [
+            DistrictSocioeconomic(
+                district=d["district"],
+                literacy_rate=d["literacy_rate"],
+                urbanization_percentage=d["urbanization_percentage"],
+                population=d["population"],
+            )
+            for d in data.get("districts", [])
+        ]
+        
+        response = SocioeconomicResponse(
+            districts=districts,
             generated_at=datetime.utcnow(),
         )
+        
+        # Cache the response for 1 hour (3600 seconds) since data is static
+        cache.set(cache_key, json.dumps(response.model_dump()), 3600)
+        
+        return response
     except Exception as exc:
         print(f"[Warning] Failed to get socioeconomic data: {exc}")
         return SocioeconomicResponse(
