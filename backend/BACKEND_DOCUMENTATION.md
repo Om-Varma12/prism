@@ -186,6 +186,238 @@ Get crime trend data with sparklines.
 
 ---
 
+### Analytics APIs (`/api/analytics`)
+
+#### GET `/api/analytics/hotspots`
+Get spatial crime hotspots using DBSCAN clustering.
+
+**Authentication**: Requires role `investigator`, `analyst`, or `supervisor`
+
+**Query Parameters**:
+- `date_from`: Start date filter (YYYY-MM-DD format)
+- `date_to`: End date filter (YYYY-MM-DD format)
+- `district`: District name filter
+
+**Response**:
+```json
+{
+  "clusters": [
+    {
+      "cluster_id": 1,
+      "centroid_lat": 13.0,
+      "centroid_lng": 77.5,
+      "point_count": 25,
+      "radius_km": 2.5,
+      "dominant_crime_type": "Robbery",
+      "district": "Bengaluru North"
+    }
+  ],
+  "total_incidents": 150,
+  "filters": {
+    "date_from": "2024-01-01",
+    "date_to": "2024-12-31",
+    "district": "Bengaluru North"
+  },
+  "generated_at": "2026-07-14T10:30:00"
+}
+```
+
+**Logic**:
+1. Queries CaseMaster with latitude/longitude for geospatial clustering
+2. Applies DBSCAN clustering algorithm to identify hotspots
+3. Computes cluster centroids, radius, and dominant crime type
+4. Results cached for 5 minutes
+
+---
+
+#### GET `/api/analytics/emerging-clusters`
+Get emerging crime clusters from crime_alerts table.
+
+**Authentication**: Requires role `investigator`, `analyst`, or `supervisor`
+
+**Response**:
+```json
+{
+  "alerts": [
+    {
+      "alert_id": 1,
+      "crime_type": "Robbery",
+      "district": "Bengaluru North",
+      "spike_ratio": 2.5,
+      "baseline_count": 10,
+      "current_count": 25,
+      "detected_at": "2026-07-14T09:00:00",
+      "acknowledged": false,
+      "severity": "HIGH"
+    }
+  ],
+  "total_alerts": 5,
+  "generated_at": "2026-07-14T10:30:00"
+}
+```
+
+**Logic**:
+1. Queries crime_alerts table for recent alerts
+2. Filters by spike_ratio > 2.0 for significant spikes
+3. Returns sorted by severity and detection date
+4. Results cached for 5 minutes
+
+---
+
+#### GET `/api/analytics/trends`
+Get crime trend analysis with forecast data.
+
+**Authentication**: Requires role `investigator`, `analyst`, or `supervisor`
+
+**Query Parameters**:
+- `granularity`: Time granularity (`month` or `week`) - default: `month`
+- `crime_type`: Filter by crime type (optional)
+- `district`: Filter by district (optional)
+
+**Response**:
+```json
+{
+  "data": [
+    {
+      "date": "2024-01-01",
+      "count": 150,
+      "is_forecast": false,
+      "lower_bound": null,
+      "upper_bound": null
+    },
+    {
+      "date": "2024-08-15",
+      "count": 180,
+      "is_forecast": true,
+      "lower_bound": 160,
+      "upper_bound": 200
+    }
+  ],
+  "filters": {
+    "granularity": "month",
+    "crime_type": "Robbery",
+    "district": "Bengaluru North"
+  },
+  "total_count": 20,
+  "generated_at": "2026-07-14T10:30:00"
+}
+```
+
+**Logic**:
+1. Aggregates crime counts by month or week from CaseMaster
+2. Merges historical data with Prophet forecast data from crime_forecasts table
+3. Marks forecast points with is_forecast flag
+4. Includes confidence intervals (lower_bound, upper_bound) for forecasts
+5. Results cached for 1 hour
+
+---
+
+#### GET `/api/analytics/festival-calendar`
+Get seasonal crime comparisons around Karnataka festivals.
+
+**Authentication**: Requires role `investigator`, `analyst`, or `supervisor`
+
+**Response**:
+```json
+{
+  "comparisons": [
+    {
+      "event_name": "Dasara",
+      "event_date": "2024-10-12",
+      "window_start": "2024-10-05",
+      "window_end": "2024-10-19",
+      "event_window_count": 45,
+      "baseline_window_count": 20,
+      "percentage_change": 125.0
+    }
+  ],
+  "generated_at": "2026-07-14T10:30:00"
+}
+```
+
+**Logic**:
+1. Uses static Karnataka festival calendar
+2. Computes crime counts in ±7-day window around each festival
+3. Compares to baseline (same window in other months)
+4. Results cached for 1 hour
+
+---
+
+#### GET `/api/analytics/offender-risk`
+Get offender risk scores from risk_scores table.
+
+**Authentication**: Requires role `investigator`, `analyst`, or `supervisor`
+
+**Query Parameters**:
+- `district`: Filter by district (optional)
+- `min_risk_score`: Minimum risk score filter (0-100)
+- `is_absconding`: Filter by absconding status (true/false)
+- `page`: Page number - default: 1
+- `page_size`: Items per page - default: 20
+
+**Response**:
+```json
+{
+  "offenders": [
+    {
+      "accused_id": 123,
+      "accused_name": "John Doe",
+      "risk_score": 85,
+      "mo_tag": "Vehicle Theft Specialist",
+      "district_ids": ["Bengaluru North", "Mysuru"],
+      "is_absconding": true,
+      "fir_count": 15
+    }
+  ],
+  "total_count": 150,
+  "page": 1,
+  "page_size": 20,
+  "filters": {
+    "district": "Bengaluru North",
+    "min_risk_score": 70,
+    "is_absconding": true
+  },
+  "generated_at": "2026-07-14T10:30:00"
+}
+```
+
+**Logic**:
+1. Queries risk_scores derived table
+2. Applies filters for district, min_risk_score, is_absconding
+3. Sorts by risk_score descending
+4. Implements pagination
+5. Results cached for 10 minutes
+
+---
+
+#### GET `/api/analytics/socioeconomic`
+Get district-level socioeconomic indicators.
+
+**Authentication**: Requires role `analyst` or `supervisor` (role-gated)
+
+**Response**:
+```json
+{
+  "districts": [
+    {
+      "district": "Bengaluru Urban",
+      "literacy_rate": 87.67,
+      "urbanization_percentage": 90.56,
+      "population": 9621551
+    }
+  ],
+  "generated_at": "2026-07-14T10:30:00"
+}
+```
+
+**Logic**:
+1. Returns static Karnataka district socioeconomic data from JSON file
+2. Includes literacy rate, urbanization percentage, and population
+3. Server-side role enforcement (Analyst/Supervisor only)
+4. Results cached for 1 hour
+
+---
+
 ### Database Test/Debug APIs (`/db/test`)
 
 #### GET `/db/test/schema`
