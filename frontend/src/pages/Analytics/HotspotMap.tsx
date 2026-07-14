@@ -189,12 +189,12 @@ export default function HotspotMap() {
               <span className="text-primary font-bold">
                 CURRENT WINDOW: {filters.date_from || 'ALL TIME'}
               </span>
-              <span>DEC 2025</span>
+              <span>JUL 2026</span>
             </div>
             <div className="relative w-full h-4">
               <input
                 className="w-full"
-                max="36"
+                max="43"
                 min="1"
                 type="range"
                 defaultValue="22"
@@ -207,7 +207,8 @@ export default function HotspotMap() {
                     '2024-01', '2024-02', '2024-03', '2024-04', '2024-05', '2024-06',
                     '2024-07', '2024-08', '2024-09', '2024-10', '2024-11', '2024-12',
                     '2025-01', '2025-02', '2025-03', '2025-04', '2025-05', '2025-06',
-                    '2025-07', '2025-08', '2025-09', '2025-10', '2025-11', '2025-12'
+                    '2025-07', '2025-08', '2025-09', '2025-10', '2025-11', '2025-12',
+                    '2026-01', '2026-02', '2026-03', '2026-04', '2026-05', '2026-06', '2026-07'
                   ];
                   handleDateChange(months[val - 1], months[val - 1]);
                 }}

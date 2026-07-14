@@ -279,19 +279,19 @@ async def get_emerging_clusters(
         # Query crime_alerts table for unacknowledged, high-severity alerts
         query = """
             SELECT
-                ROWID as alert_id,
-                crime_type,
-                district,
-                spike_ratio,
-                baseline_count,
-                current_count,
-                detected_at,
-                acknowledged,
-                severity
+                crime_alerts.ROWID as alert_id,
+                CrimeSubHead.CrimeHeadName as crime_type,
+                District.DistrictName as district,
+                crime_alerts.spike_ratio,
+                crime_alerts.created_at as detected_at,
+                crime_alerts.is_acknowledged as acknowledged,
+                crime_alerts.severity
             FROM crime_alerts
-            WHERE acknowledged = FALSE
-            AND severity = 'HIGH'
-            ORDER BY spike_ratio DESC
+            LEFT JOIN CrimeSubHead ON crime_alerts.crime_sub_head_id = CrimeSubHead.ROWID
+            LEFT JOIN District ON crime_alerts.district_id = District.ROWID
+            WHERE crime_alerts.is_acknowledged = 0
+            AND crime_alerts.severity = 'HIGH'
+            ORDER BY crime_alerts.spike_ratio DESC
             LIMIT 50
         """
         
@@ -307,10 +307,10 @@ async def get_emerging_clusters(
                 crime_type=row.get("crime_type", "Unknown"),
                 district=row.get("district", "Unknown"),
                 spike_ratio=row.get("spike_ratio", 0.0),
-                baseline_count=row.get("baseline_count", 0),
-                current_count=row.get("current_count", 0),
+                baseline_count=row.get("baseline_count"),  # Will be None since column doesn't exist
+                current_count=row.get("current_count"),  # Will be None since column doesn't exist
                 detected_at=row.get("detected_at"),
-                acknowledged=row.get("acknowledged", False),
+                acknowledged=bool(row.get("acknowledged", 0)),
                 severity=row.get("severity", "HIGH"),
             ))
         
