@@ -6,7 +6,7 @@
 import React, { useState, useCallback } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { analyticsService } from '../../services/analytics.service';
-import { TrendDataResponse, TrendFilters, TrendGranularity, FestivalCalendarResponse } from '../../types/analytics';
+import { TrendDataResponse, TrendFilters, TrendGranularity, FestivalCalendarResponse, TrendPoint, SeasonalComparison } from '../../types/analytics';
 
 export default function TrendAnalysis() {
   // Trend filters
@@ -132,7 +132,7 @@ export default function TrendAnalysis() {
               )}
               {trendsData && showForecast && (
                 <p className="mt-1 text-primary">
-                  {trendsData.data.filter(d => d.is_forecast).length} forecast points
+                  {trendsData.data.filter((d: TrendPoint) => d.is_forecast).length} forecast points
                 </p>
               )}
             </div>
@@ -152,7 +152,7 @@ export default function TrendAnalysis() {
           </div>
         ) : (
           <div className="space-y-3">
-            {festivalData?.comparisons.map((comparison) => (
+            {festivalData?.comparisons.map((comparison: SeasonalComparison) => (
               <div
                 key={comparison.event_name}
                 className="flex items-center justify-between p-3 border border-outline-variant bg-surface-variant"

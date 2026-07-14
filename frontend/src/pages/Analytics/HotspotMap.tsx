@@ -7,6 +7,8 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { analyticsService } from '../../services/analytics.service';
 import { HotspotCluster, HotspotClusterResponse, HotspotFilters, CrimeAlert } from '../../types/analytics';
+import { MapContainer, TileLayer, CircleMarker, Popup } from 'react-leaflet';
+import 'leaflet/dist/leaflet.css';
 
 export default function HotspotMap() {
   // Hotspot filters
@@ -53,25 +55,73 @@ export default function HotspotMap() {
     setSelectedCluster(cluster);
   }, []);
 
+  // Get cluster color based on point count (severity)
+  const getClusterColor = (pointCount: number) => {
+    if (pointCount >= 20) return '#ff4d4d'; // Red for high density
+    if (pointCount >= 10) return '#ff9f0a'; // Orange for medium density
+    return '#00F0FF'; // Cyan for low density
+  };
+
+  // Get cluster radius based on point count
+  const getClusterRadius = (pointCount: number) => {
+    return Math.min(Math.max(pointCount * 500, 2000), 15000); // Scale between 2km and 15km
+  };
+
   return (
     <div className="flex flex-col xl:flex-row gap-lg h-full">
       {/* LEFT SIDE (70%) - Map */}
       <div className="flex-1 xl:w-[70%] flex flex-col gap-sm">
         <div className="flex-1 bg-surface border border-outline-variant relative overflow-hidden flex flex-col min-h-[400px]">
-          {/* Map Container - Placeholder for Leaflet integration */}
+          {/* Map Container with Leaflet */}
           <div className="flex-1 relative bg-[#0A0C10]">
-            <div className="absolute inset-0 flex items-center justify-center text-on-surface-variant">
-              <div className="text-center">
-                <p className="font-label-mono text-label-mono mb-2">MAP VISUALIZATION</p>
-                <p className="font-body-sm text-body-sm">Install Leaflet: npm install leaflet react-leaflet</p>
-                {hotspotsLoading && <p className="mt-2 text-primary">Loading hotspots...</p>}
-                {hotspotsData && (
-                  <p className="mt-2 text-on-surface">
-                    {hotspotsData.clusters.length} clusters found
-                  </p>
-                )}
+            {hotspotsLoading ? (
+              <div className="absolute inset-0 flex items-center justify-center text-on-surface-variant">
+                <span className="text-primary font-body-sm text-body-sm">Loading hotspots...</span>
               </div>
-            </div>
+            ) : (
+              <MapContainer
+                key="hotspot-map"
+                center={[15.3173, 76.4639]} // Center of Karnataka
+                zoom={7}
+                style={{ height: '100%', width: '100%' }}
+                className="z-0"
+              >
+                <TileLayer
+                  url="https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png"
+                />
+                {hotspotsData?.clusters.map((cluster: HotspotCluster) => (
+                  <CircleMarker
+                    key={cluster.cluster_id}
+                    center={[cluster.centroid_lat, cluster.centroid_lng]}
+                    pathOptions={{
+                      color: getClusterColor(cluster.point_count),
+                      fillColor: getClusterColor(cluster.point_count),
+                      weight: 2,
+                      opacity: 0.8,
+                      fillOpacity: 0.4,
+                    }}
+                    radius={getClusterRadius(cluster.point_count)}
+                    eventHandlers={{
+                      click: () => handleClusterClick(cluster),
+                    }}
+                  >
+                    <Popup>
+                      <div className="font-sans">
+                        <div className="font-bold text-sm mb-1">
+                          Cluster #{cluster.cluster_id}
+                        </div>
+                        <div className="text-xs">
+                          <div><strong>Points:</strong> {cluster.point_count}</div>
+                          <div><strong>Dominant Crime:</strong> {cluster.dominant_crime_type || 'N/A'}</div>
+                          <div><strong>District:</strong> {cluster.district || 'N/A'}</div>
+                          <div><strong>Radius:</strong> {cluster.radius_km.toFixed(2)} km</div>
+                        </div>
+                      </div>
+                    </Popup>
+                  </CircleMarker>
+                ))}
+              </MapContainer>
+            )}
 
             {/* Map Controls Placeholder */}
             <div className="absolute top-sm right-sm flex flex-col gap-xs z-10">
