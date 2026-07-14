@@ -33,10 +33,12 @@ export const networkService = {
   /**
    * Get a single accused profile by ID
    */
-  getProfile: async (accusedId: number): Promise<AccusedProfileResponse> => {
-    const response = await apiClient.get<AccusedProfileResponse>(
-      `/api/network/profile/${accusedId}`
-    );
+  getProfile: async (accusedId: number, rowId?: number): Promise<AccusedProfileResponse> => {
+    const params = new URLSearchParams();
+    if (rowId) params.append('row_id', rowId.toString());
+    const queryString = params.toString();
+    const url = queryString ? `/api/network/profile/${accusedId}?${queryString}` : `/api/network/profile/${accusedId}`;
+    const response = await apiClient.get<AccusedProfileResponse>(url);
     return response.data;
   },
 

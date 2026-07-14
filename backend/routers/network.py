@@ -73,18 +73,28 @@ async def get_network_graph(
 @router.get("/profile/{accused_id}", response_model=AccusedProfileResponse)
 async def get_accused_profile(
     accused_id: int,
+    row_id: Optional[int] = None,
     zcql=Depends(get_zcql),
     user=Depends(require_role(["investigator", "analyst", "supervisor"])),
 ):
     """
     Return a single accused profile with FIR history, associates, and risk scoring.
+    
+    Can query by either accused_id (AccusedMasterID) or row_id (Accused.ROWID).
     """
     try:
+        # Use row_id if provided, otherwise use accused_id
+        if row_id is not None:
+            where_clause = f"Accused.ROWID = {row_id}"
+        else:
+            where_clause = f"Accused.AccusedMasterID = {accused_id}"
+        
         # Query accused basic info with FIR history (max 3 joins)
         # ZCQL: use ROWID for PK joins, max 4 joins total
         accused_query = f"""
             SELECT
                 Accused.AccusedMasterID,
+                Accused.ROWID as Accused_ROWID,
                 Accused.AccusedName,
                 Accused.AgeYear,
                 Accused.GenderID,
@@ -97,7 +107,7 @@ async def get_accused_profile(
             INNER JOIN Accused ON CaseMaster.ROWID = Accused.CaseMasterID
             LEFT JOIN CrimeSubHead ON CaseMaster.CrimeMinorHeadID = CrimeSubHead.ROWID
             LEFT JOIN Unit ON CaseMaster.PoliceStationID = Unit.ROWID
-            WHERE Accused.AccusedMasterID = {accused_id}
+            WHERE {where_clause}
             LIMIT 300
         """
         accused_result = zcql.execute_query(accused_query)

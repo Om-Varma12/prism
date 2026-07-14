@@ -74,7 +74,9 @@ export default function NetworkExplorerScreen() {
   const [selectedProfile, setSelectedProfile] = useState<SuspectProfile | null>(null);
   const [selectedNodeId, setSelectedNodeId] = useState<string | null>(null);
   const [selectedAccusedId, setSelectedAccusedId] = useState<number | null>(null);
+  const [selectedRowId, setSelectedRowId] = useState<number | null>(null);
   const [showProfilePanel, setShowProfilePanel] = useState(false);
+  const [profileSearchQuery, setProfileSearchQuery] = useState('');
   
   // Fetch live graph data
   const { data: graphData, isLoading, error } = useNetworkGraph(filters);
@@ -84,7 +86,19 @@ export default function NetworkExplorerScreen() {
   const edges = graphData?.edges || [];
 
   // Fetch accused profile when a node is selected
-  const { data: profileData, isLoading: profileLoading, error: profileError } = useAccusedProfile(selectedAccusedId);
+  const { data: profileData, isLoading: profileLoading, error: profileError } = useAccusedProfile(selectedAccusedId, selectedRowId);
+
+  // Search for accused by name when node lacks accused_id
+  const { data: profileSearchResults, isLoading: profileSearchLoading } = useSearchAccused(profileSearchQuery);
+
+  // When search results come back, use the first result to fetch profile
+  useEffect(() => {
+    if (profileSearchResults && profileSearchResults.results.length > 0) {
+      const firstResult = profileSearchResults.results[0];
+      setSelectedAccusedId(firstResult.accused_id);
+      setProfileSearchQuery(''); // Clear search after getting ID
+    }
+  }, [profileSearchResults]);
 
    const handleNodeClick = (nodeId: string) => {
      setSelectedNodeId(nodeId);
@@ -94,6 +108,12 @@ export default function NetworkExplorerScreen() {
        // Extract accused_id from node and fetch real profile
        if (node.accused_id) {
          setSelectedAccusedId(node.accused_id);
+         setSelectedRowId(null);
+       } else {
+         // No accused_id - search by name to get the ID
+         setProfileSearchQuery(node.label);
+         setSelectedAccusedId(null);
+         setSelectedRowId(null);
        }
        // Always show the profile panel with available node data
        setShowProfilePanel(true);
@@ -321,6 +341,7 @@ export default function NetworkExplorerScreen() {
                     onClick={() => {
                       setSelectedProfile(null);
                       setSelectedAccusedId(null);
+                      setSelectedRowId(null);
                       setShowProfilePanel(false);
                     }}
                     className="text-outline hover:text-on-surface cursor-pointer"

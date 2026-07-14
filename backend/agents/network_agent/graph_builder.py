@@ -150,7 +150,8 @@ class NetworkGraphBuilder:
             
             if matched_node:
                 resolved_id = matched_node.id
-                if not matched_node.accused_id and accused_id:
+                # Always update accused_id if current row has one
+                if accused_id:
                     matched_node.accused_id = accused_id
                 if matched_node.age is None and age is not None:
                     matched_node.age = age

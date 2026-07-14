@@ -22,11 +22,11 @@ export function useNetworkGraph(filters: NetworkGraphFilters) {
 /**
  * Hook for fetching a single accused profile
  */
-export function useAccusedProfile(accusedId: number | null) {
+export function useAccusedProfile(accusedId: number | null, rowId?: number | null) {
   return useQuery({
-    queryKey: ['accused-profile', accusedId],
-    queryFn: () => networkService.getProfile(accusedId!),
-    enabled: accusedId !== null,
+    queryKey: ['accused-profile', accusedId, rowId],
+    queryFn: () => networkService.getProfile(accusedId!, rowId || undefined),
+    enabled: accusedId !== null || rowId !== null,
     staleTime: 10 * 60 * 1000, // 10 minutes
     gcTime: 15 * 60 * 1000, // 15 minutes
   });
