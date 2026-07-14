@@ -4,7 +4,7 @@ Analytics & Patterns API routes.
 These endpoints provide statistical intelligence for crime patterns,
 including hotspot clustering, trend analysis, and offender risk scoring.
 """
-from datetime import datetime
+from datetime import datetime, timedelta
 from typing import Optional
 
 from fastapi import APIRouter, Depends
@@ -22,6 +22,73 @@ from schemas.analytics import (
 
 
 router = APIRouter(prefix="/api/analytics", tags=["analytics"])
+
+
+def convert_month_to_date_range(month_str: str) -> tuple[str, str]:
+    """
+    Convert month string (YYYY-MM) to date range (YYYY-MM-01 to YYYY-MM-last_day)
+    
+    Args:
+        month_str: Month in format 'YYYY-MM'
+        
+    Returns:
+        Tuple of (date_from, date_to) in 'YYYY-MM-DD' format
+    """
+    try:
+        # Parse the month string
+        dt = datetime.strptime(month_str, '%Y-%m')
+        
+        # First day of the month
+        date_from = dt.strftime('%Y-%m-%d')
+        
+        # Last day of the month
+        # Go to first day of next month, then subtract one day
+        if dt.month == 12:
+            next_month = dt.replace(year=dt.year + 1, month=1, day=1)
+        else:
+            next_month = dt.replace(month=dt.month + 1, day=1)
+        
+        last_day = next_month - timedelta(days=1)
+        date_to = last_day.strftime('%Y-%m-%d')
+        
+        return date_from, date_to
+    except ValueError:
+        # If conversion fails, return as-is (might already be full date)
+        return month_str, month_str
+
+
+def validate_and_convert_date(date_str: Optional[str]) -> Optional[str]:
+    """
+    Validate and convert date string to proper format.
+    
+    Args:
+        date_str: Date string in various formats
+        
+    Returns:
+        Properly formatted date string or None if invalid
+    """
+    if not date_str:
+        return None
+    
+    try:
+        # If already in YYYY-MM-DD format, validate and return
+        if len(date_str) == 10 and date_str.count('-') == 2:
+            datetime.strptime(date_str, '%Y-%m-%d')
+            return date_str
+        
+        # If in YYYY-MM format, convert to range
+        if len(date_str) == 7 and date_str.count('-') == 1:
+            date_from, _ = convert_month_to_date_range(date_str)
+            return date_from
+        
+        # Try to parse as datetime and format back
+        dt = datetime.strptime(date_str, '%Y-%m-%d')
+        return dt.strftime('%Y-%m-%d')
+        
+    except ValueError:
+        # Log warning and return None
+        print(f"[Warning] Invalid date format: {date_str}")
+        return None
 
 
 def _empty_hotspot_response() -> HotspotClusterResponse:
@@ -77,6 +144,12 @@ async def get_hotspots(
     try:
         from analytics.hotspot import HotspotAnalyzer
         from schemas.analytics import HotspotFilters
+        
+        # Convert month-only dates to full date ranges
+        if date_from and len(date_from) == 7:  # YYYY-MM format
+            date_from, _ = convert_month_to_date_range(date_from)
+        if date_to and len(date_to) == 7:  # YYYY-MM format
+            _, date_to = convert_month_to_date_range(date_to)
         
         # Build cache key from filter combination
         cache_key = f"hotspots:{date_from or 'all'}:{date_to or 'all'}:{district or 'all'}"

@@ -1,58 +1,56 @@
-[debug] [2026-07-14T14:44:47.311Z] : 
-[debug] [2026-07-14T14:44:47.312Z] : ----------------------------------------------------------------------
-[debug] [2026-07-14T14:44:47.313Z] : Command:      C:\Program Files\nodejs\node.exe C:\Users\Acer\AppData\Roaming\npm\node_modules\zcatalyst-cli\lib\bin\catalyst.js serve
-[debug] [2026-07-14T14:44:47.313Z] : CLI Version:  1.26.1
-[debug] [2026-07-14T14:44:47.313Z] : Platform:     win32
-[debug] [2026-07-14T14:44:47.313Z] : Node Version: v22.20.0
-[debug] [2026-07-14T14:44:47.313Z] : Time:         Tue Jul 14 2026 20:14:47 GMT+0530 (India Standard Time)
-[debug] [2026-07-14T14:44:47.313Z] : ----------------------------------------------------------------------
-[debug] [2026-07-14T14:44:47.313Z] : 
-[debug] [2026-07-14T14:44:48.113Z] : > authorizing via signed-in user option
-[debug] [2026-07-14T14:44:48.113Z] : > command requires scopes: ["ZohoCatalyst.projects.ALL","ZohoCatalyst.apigateway.apis.READ","ZohoCatalyst.apigateway.READ","ZohoCatalyst.segments.ALL","ZohoCatalyst.cache.READ","ZohoCatalyst.cache.CREATE","ZohoCatalyst.cache.DELETE","ZohoCatalyst.projects.ALL","ZohoCatalyst.cron.ALL","ZohoCatalyst.zcql.CREATE","ZohoCatalyst.projects.users.READ","ZohoCatalyst.projects.users.CREATE","ZohoCatalyst.projects.users.DELETE","ZohoCatalyst.projects.users.UPDATE","ZohoCatalyst.authentication.CREATE","ZohoCatalyst.email.CREATE","ZohoCatalyst.tables.ALL","ZohoCatalyst.tables.rows.ALL","ZohoCatalyst.tables.columns.ALL","ZohoCatalyst.tables.bulk.CREATE","ZohoCatalyst.tables.bulk.READ","ZohoCatalyst.folders.ALL","ZohoCatalyst.files.CREATE","ZohoCatalyst.files.READ","ZohoCatalyst.files.DELETE","ZohoCatalyst.functions.ALL","ZohoCatalyst.functions.EXECUTE","ZohoCatalyst.eventlistners.ALL","ZohoCatalyst.eventlisteners.produce","ZohoCatalyst.security.rules.Read","ZohoCatalyst.security.rules.Update","ZohoCatalyst.notifications.mobile","ZohoCatalyst.notifications.web","ZohoCatalyst.search.READ","ZohoCatalyst.mlkit.READ","QuickML.deployment.READ","ZohoCatalyst.pdfshot.execute","ZohoCatalyst.grid.READ","ZohoCatalyst.grid.terminate","ZohoCatalyst.circuits.execution.DELETE","ZohoCatalyst.circuits.execution.READ","ZohoCatalyst.circuits.execute","ZohoCatalyst.appsail.Read","ZohoCatalyst.jobpool.READ","ZohoCatalyst.job.ALL","ZohoCatalyst.nosql.READ","ZohoCatalyst.nosql.rows.ALL"]
-[debug] [2026-07-14T14:44:48.126Z] : >>>> HTTP REQUEST : GET https://api.catalyst.zoho.in/baas/v1/project/46143000000022001 
+[debug] [2026-07-14T15:02:27.574Z] : 
+[debug] [2026-07-14T15:02:27.576Z] : ----------------------------------------------------------------------
+[debug] [2026-07-14T15:02:27.576Z] : Command:      C:\Program Files\nodejs\node.exe C:\Users\Acer\AppData\Roaming\npm\node_modules\zcatalyst-cli\lib\bin\catalyst.js serve
+[debug] [2026-07-14T15:02:27.576Z] : CLI Version:  1.26.1
+[debug] [2026-07-14T15:02:27.576Z] : Platform:     win32
+[debug] [2026-07-14T15:02:27.576Z] : Node Version: v22.20.0
+[debug] [2026-07-14T15:02:27.576Z] : Time:         Tue Jul 14 2026 20:32:27 GMT+0530 (India Standard Time)
+[debug] [2026-07-14T15:02:27.576Z] : ----------------------------------------------------------------------
+[debug] [2026-07-14T15:02:27.576Z] : 
+[debug] [2026-07-14T15:02:28.478Z] : > authorizing via signed-in user option
+[debug] [2026-07-14T15:02:28.478Z] : > command requires scopes: ["ZohoCatalyst.projects.ALL","ZohoCatalyst.apigateway.apis.READ","ZohoCatalyst.apigateway.READ","ZohoCatalyst.segments.ALL","ZohoCatalyst.cache.READ","ZohoCatalyst.cache.CREATE","ZohoCatalyst.cache.DELETE","ZohoCatalyst.projects.ALL","ZohoCatalyst.cron.ALL","ZohoCatalyst.zcql.CREATE","ZohoCatalyst.projects.users.READ","ZohoCatalyst.projects.users.CREATE","ZohoCatalyst.projects.users.DELETE","ZohoCatalyst.projects.users.UPDATE","ZohoCatalyst.authentication.CREATE","ZohoCatalyst.email.CREATE","ZohoCatalyst.tables.ALL","ZohoCatalyst.tables.rows.ALL","ZohoCatalyst.tables.columns.ALL","ZohoCatalyst.tables.bulk.CREATE","ZohoCatalyst.tables.bulk.READ","ZohoCatalyst.folders.ALL","ZohoCatalyst.files.CREATE","ZohoCatalyst.files.READ","ZohoCatalyst.files.DELETE","ZohoCatalyst.functions.ALL","ZohoCatalyst.functions.EXECUTE","ZohoCatalyst.eventlistners.ALL","ZohoCatalyst.eventlisteners.produce","ZohoCatalyst.security.rules.Read","ZohoCatalyst.security.rules.Update","ZohoCatalyst.notifications.mobile","ZohoCatalyst.notifications.web","ZohoCatalyst.search.READ","ZohoCatalyst.mlkit.READ","QuickML.deployment.READ","ZohoCatalyst.pdfshot.execute","ZohoCatalyst.grid.READ","ZohoCatalyst.grid.terminate","ZohoCatalyst.circuits.execution.DELETE","ZohoCatalyst.circuits.execution.READ","ZohoCatalyst.circuits.execute","ZohoCatalyst.appsail.Read","ZohoCatalyst.jobpool.READ","ZohoCatalyst.job.ALL","ZohoCatalyst.nosql.READ","ZohoCatalyst.nosql.rows.ALL"]
+[debug] [2026-07-14T15:02:28.489Z] : >>>> HTTP REQUEST : GET https://api.catalyst.zoho.in/baas/v1/project/46143000000022001 
 
-[debug] [2026-07-14T14:44:48.243Z] : <<<< HTTP RESPONSE : 200
-Response Headers: {"server":"ZGS","date":"Tue, 14 Jul 2026 14:44:49 GMT","content-type":"application/vnd.catalyst.v2+json","transfer-encoding":"chunked","connection":"keep-alive","x-content-type-options":"nosniff","cache-control":"private,no-cache,no-store,max-age=0,must-revalidate","pragma":"no-cache","expires":"Thu, 01 Jan 1970 00:00:00 GMT","x-frame-options":"DENY","strict-transport-security":"max-age=64072000; includeSubDomains; preload"}
+[debug] [2026-07-14T15:02:28.611Z] : <<<< HTTP RESPONSE : 200
+Response Headers: {"server":"ZGS","date":"Tue, 14 Jul 2026 15:02:30 GMT","content-type":"application/vnd.catalyst.v2+json","transfer-encoding":"chunked","connection":"keep-alive","x-content-type-options":"nosniff","cache-control":"private,no-cache,no-store,max-age=0,must-revalidate","pragma":"no-cache","expires":"Thu, 01 Jan 1970 00:00:00 GMT","x-frame-options":"DENY","strict-transport-security":"max-age=64072000; includeSubDomains; preload"}
 
-[debug] [2026-07-14T14:44:48.245Z] : >>>> HTTP REQUEST : GET https://api.catalyst.zoho.in/baas/v1/project/46143000000022001/environment 
+[debug] [2026-07-14T15:02:28.614Z] : >>>> HTTP REQUEST : GET https://api.catalyst.zoho.in/baas/v1/project/46143000000022001/environment 
 
-[debug] [2026-07-14T14:44:48.287Z] : <<<< HTTP RESPONSE : 200
-Response Headers: {"server":"ZGS","date":"Tue, 14 Jul 2026 14:44:49 GMT","content-type":"application/vnd.catalyst.v2+json","transfer-encoding":"chunked","connection":"keep-alive","x-content-type-options":"nosniff","cache-control":"private,no-cache,no-store,max-age=0,must-revalidate","pragma":"no-cache","expires":"Thu, 01 Jan 1970 00:00:00 GMT","x-frame-options":"DENY","strict-transport-security":"max-age=64072000; includeSubDomains; preload"}
+[debug] [2026-07-14T15:02:28.725Z] : <<<< HTTP RESPONSE : 200
+Response Headers: {"server":"ZGS","date":"Tue, 14 Jul 2026 15:02:30 GMT","content-type":"application/vnd.catalyst.v2+json","transfer-encoding":"chunked","connection":"keep-alive","x-content-type-options":"nosniff","cache-control":"private,no-cache,no-store,max-age=0,must-revalidate","pragma":"no-cache","expires":"Thu, 01 Jan 1970 00:00:00 GMT","x-frame-options":"DENY","strict-transport-security":"max-age=64072000; includeSubDomains; preload"}
 
-[debug] [2026-07-14T14:44:48.948Z] : http port : '3000' is not available. Hence port '3001' will be used instead.
-[debug] [2026-07-14T14:44:49.066Z] : No basic functions to add
-[info] [2026-07-14T14:44:53.119Z] : [react-plugin]: Starting the development server...
+[debug] [2026-07-14T15:02:29.294Z] : http port : '3000' is not available. Hence port '3001' will be used instead.
+[debug] [2026-07-14T15:02:29.509Z] : No basic functions to add
+[info] [2026-07-14T15:02:32.778Z] : [react-plugin]: Starting the development server...
 
-[info] [2026-07-14T14:44:53.121Z] : 
-[info] [2026-07-14T14:44:53.121Z] : i Client[frontend]: Plugin : "zcatalyst-cli-plugin-react" is used for client serve
-[info] [2026-07-14T14:44:53.121Z] : 
-[debug] [2026-07-14T14:44:54.606Z] : No API Gateway configuration found. Skipping API Gateway rules
-[debug] [2026-07-14T14:44:54.684Z] : No API Gateway configuration found. Skipping API Gateway rules
-[info] [2026-07-14T14:44:54.816Z] : 
-[info] [2026-07-14T14:44:54.816Z] :  >>>>>>>>>>>>>> AppSail <<<<<<<<<<<<<< 
-[info] [2026-07-14T14:44:54.817Z] : i backend: http://localhost:3001
-[info] [2026-07-14T14:44:54.817Z] : 
-[info] [2026-07-14T14:44:54.817Z] : 
-[info] [2026-07-14T14:44:54.817Z] :  >>>>>>>>>>>>> Web Client <<<<<<<<<<<<
-[info] [2026-07-14T14:44:54.817Z] : i client[frontend]: http://localhost:3000/app/
-[info] [2026-07-14T14:44:54.818Z] : 
-[info] [2026-07-14T14:44:56.101Z] : [1784040296100]  "GET"  "/app/"
-[info] [2026-07-14T14:44:57.178Z] : [react-plugin]: Compiled successfully!
-[info] [2026-07-14T14:44:57.178Z] : [react-plugin]: 
-[info] [2026-07-14T14:44:57.178Z] : [react-plugin]: You can now view fron in the browser.
-[info] [2026-07-14T14:44:57.179Z] : [react-plugin]: 
-[info] [2026-07-14T14:44:57.179Z] : [react-plugin]:   http://localhost:3000/app/
-[info] [2026-07-14T14:44:57.179Z] : [react-plugin]: 
-[info] [2026-07-14T14:44:57.179Z] : [react-plugin]: Note that the development build is not optimized.
-[info] [2026-07-14T14:44:57.179Z] : [react-plugin]: To create a production build, use npm run build.
-[info] [2026-07-14T14:44:57.179Z] : [react-plugin]: 
-[info] [2026-07-14T14:44:57.491Z] : [1784040297491]  "GET"  "/app/static/js/bundle.js"
-[info] [2026-07-14T14:44:57.858Z] : [1784040297857]  "GET"  "/app/map.svg"
-[info] [2026-07-14T14:44:58.160Z] : [1784040298160]  "GET"  "/app/manifest.json"
-[info] [2026-07-14T14:44:58.257Z] : [1784040298257]  Appsail[backend]  "GET"  "/api/dashboard/stats"
-[info] [2026-07-14T14:44:58.260Z] : [1784040298260]  Appsail[backend]  "GET"  "/api/dashboard/district-crimes?timeframe=30d"
-[info] [2026-07-14T14:44:58.262Z] : [1784040298262]  Appsail[backend]  "GET"  "/api/dashboard/trends"
-[info] [2026-07-14T14:44:58.264Z] : [1784040298264]  "GET"  "/app/favicon.ico"
-[info] [2026-07-14T14:44:58.483Z] : [1784040298483]  "GET"  "/app/logo192.png"
-[info] [2026-07-14T14:44:59.350Z] : [1784040299350]  Appsail[backend]  "GET"  "/api/analytics/hotspots?"
-[info] [2026-07-14T14:44:59.657Z] : [1784040299656]  Appsail[backend]  "GET"  "/api/analytics/emerging-clusters"
+[info] [2026-07-14T15:02:32.780Z] : 
+[info] [2026-07-14T15:02:32.780Z] : i Client[frontend]: Plugin : "zcatalyst-cli-plugin-react" is used for client serve
+[info] [2026-07-14T15:02:32.780Z] : 
+[debug] [2026-07-14T15:02:34.474Z] : No API Gateway configuration found. Skipping API Gateway rules
+[debug] [2026-07-14T15:02:34.630Z] : No API Gateway configuration found. Skipping API Gateway rules
+[info] [2026-07-14T15:02:34.737Z] : 
+[info] [2026-07-14T15:02:34.738Z] :  >>>>>>>>>>>>>> AppSail <<<<<<<<<<<<<< 
+[info] [2026-07-14T15:02:34.738Z] : i backend: http://localhost:3001
+[info] [2026-07-14T15:02:34.738Z] : 
+[info] [2026-07-14T15:02:34.739Z] : 
+[info] [2026-07-14T15:02:34.739Z] :  >>>>>>>>>>>>> Web Client <<<<<<<<<<<<
+[info] [2026-07-14T15:02:34.739Z] : i client[frontend]: http://localhost:3000/app/
+[info] [2026-07-14T15:02:34.739Z] : 
+[info] [2026-07-14T15:02:35.338Z] : [1784041355337]  "GET"  "/app/"
+[info] [2026-07-14T15:02:37.427Z] : [react-plugin]: Compiled successfully!
+[info] [2026-07-14T15:02:37.427Z] : [react-plugin]: 
+[info] [2026-07-14T15:02:37.427Z] : [react-plugin]: You can now view fron in the browser.
+[info] [2026-07-14T15:02:37.427Z] : [react-plugin]: 
+[info] [2026-07-14T15:02:37.427Z] : [react-plugin]:   http://localhost:3000/app/
+[info] [2026-07-14T15:02:37.428Z] : [react-plugin]: 
+[info] [2026-07-14T15:02:37.428Z] : [react-plugin]: Note that the development build is not optimized.
+[info] [2026-07-14T15:02:37.428Z] : [react-plugin]: To create a production build, use npm run build.
+[info] [2026-07-14T15:02:37.428Z] : [react-plugin]: 
+[info] [2026-07-14T15:02:37.724Z] : [1784041357723]  "GET"  "/app/static/js/bundle.js"
+[info] [2026-07-14T15:02:38.431Z] : [1784041358431]  "GET"  "/app/map.svg"
+[info] [2026-07-14T15:02:38.713Z] : [1784041358713]  "GET"  "/app/manifest.json"
+[info] [2026-07-14T15:02:38.824Z] : [1784041358824]  Appsail[backend]  "GET"  "/api/dashboard/stats"
+[info] [2026-07-14T15:02:38.829Z] : [1784041358828]  Appsail[backend]  "GET"  "/api/dashboard/district-crimes?timeframe=30d"
+[info] [2026-07-14T15:02:38.831Z] : [1784041358831]  Appsail[backend]  "GET"  "/api/dashboard/trends"
+[info] [2026-07-14T15:02:39.044Z] : [1784041359044]  "GET"  "/app/favicon.ico"
+[info] [2026-07-14T15:02:39.046Z] : [1784041359045]  "GET"  "/app/logo192.png"
