@@ -170,22 +170,77 @@ async def get_hotspots(
 @router.get("/emerging-clusters", response_model=CrimeAlertResponse)
 async def get_emerging_clusters(
     zcql=Depends(get_zcql),
+    cache=Depends(get_cache),
     user=Depends(require_role(["analyst", "supervisor"])),
 ):
     """
     Get emerging crime clusters from the crime_alerts table.
     
     Returns unacknowledged, high-severity alerts where crime rate is significantly
-    above historical baseline (spike_ratio > 2.0).
+    above historical baseline (spike_ratio > 2.0). Results are cached for 5 minutes.
+    Role-gated to Analyst/Supervisor only.
     """
     try:
-        # TODO: Implement emerging clusters logic in Step 3
         from schemas.analytics import CrimeAlert
-        return CrimeAlertResponse(
-            alerts=[],
-            total_alerts=0,
+        
+        # Build cache key
+        cache_key = "emerging-clusters:unacknowledged:high-severity"
+        
+        # Try to get from cache first
+        cached_data = cache.get(cache_key)
+        if cached_data:
+            import json
+            return CrimeAlertResponse(**json.loads(cached_data))
+        
+        # Query crime_alerts table for unacknowledged, high-severity alerts
+        query = """
+            SELECT
+                ROWID as alert_id,
+                crime_type,
+                district,
+                spike_ratio,
+                baseline_count,
+                current_count,
+                detected_at,
+                acknowledged,
+                severity
+            FROM crime_alerts
+            WHERE acknowledged = FALSE
+            AND severity = 'HIGH'
+            ORDER BY spike_ratio DESC
+            LIMIT 50
+        """
+        
+        # Execute query
+        result = zcql.execute_query(query)
+        rows = result if isinstance(result, list) else []
+        
+        # Convert to response format
+        alerts = []
+        for row in rows:
+            alerts.append(CrimeAlert(
+                alert_id=row.get("alert_id"),
+                crime_type=row.get("crime_type", "Unknown"),
+                district=row.get("district", "Unknown"),
+                spike_ratio=row.get("spike_ratio", 0.0),
+                baseline_count=row.get("baseline_count", 0),
+                current_count=row.get("current_count", 0),
+                detected_at=row.get("detected_at"),
+                acknowledged=row.get("acknowledged", False),
+                severity=row.get("severity", "HIGH"),
+            ))
+        
+        response = CrimeAlertResponse(
+            alerts=alerts,
+            total_alerts=len(alerts),
             generated_at=datetime.utcnow(),
         )
+        
+        # Cache the response for 5 minutes (300 seconds)
+        import json
+        cache.set(cache_key, json.dumps(response.model_dump()), 300)
+        
+        return response
     except Exception as exc:
         print(f"[Warning] Failed to get emerging clusters: {exc}")
         from schemas.analytics import CrimeAlert
