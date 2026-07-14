@@ -7,3 +7,6 @@ apscheduler
 python-dotenv
 dotenv
 reportlab
+prophet
+scikit-learn
+pandas

@@ -6,7 +6,7 @@
 import React, { useState, useCallback } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { analyticsService } from '../../services/analytics.service';
-import { OffenderRiskResponse, OffenderRiskFilters } from '../../types/analytics';
+import { OffenderRiskResponse, OffenderRiskFilters, OffenderRisk } from '../../types/analytics';
 
 export default function OffenderRiskBoard() {
   // Offender filters
@@ -83,7 +83,7 @@ export default function OffenderRiskBoard() {
   }, []);
 
   // Filter offenders by search query (client-side filtering)
-  const filteredOffenders = offenderData?.offenders.filter(offender =>
+  const filteredOffenders = offenderData?.offenders.filter((offender: OffenderRisk) =>
     offender.accused_name.toLowerCase().includes(searchQuery.toLowerCase())
   ) || [];
 
