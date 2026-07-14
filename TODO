@@ -1,2 +1,10 @@
 first page: dashboard
 5. ek micro-service for real-time data change and dashboard value updates
+
+second page: chat
+1. pdf should be stored in 'Stratus' with id
+
+third page: network
+1. pop up of person must be shown in right side without taking the focus of entire screen
+2. filter is still not proper
+3. cross-check the feature to assure the given feature from prbm stmt

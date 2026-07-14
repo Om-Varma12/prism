@@ -73,17 +73,28 @@ async def get_network_graph(
 @router.get("/profile/{accused_id}", response_model=AccusedProfileResponse)
 async def get_accused_profile(
     accused_id: int,
+    row_id: Optional[int] = None,
     zcql=Depends(get_zcql),
     user=Depends(require_role(["investigator", "analyst", "supervisor"])),
 ):
     """
     Return a single accused profile with FIR history, associates, and risk scoring.
+    
+    Can query by either accused_id (AccusedMasterID) or row_id (Accused.ROWID).
     """
     try:
-        # Query accused basic info with FIR history
+        # Use row_id if provided, otherwise use accused_id
+        if row_id is not None:
+            where_clause = f"Accused.ROWID = {row_id}"
+        else:
+            where_clause = f"Accused.AccusedMasterID = {accused_id}"
+        
+        # Query accused basic info with FIR history (max 3 joins)
+        # ZCQL: use ROWID for PK joins, max 4 joins total
         accused_query = f"""
             SELECT
                 Accused.AccusedMasterID,
+                Accused.ROWID as Accused_ROWID,
                 Accused.AccusedName,
                 Accused.AgeYear,
                 Accused.GenderID,
@@ -91,15 +102,12 @@ async def get_accused_profile(
                 CaseMaster.CrimeNo,
                 CaseMaster.IncidentFromDate,
                 CrimeSubHead.CrimeHeadName,
-                District.DistrictName,
-                ArrestSurrender.ArrestSurrenderID
+                Unit.UnitName
             FROM CaseMaster
             INNER JOIN Accused ON CaseMaster.ROWID = Accused.CaseMasterID
             LEFT JOIN CrimeSubHead ON CaseMaster.CrimeMinorHeadID = CrimeSubHead.ROWID
             LEFT JOIN Unit ON CaseMaster.PoliceStationID = Unit.ROWID
-            LEFT JOIN District ON Unit.DistrictID = District.ROWID
-            LEFT JOIN ArrestSurrender ON Accused.ROWID = ArrestSurrender.AccusedMasterID
-            WHERE Accused.AccusedMasterID = {accused_id}
+            WHERE {where_clause}
             LIMIT 300
         """
         accused_result = zcql.execute_query(accused_query)
@@ -124,8 +132,18 @@ async def get_accused_profile(
         gender_id = _value(first_row, "Accused", "GenderID", "GenderID")
         gender = _gender_label(gender_id)
         
-        # Check if absconding (no arrest record)
-        is_absconding = _value(first_row, "ArrestSurrender", "ArrestSurrenderID", "ArrestSurrenderID") is None
+        # Check absconding status in a separate query (to stay within 4-join limit)
+        arrest_query = f"""
+            SELECT ArrestSurrenderID
+            FROM ArrestSurrender
+            WHERE ArrestSurrender.AccusedMasterID = {accused_id}
+            LIMIT 1
+        """
+        try:
+            arrest_result = zcql.execute_query(arrest_query)
+            is_absconding = not (arrest_result and isinstance(arrest_result, list) and len(arrest_result) > 0)
+        except Exception:
+            is_absconding = True
         
         # Build FIR summary list
         firs = []
@@ -137,7 +155,7 @@ async def get_accused_profile(
             crime_no = _value(row, "CaseMaster", "CrimeNo", "CrimeNo")
             incident_date = _value(row, "CaseMaster", "IncidentFromDate", "IncidentFromDate")
             crime_type = _value(row, "CrimeSubHead", "CrimeHeadName", "CrimeHeadName")
-            district = _value(row, "District", "DistrictName", "DistrictName")
+            unit_name = _value(row, "Unit", "UnitName", "UnitName")
             
             if crime_type:
                 crime_type_counts[crime_type] = crime_type_counts.get(crime_type, 0) + 1
@@ -151,7 +169,7 @@ async def get_accused_profile(
                     "crime_no": crime_no,
                     "crime_type": crime_type,
                     "date": incident_date,
-                    "district": district,
+                    "district": unit_name,  # Use UnitName as location identifier
                     "status": "Under Investigation" if is_absconding else "Charge Sheeted"
                 })
         
@@ -266,6 +284,10 @@ def _gender_label(gender_id):
 async def search_accused(
     q: str,
     limit: int = 10,
+    crime_type: Optional[str] = None,
+    district: Optional[str] = None,
+    date_from: Optional[str] = None,
+    date_to: Optional[str] = None,
     zcql=Depends(get_zcql),
     user=Depends(require_role(["investigator", "analyst", "supervisor"])),
 ):
@@ -273,6 +295,7 @@ async def search_accused(
     Search accused persons by name with wildcard matching.
     
     Results are ranked by FIR count and latest FIR date.
+    Optional filters (crime_type, district, date_from, date_to) can be applied.
     """
     try:
         if not q or len(q.strip()) < 2:
@@ -280,9 +303,47 @@ async def search_accused(
         
         search_term = q.strip()
         
+        # Build WHERE clauses for filters
+        where_clauses = []
+        if crime_type:
+            # Get CrimeMinorHeadID for the crime type
+            crime_type_query = f"""
+                SELECT CrimeSubHead.CrimeSubHeadID
+                FROM CrimeSubHead
+                WHERE CrimeSubHead.CrimeHeadName = '{crime_type}'
+                LIMIT 100
+            """
+            try:
+                crime_type_result = zcql.execute_query(crime_type_query)
+                crime_type_ids = [
+                    _to_int(_value(row, "CrimeSubHead", "CrimeSubHeadID", "CrimeSubHeadID"))
+                    for row in (crime_type_result if isinstance(crime_type_result, list) else [])
+                ]
+                crime_type_ids = [cid for cid in crime_type_ids if cid is not None]
+                if crime_type_ids:
+                    where_clauses.append(f"CaseMaster.CrimeMinorHeadID IN ({','.join(map(str, crime_type_ids))})")
+            except Exception:
+                pass
+        
+        if district:
+            where_clauses.append(f"District.DistrictName = '{district}'")
+        
+        if date_from:
+            where_clauses.append(f"CaseMaster.IncidentFromDate >= '{date_from}'")
+        
+        if date_to:
+            where_clauses.append(f"CaseMaster.IncidentFromDate <= '{date_to}'")
+        
+        # Add name filter to WHERE clauses
+        safe_term = search_term.replace("'", "''")
+        where_clauses.append(f"Accused.AccusedName LIKE '*{safe_term}*'")
+        
+        where_sql = ""
+        if where_clauses:
+            where_sql = "WHERE " + " AND ".join(where_clauses)
+        
         # Query accused with FIR count and latest FIR date
         # ZCQL: use * wildcard (not %), no complex aggregates in search
-        safe_term = search_term.replace("'", "''")
         search_query = f"""
             SELECT
                 Accused.AccusedMasterID,
@@ -291,7 +352,9 @@ async def search_accused(
                 CaseMaster.IncidentFromDate
             FROM CaseMaster
             INNER JOIN Accused ON CaseMaster.ROWID = Accused.CaseMasterID
-            WHERE Accused.AccusedName LIKE '*{safe_term}*'
+            LEFT JOIN Unit ON CaseMaster.PoliceStationID = Unit.ROWID
+            LEFT JOIN District ON Unit.DistrictID = District.ROWID
+            {where_sql}
             LIMIT {min(limit * 20, 300)}
         """
         

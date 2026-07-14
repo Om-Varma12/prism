@@ -33,19 +33,30 @@ export const networkService = {
   /**
    * Get a single accused profile by ID
    */
-  getProfile: async (accusedId: number): Promise<AccusedProfileResponse> => {
-    const response = await apiClient.get<AccusedProfileResponse>(
-      `/api/network/profile/${accusedId}`
-    );
+  getProfile: async (accusedId: number, rowId?: number): Promise<AccusedProfileResponse> => {
+    const params = new URLSearchParams();
+    if (rowId) params.append('row_id', rowId.toString());
+    const queryString = params.toString();
+    const url = queryString ? `/api/network/profile/${accusedId}?${queryString}` : `/api/network/profile/${accusedId}`;
+    const response = await apiClient.get<AccusedProfileResponse>(url);
     return response.data;
   },
 
   /**
-   * Search accused persons by name
+   * Search accused persons by name with optional filters
    */
-  search: async (query: string, limit = 10): Promise<NetworkSearchResponse> => {
+  search: async (query: string, limit = 10, filters?: NetworkGraphFilters): Promise<NetworkSearchResponse> => {
+    const params = new URLSearchParams();
+    params.append('q', query);
+    params.append('limit', limit.toString());
+    
+    if (filters?.crime_type) params.append('crime_type', filters.crime_type);
+    if (filters?.district) params.append('district', filters.district);
+    if (filters?.date_from) params.append('date_from', filters.date_from);
+    if (filters?.date_to) params.append('date_to', filters.date_to);
+    
     const response = await apiClient.get<NetworkSearchResponse>(
-      `/api/network/search?q=${encodeURIComponent(query)}&limit=${limit}`
+      `/api/network/search?${params.toString()}`
     );
     return response.data;
   },
