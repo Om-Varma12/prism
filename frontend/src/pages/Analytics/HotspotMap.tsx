@@ -17,7 +17,7 @@ export default function HotspotMap() {
   // Map refs for manual initialization
   const mapContainerRef = useRef<HTMLDivElement>(null);
   const mapInstanceRef = useRef<L.Map | null>(null);
-  const markersRef = useRef<L.CircleMarker[]>([]);
+  const markersRef = useRef<L.Circle[]>([]);
 
   // Hotspot filters
   const [filters, setFilters] = useState<HotspotFilters>({
@@ -90,9 +90,10 @@ export default function HotspotMap() {
     return '#00F0FF'; // Cyan for low density
   };
 
-  // Get cluster radius based on point count
+  // Get cluster radius based on point count (in meters for L.circle)
   const getClusterRadius = (pointCount: number) => {
-    return Math.min(Math.max(pointCount * 1.5, 8), 40);
+    // Scale between 500m and 5000m based on point count
+    return Math.min(Math.max(pointCount * 100, 500), 5000);
   };
   // Initialize map on mount
   useEffect(() => {
@@ -137,7 +138,7 @@ export default function HotspotMap() {
 
     // Add new markers
     hotspotsData.clusters.forEach((cluster: HotspotCluster) => {
-      const marker = L.circleMarker([cluster.centroid_lat, cluster.centroid_lng], {
+      const marker = L.circle([cluster.centroid_lat, cluster.centroid_lng], {
         radius: getClusterRadius(cluster.point_count),
         color: getClusterColor(cluster.point_count),
         fillColor: getClusterColor(cluster.point_count),
