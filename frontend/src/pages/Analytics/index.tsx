@@ -3,13 +3,37 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import React, { useState } from 'react';
+import React, { useState, Component } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import HotspotMap from './HotspotMap';
 import TrendAnalysis from './TrendAnalysis';
 import OffenderRiskBoard from './OffenderRiskBoard';
 
 type ActiveTab = 'hotspot' | 'trends' | 'offenders';
+
+// Error boundary for map component
+class MapErrorBoundary extends Component<{children: React.ReactNode}, {hasError: boolean}> {
+  constructor(props: {children: React.ReactNode}) {
+    super(props);
+    this.state = { hasError: false };
+  }
+
+  static getDerivedStateFromError() {
+    return { hasError: true };
+  }
+
+  render() {
+    if (this.state.hasError) {
+      return (
+        <div className="p-4 bg-error-container border border-error text-error">
+          <h3 className="font-bold mb-2">Map Error</h3>
+          <p className="text-sm">Failed to load the map. Please refresh the page.</p>
+        </div>
+      );
+    }
+    return this.props.children;
+  }
+}
 
 export default function AnalyticsPage() {
   const [activeTab, setActiveTab] = useState<ActiveTab>('hotspot');
@@ -52,19 +76,14 @@ export default function AnalyticsPage() {
 
       {/* Scrollable Content */}
       <div className="flex-1 overflow-y-auto p-margin-desktop custom-scrollbar">
-        <AnimatePresence mode="wait">
-          {/* TAB 1: Hotspot Map */}
-          {activeTab === 'hotspot' && (
-            <motion.div
-              key="hotspot"
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -10 }}
-            >
-              <HotspotMap />
-            </motion.div>
-          )}
+        {/* TAB 1: Hotspot Map - No animation to prevent Leaflet re-initialization issues */}
+        {activeTab === 'hotspot' && (
+          <MapErrorBoundary>
+            <HotspotMap />
+          </MapErrorBoundary>
+        )}
 
+        <AnimatePresence mode="wait">
           {/* TAB 2: Trend Analysis */}
           {activeTab === 'trends' && (
             <motion.div

@@ -41,13 +41,13 @@ class HotspotClusterResponse(BaseModel):
 class CrimeAlert(BaseModel):
     """A single emerging crime cluster alert from crime_alerts table."""
 
-    alert_id: int
+    alert_id: Optional[int] = None
     crime_type: str
     district: str
     spike_ratio: float
-    baseline_count: int
-    current_count: int
-    detected_at: datetime
+    baseline_count: Optional[int] = None
+    current_count: Optional[int] = None
+    detected_at: Optional[datetime] = None
     acknowledged: bool = False
     severity: Literal["LOW", "MEDIUM", "HIGH"]
 
