@@ -490,6 +490,7 @@ async def get_offender_risk(
     page: int = 1,
     page_size: int = 20,
     zcql=Depends(get_zcql),
+    cache=Depends(get_cache),
     user=Depends(require_role(["investigator", "analyst", "supervisor"])),
 ):
     """
@@ -497,10 +498,119 @@ async def get_offender_risk(
     
     Returns sortable, filterable list of offenders with risk scores,
     MO tags, absconding status, and FIR count.
+    Results are cached for 10 minutes based on filter combination.
     """
     try:
-        # TODO: Implement offender risk logic in Step 7
-        return _empty_offender_risk_response()
+        from schemas.analytics import OffenderRisk, OffenderRiskFilters
+        
+        # Validate pagination parameters
+        if page < 1:
+            page = 1
+        if page_size < 1 or page_size > 100:
+            page_size = 20
+        
+        # Build cache key from filter combination
+        cache_key = f"offender-risk:{district or 'all'}:{min_risk_score or 'all'}:{is_absconding or 'all'}:{page}:{page_size}"
+        
+        # Try to get from cache first
+        cached_data = cache.get(cache_key)
+        if cached_data:
+            import json
+            return OffenderRiskResponse(**json.loads(cached_data))
+        
+        # Build ZCQL query to fetch risk_scores data
+        query = """
+            SELECT
+                ROWID,
+                accused_name,
+                risk_score,
+                mo_tag,
+                district_ids,
+                is_absconding,
+                fir_count
+            FROM risk_scores
+            WHERE 1=1
+        """
+        
+        # Add optional filters
+        if district:
+            # district_ids is stored as JSON array, need to check if district is in the array
+            query += f" AND district_ids LIKE '%{district}%'"
+        if min_risk_score is not None:
+            query += f" AND risk_score >= {min_risk_score}"
+        if is_absconding is not None:
+            is_absconding_val = "TRUE" if is_absconding else "FALSE"
+            query += f" AND is_absconding = {is_absconding_val}"
+        
+        # Add sorting (default: risk_score DESC)
+        query += " ORDER BY risk_score DESC"
+        
+        # Add pagination
+        offset = (page - 1) * page_size
+        query += f" LIMIT {page_size} OFFSET {offset}"
+        
+        # Execute query
+        result = zcql.execute_query(query)
+        rows = result if isinstance(result, list) else []
+        
+        # Convert to response format
+        offenders = []
+        for row in rows:
+            # Parse district_ids from JSON if it's a string
+            district_ids = row.get("district_ids", "[]")
+            if isinstance(district_ids, str):
+                try:
+                    import json
+                    district_ids = json.loads(district_ids)
+                except:
+                    district_ids = []
+            
+            offenders.append(OffenderRisk(
+                accused_id=row.get("ROWID"),
+                accused_name=row.get("accused_name", "Unknown"),
+                risk_score=row.get("risk_score", 0.0),
+                mo_tag=row.get("mo_tag"),
+                district_ids=district_ids if isinstance(district_ids, list) else [],
+                is_absconding=row.get("is_absconding", False),
+                fir_count=row.get("fir_count", 0),
+            ))
+        
+        # Get total count for pagination (without LIMIT/OFFSET)
+        count_query = """
+            SELECT COUNT(*) as total
+            FROM risk_scores
+            WHERE 1=1
+        """
+        
+        if district:
+            count_query += f" AND district_ids LIKE '%{district}%'"
+        if min_risk_score is not None:
+            count_query += f" AND risk_score >= {min_risk_score}"
+        if is_absconding is not None:
+            is_absconding_val = "TRUE" if is_absconding else "FALSE"
+            count_query += f" AND is_absconding = {is_absconding_val}"
+        
+        count_result = zcql.execute_query(count_query)
+        total_count = count_result[0].get("total", 0) if count_result else 0
+        
+        response = OffenderRiskResponse(
+            offenders=offenders,
+            total_count=total_count,
+            page=page,
+            page_size=page_size,
+            filters=OffenderRiskFilters(
+                district=district,
+                min_risk_score=min_risk_score,
+                is_absconding=is_absconding,
+            ),
+            generated_at=datetime.utcnow(),
+        )
+        
+        # Cache the response for 10 minutes (600 seconds)
+        import json
+        cache.set(cache_key, json.dumps(response.model_dump()), 600)
+        
+        return response
     except Exception as exc:
         print(f"[Warning] Failed to get offender risk: {exc}")
         return _empty_offender_risk_response()
