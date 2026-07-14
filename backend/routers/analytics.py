@@ -257,6 +257,7 @@ async def get_trends(
     crime_type: Optional[str] = None,
     district: Optional[str] = None,
     zcql=Depends(get_zcql),
+    cache=Depends(get_cache),
     user=Depends(require_role(["investigator", "analyst", "supervisor"])),
 ):
     """
@@ -264,11 +265,90 @@ async def get_trends(
     
     Returns historical data and forecasted values for the next 30 days.
     Forecasted data is visually distinct from historical data.
+    Results are cached for 5 minutes based on filter combination.
     """
     try:
-        # TODO: Implement trend aggregation logic in Step 4
-        # TODO: Integrate forecast data in Step 6
-        return _empty_trend_response()
+        from analytics.trends import TrendAggregator
+        from schemas.analytics import TrendFilters
+        
+        # Validate granularity
+        if granularity not in ["month", "week"]:
+            granularity = "month"
+        
+        # Build cache key from filter combination
+        cache_key = f"trends:{granularity}:{crime_type or 'all'}:{district or 'all'}"
+        
+        # Try to get from cache first
+        cached_data = cache.get(cache_key)
+        if cached_data:
+            import json
+            return TrendDataResponse(**json.loads(cached_data))
+        
+        # Build ZCQL query to fetch incident data
+        query = """
+            SELECT
+                CaseMaster.IncidentFromDate as date,
+                CrimeSubHead.CrimeHeadName as crime_type,
+                District.DistrictName as district
+            FROM CaseMaster
+            LEFT JOIN CrimeSubHead ON CaseMaster.CrimeMinorHeadID = CrimeSubHead.ROWID
+            LEFT JOIN Unit ON CaseMaster.PoliceStationID = Unit.ROWID
+            LEFT JOIN District ON Unit.DistrictID = District.ROWID
+            WHERE CaseMaster.IncidentFromDate IS NOT NULL
+        """
+        
+        # Add optional filters
+        if crime_type:
+            query += f" AND CrimeSubHead.CrimeHeadName = '{crime_type}'"
+        if district:
+            query += f" AND District.DistrictName = '{district}'"
+        
+        query += " LIMIT 300"
+        
+        # Execute query
+        result = zcql.execute_query(query)
+        rows = result if isinstance(result, list) else []
+        
+        # Convert to incident data format
+        incident_data = []
+        for row in rows:
+            incident_data.append({
+                "date": row.get("date"),
+                "crime_type": row.get("crime_type"),
+                "district": row.get("district"),
+            })
+        
+        # Perform trend aggregation
+        aggregator = TrendAggregator()
+        aggregated_data = aggregator.aggregate_trends(incident_data, granularity)
+        
+        # Convert to response format (without forecast for now - Step 6)
+        from schemas.analytics import TrendPoint
+        trend_points = [
+            TrendPoint(
+                date=d["date"],
+                count=d["count"],
+                is_forecast=False,
+            )
+            for d in aggregated_data
+        ]
+        
+        response = TrendDataResponse(
+            data=trend_points,
+            filters=TrendFilters(
+                granularity=granularity,
+                crime_type=crime_type,
+                district=district,
+            ),
+            total_count=len(trend_points),
+            generated_at=datetime.utcnow(),
+        )
+        
+        # Cache the response for 5 minutes (300 seconds)
+        import json
+        cache.set(cache_key, json.dumps(response.model_dump()), 300)
+        
+        return response
     except Exception as exc:
         print(f"[Warning] Failed to get trends: {exc}")
         return _empty_trend_response()
@@ -277,19 +357,77 @@ async def get_trends(
 @router.get("/festival-calendar", response_model=FestivalCalendarResponse)
 async def get_festival_calendar(
     zcql=Depends(get_zcql),
+    cache=Depends(get_cache),
     user=Depends(require_role(["investigator", "analyst", "supervisor"])),
 ):
     """
     Get seasonal event comparisons for Karnataka festivals.
     
     Returns crime rate in ±7-day window around festivals vs yearly baseline.
+    Results are cached for 1 hour since festival dates are static.
     """
     try:
-        # TODO: Implement festival calendar logic in Step 4
-        return FestivalCalendarResponse(
-            comparisons=[],
+        from analytics.trends import TrendAggregator, FESTIVAL_CALENDAR
+        from schemas.analytics import SeasonalComparison
+        
+        # Build cache key
+        cache_key = "festival-calendar:seasonal-comparisons"
+        
+        # Try to get from cache first
+        cached_data = cache.get(cache_key)
+        if cached_data:
+            import json
+            return FestivalCalendarResponse(**json.loads(cached_data))
+        
+        # Fetch incident data for the current year
+        query = """
+            SELECT
+                CaseMaster.IncidentFromDate as date
+            FROM CaseMaster
+            WHERE CaseMaster.IncidentFromDate IS NOT NULL
+            LIMIT 300
+        """
+        
+        # Execute query
+        result = zcql.execute_query(query)
+        rows = result if isinstance(result, list) else []
+        
+        # Convert to incident data format
+        incident_data = [{"date": row.get("date")} for row in rows]
+        
+        # Compute seasonal comparisons for each festival
+        aggregator = TrendAggregator()
+        comparisons = []
+        
+        for festival_name, festival_info in FESTIVAL_CALENDAR.items():
+            comparison = aggregator.compute_seasonal_comparison(incident_data, festival_name)
+            
+            # Calculate window dates
+            from datetime import datetime, timedelta
+            festival_date = datetime.strptime(festival_info["date"], "%Y-%m-%d")
+            window_start = festival_date - timedelta(days=7)
+            window_end = festival_date + timedelta(days=7)
+            
+            comparisons.append(SeasonalComparison(
+                event_name=festival_name,
+                event_date=festival_info["date"],
+                window_start=window_start.strftime("%Y-%m-%d"),
+                window_end=window_end.strftime("%Y-%m-%d"),
+                event_window_count=comparison["event_window_count"],
+                baseline_window_count=comparison["baseline_window_count"],
+                percentage_change=comparison["percentage_change"],
+            ))
+        
+        response = FestivalCalendarResponse(
+            comparisons=comparisons,
             generated_at=datetime.utcnow(),
         )
+        
+        # Cache the response for 1 hour (3600 seconds) since festival dates are static
+        import json
+        cache.set(cache_key, json.dumps(response.model_dump()), 3600)
+        
+        return response
     except Exception as exc:
         print(f"[Warning] Failed to get festival calendar: {exc}")
         return FestivalCalendarResponse(
