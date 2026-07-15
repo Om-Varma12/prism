@@ -602,7 +602,7 @@ async def get_festival_calendar(
             LEFT JOIN Unit ON CaseMaster.PoliceStationID = Unit.ROWID
             LEFT JOIN District ON Unit.DistrictID = District.ROWID
             WHERE {' AND '.join(where_conditions)}
-            LIMIT 5000
+            LIMIT 300
         """
         
         # Execute query
@@ -613,15 +613,25 @@ async def get_festival_calendar(
         # Convert to incident data format
         incident_data = []
         for row in rows:
-            date = row.get("date")
+            # Handle nested ZCQL response structure
+            case_master = row.get("CaseMaster", {})
+            crime_sub_head = row.get("CrimeSubHead", {})
+            district_data = row.get("District", {})
+            
+            date = case_master.get("IncidentFromDate")
             if not date:
                 continue
+            
             incident_data.append({
                 "date": date,
-                "crime_type": row.get("crime_type"),
-                "district": row.get("district")
+                "crime_type": crime_sub_head.get("CrimeHeadName"),
+                "district": district_data.get("DistrictName"),
             })
         print(f"[DEBUG] Processed {len(incident_data)} incident records")
+        
+        # Show sample incident data for debugging
+        if incident_data:
+            print(f"[DEBUG] Sample incident data: {incident_data[0]}")
         
         # Get dynamic festival calendar for current year
         festival_calendar = get_current_festival_calendar()
