@@ -101,7 +101,13 @@ class TrendAggregator:
             
             # Parse date and format based on granularity
             try:
-                date_obj = datetime.strptime(date_str, "%Y-%m-%d")
+                # Try parsing with time component first
+                try:
+                    date_obj = datetime.strptime(date_str, "%Y-%m-%d %H:%M:%S")
+                except ValueError:
+                    # Fall back to date-only format
+                    date_obj = datetime.strptime(date_str, "%Y-%m-%d")
+                
                 if granularity == "month":
                     period_key = date_obj.strftime("%Y-%m")
                 else:  # week
@@ -109,7 +115,8 @@ class TrendAggregator:
                     period_key = f"{date_obj.year}-W{date_obj.isocalendar()[1]:02d}"
                 
                 grouped[period_key][crime_type] += 1
-            except ValueError:
+            except ValueError as e:
+                print(f"[DEBUG] Date parsing failed for '{date_str}': {e}")
                 continue
 
         # Convert to list of data points

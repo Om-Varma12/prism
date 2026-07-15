@@ -410,19 +410,30 @@ async def get_trends(
         # Execute query
         result = zcql.execute_query(query)
         rows = result if isinstance(result, list) else []
+        print(f"[DEBUG] Trends query returned {len(rows)} rows")
+        
+        # Show sample row for debugging
+        if rows:
+            print(f"[DEBUG] Sample row: {rows[0]}")
         
         # Convert to incident data format
         incident_data = []
         for row in rows:
+            case_master = row.get("CaseMaster", {})
+            crime_sub_head = row.get("CrimeSubHead", {})
+            district_data = row.get("District", {})
+
             incident_data.append({
-                "date": row.get("date"),
-                "crime_type": row.get("crime_type"),
-                "district": row.get("district"),
+                "date": case_master.get("IncidentFromDate"),
+                "crime_type": crime_sub_head.get("CrimeHeadName"),
+                "district": district_data.get("DistrictName"),
             })
+        print(f"[DEBUG] Incident data: {len(incident_data)} records")
         
         # Perform trend aggregation
         aggregator = TrendAggregator()
         aggregated_data = aggregator.aggregate_trends(incident_data, granularity)
+        print(f"[DEBUG] Aggregated data: {len(aggregated_data)} points")
         
         # Convert historical data to response format
         from schemas.analytics import TrendPoint
@@ -435,30 +446,45 @@ async def get_trends(
             for d in aggregated_data
         ]
         
-        # Fetch forecast data from crime_forecasts table
-        forecast_query = """
-            SELECT
-                crime_category,
-                forecast_date,
-                predicted_value,
-                lower_bound,
-                upper_bound
-            FROM crime_forecasts
-            ORDER BY forecast_date ASC
-            LIMIT 150
-        """
-        
-        forecast_result = zcql.execute_query(forecast_query)
-        forecast_rows = forecast_result if isinstance(forecast_result, list) else []
+        # Fetch forecast data from crime_forecasts table (optional - may not exist)
+        forecast_rows = []
+        try:
+            forecast_query = """
+                SELECT
+                    crime_category,
+                    forecast_date,
+                    predicted_value,
+                    lower_bound,
+                    upper_bound
+                FROM crime_forecasts
+                ORDER BY forecast_date ASC
+                LIMIT 150
+            """
+            
+            forecast_result = zcql.execute_query(forecast_query)
+            forecast_rows = forecast_result if isinstance(forecast_result, list) else []
+            print(f"[DEBUG] Forecast query returned {len(forecast_rows)} rows")
+        except Exception as e:
+            print(f"[DEBUG] Forecast query failed: {e}")
+            forecast_rows = []
         
         # Convert forecast data to response format
         for row in forecast_rows:
+            # Handle both flat and nested ZCQL response structures
+            crime_category = row.get("crime_category")
+            if not crime_category:
+                # Try nested structure
+                crime_category = row.get("crime_forecasts", {}).get("crime_category")
+            
             # Only include forecasts that match the crime_type filter (if specified)
-            if crime_type and row.get("crime_category") != crime_type:
+            if crime_type and crime_category != crime_type:
                 continue
             
             # Format date based on granularity
             forecast_date = row.get("forecast_date")
+            if not forecast_date:
+                forecast_date = row.get("crime_forecasts", {}).get("forecast_date")
+            
             if forecast_date:
                 try:
                     from datetime import datetime
@@ -468,18 +494,35 @@ async def get_trends(
                     else:  # week
                         period_key = f"{date_obj.year}-W{date_obj.isocalendar()[1]:02d}"
                     
+                    predicted_value = row.get("predicted_value")
+                    if predicted_value is None:
+                        predicted_value = row.get("crime_forecasts", {}).get("predicted_value", 0)
+                    
+                    lower_bound = row.get("lower_bound")
+                    if lower_bound is None:
+                        lower_bound = row.get("crime_forecasts", {}).get("lower_bound")
+                    
+                    upper_bound = row.get("upper_bound")
+                    if upper_bound is None:
+                        upper_bound = row.get("crime_forecasts", {}).get("upper_bound")
+                    
                     trend_points.append(TrendPoint(
                         date=period_key,
-                        count=row.get("predicted_value", 0),
+                        count=predicted_value or 0,
                         is_forecast=True,
-                        lower_bound=row.get("lower_bound"),
-                        upper_bound=row.get("upper_bound"),
+                        lower_bound=lower_bound,
+                        upper_bound=upper_bound,
                     ))
-                except ValueError:
+                except ValueError as e:
+                    print(f"[DEBUG] Failed to parse forecast date '{forecast_date}': {e}")
                     continue
         
         # Sort all points by date
         trend_points.sort(key=lambda x: x.date)
+        
+        print(f"[DEBUG] Total trend points (historical + forecast): {len(trend_points)}")
+        print(f"[DEBUG] Historical points: {len([p for p in trend_points if not p.is_forecast])}")
+        print(f"[DEBUG] Forecast points: {len([p for p in trend_points if p.is_forecast])}")
         
         response = TrendDataResponse(
             data=trend_points,
@@ -812,3 +855,75 @@ async def get_socioeconomic(
             districts=[],
             generated_at=datetime.utcnow(),
         )
+
+
+@router.get("/test/insert-forecasts")
+async def insert_test_forecasts(
+    zcql=Depends(get_zcql),
+):
+    """
+    Test route to insert sample forecast data into crime_forecasts table.
+    This is for development/testing purposes only.
+    """
+    try:
+        # Generate sample forecast data for next 30 days
+        crime_categories = ["Murder", "Theft", "Robbery", "Assault", "Vehicle Theft"]
+        base_date = datetime.now()
+        
+        inserted_count = 0
+        
+        for category in crime_categories:
+            for day_offset in range(30):  # 30 days forecast
+                forecast_date = base_date + timedelta(days=day_offset)
+                
+                # Generate realistic forecast values
+                base_value = {
+                    "Murder": 2,
+                    "Theft": 15,
+                    "Robbery": 8,
+                    "Assault": 12,
+                    "Vehicle Theft": 6
+                }[category]
+                
+                # Add some variation
+                predicted_value = base_value + (day_offset % 5) - 2
+                lower_bound = max(0, predicted_value - 3)
+                upper_bound = predicted_value + 3
+                
+                # ZCQL INSERT statement
+                insert_query = f"""
+                    INSERT INTO crime_forecasts (
+                        crime_category, 
+                        forecast_date, 
+                        predicted_value, 
+                        lower_bound, 
+                        upper_bound, 
+                        generated_at, 
+                        forecast_days
+                    ) VALUES (
+                        '{category}',
+                        '{forecast_date.strftime('%Y-%m-%d')}',
+                        {predicted_value},
+                        {lower_bound},
+                        {upper_bound},
+                        '{datetime.now().strftime('%Y-%m-%d %H:%M:%S')}',
+                        30
+                    )
+                """
+                
+                zcql.execute_query(insert_query)
+                inserted_count += 1
+        
+        return {
+            "success": True,
+            "message": f"Successfully inserted {inserted_count} forecast records",
+            "categories": crime_categories,
+            "days_forecasted": 30,
+            "total_records": inserted_count
+        }
+        
+    except Exception as e:
+        return {
+            "success": False,
+            "message": f"Failed to insert forecasts: {str(e)}"
+        }

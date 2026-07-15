@@ -7,6 +7,7 @@ import React, { useState, useCallback } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { analyticsService } from '../../services/analytics.service';
 import { TrendDataResponse, TrendFilters, TrendGranularity, FestivalCalendarResponse, TrendPoint, SeasonalComparison } from '../../types/analytics';
+import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 
 export default function TrendAnalysis() {
   // Trend filters
@@ -121,21 +122,46 @@ export default function TrendAnalysis() {
             <span className="text-primary font-body-sm text-body-sm">Loading trends...</span>
           </div>
         ) : (
-          <div className="h-64 flex items-center justify-center text-on-surface-variant">
-            <div className="text-center">
-              <p className="font-label-mono text-label-mono mb-2">CHART VISUALIZATION</p>
-              <p className="font-body-sm text-body-sm">Install Recharts: npm install recharts</p>
-              {trendsData && (
-                <p className="mt-2 text-on-surface">
-                  {trendsData.data.length} data points ({filters.granularity} granularity)
-                </p>
-              )}
-              {trendsData && showForecast && (
-                <p className="mt-1 text-primary">
-                  {trendsData.data.filter((d: TrendPoint) => d.is_forecast).length} forecast points
-                </p>
-              )}
-            </div>
+          <div className="h-64">
+            <ResponsiveContainer width="100%" height="100%">
+              <LineChart data={trendsData?.data || []}>
+                <CartesianGrid strokeDasharray="3 3" stroke="#333" />
+                <XAxis 
+                  dataKey="date" 
+                  stroke="#888"
+                  tick={{ fill: '#888', fontSize: 12 }}
+                />
+                <YAxis 
+                  stroke="#888"
+                  tick={{ fill: '#888', fontSize: 12 }}
+                />
+                <Tooltip 
+                  contentStyle={{ backgroundColor: '#1a1a1a', border: '1px solid #333' }}
+                  itemStyle={{ color: '#fff' }}
+                />
+                <Legend />
+                <Line 
+                  type="monotone" 
+                  dataKey="count" 
+                  stroke="#00F0FF" 
+                  strokeWidth={2}
+                  dot={false}
+                  name="Crime Count"
+                />
+                {showForecast && (
+                  <Line 
+                    type="monotone" 
+                    dataKey="count" 
+                    stroke="#ff4d4d" 
+                    strokeWidth={2}
+                    strokeDasharray="5 5"
+                    dot={false}
+                    name="Forecast"
+                    data={trendsData?.data?.filter((d: TrendPoint) => d.is_forecast) || []}
+                  />
+                )}
+              </LineChart>
+            </ResponsiveContainer>
           </div>
         )}
       </div>
