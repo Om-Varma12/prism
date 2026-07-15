@@ -1,0 +1,288 @@
+[debug] [2026-07-15T14:22:27.878Z] : 
+[debug] [2026-07-15T14:22:27.879Z] : ----------------------------------------------------------------------
+[debug] [2026-07-15T14:22:27.879Z] : Command:      C:\Program Files\nodejs\node.exe C:\Users\Acer\AppData\Roaming\npm\node_modules\zcatalyst-cli\lib\bin\catalyst.js serve
+[debug] [2026-07-15T14:22:27.880Z] : CLI Version:  1.26.1
+[debug] [2026-07-15T14:22:27.880Z] : Platform:     win32
+[debug] [2026-07-15T14:22:27.880Z] : Node Version: v22.20.0
+[debug] [2026-07-15T14:22:27.880Z] : Time:         Wed Jul 15 2026 19:52:27 GMT+0530 (India Standard Time)
+[debug] [2026-07-15T14:22:27.880Z] : ----------------------------------------------------------------------
+[debug] [2026-07-15T14:22:27.880Z] : 
+[debug] [2026-07-15T14:22:28.630Z] : > authorizing via signed-in user option
+[debug] [2026-07-15T14:22:28.630Z] : > command requires scopes: ["ZohoCatalyst.projects.ALL","ZohoCatalyst.apigateway.apis.READ","ZohoCatalyst.apigateway.READ","ZohoCatalyst.segments.ALL","ZohoCatalyst.cache.READ","ZohoCatalyst.cache.CREATE","ZohoCatalyst.cache.DELETE","ZohoCatalyst.projects.ALL","ZohoCatalyst.cron.ALL","ZohoCatalyst.zcql.CREATE","ZohoCatalyst.projects.users.READ","ZohoCatalyst.projects.users.CREATE","ZohoCatalyst.projects.users.DELETE","ZohoCatalyst.projects.users.UPDATE","ZohoCatalyst.authentication.CREATE","ZohoCatalyst.email.CREATE","ZohoCatalyst.tables.ALL","ZohoCatalyst.tables.rows.ALL","ZohoCatalyst.tables.columns.ALL","ZohoCatalyst.tables.bulk.CREATE","ZohoCatalyst.tables.bulk.READ","ZohoCatalyst.folders.ALL","ZohoCatalyst.files.CREATE","ZohoCatalyst.files.READ","ZohoCatalyst.files.DELETE","ZohoCatalyst.functions.ALL","ZohoCatalyst.functions.EXECUTE","ZohoCatalyst.eventlistners.ALL","ZohoCatalyst.eventlisteners.produce","ZohoCatalyst.security.rules.Read","ZohoCatalyst.security.rules.Update","ZohoCatalyst.notifications.mobile","ZohoCatalyst.notifications.web","ZohoCatalyst.search.READ","ZohoCatalyst.mlkit.READ","QuickML.deployment.READ","ZohoCatalyst.pdfshot.execute","ZohoCatalyst.grid.READ","ZohoCatalyst.grid.terminate","ZohoCatalyst.circuits.execution.DELETE","ZohoCatalyst.circuits.execution.READ","ZohoCatalyst.circuits.execute","ZohoCatalyst.appsail.Read","ZohoCatalyst.jobpool.READ","ZohoCatalyst.job.ALL","ZohoCatalyst.nosql.READ","ZohoCatalyst.nosql.rows.ALL"]
+[debug] [2026-07-15T14:22:28.642Z] : >>>> HTTP REQUEST : GET https://api.catalyst.zoho.in/baas/v1/project/46143000000022001 
+
+[debug] [2026-07-15T14:22:28.786Z] : <<<< HTTP RESPONSE : 200
+Response Headers: {"server":"ZGS","date":"Wed, 15 Jul 2026 14:22:29 GMT","content-type":"application/vnd.catalyst.v2+json","transfer-encoding":"chunked","connection":"keep-alive","x-content-type-options":"nosniff","cache-control":"private,no-cache,no-store,max-age=0,must-revalidate","pragma":"no-cache","expires":"Thu, 01 Jan 1970 00:00:00 GMT","x-frame-options":"DENY","strict-transport-security":"max-age=64072000; includeSubDomains; preload"}
+
+[debug] [2026-07-15T14:22:28.788Z] : >>>> HTTP REQUEST : GET https://api.catalyst.zoho.in/baas/v1/project/46143000000022001/environment 
+
+[debug] [2026-07-15T14:22:28.844Z] : <<<< HTTP RESPONSE : 200
+Response Headers: {"server":"ZGS","date":"Wed, 15 Jul 2026 14:22:29 GMT","content-type":"application/vnd.catalyst.v2+json","transfer-encoding":"chunked","connection":"keep-alive","x-content-type-options":"nosniff","cache-control":"private,no-cache,no-store,max-age=0,must-revalidate","pragma":"no-cache","expires":"Thu, 01 Jan 1970 00:00:00 GMT","x-frame-options":"DENY","strict-transport-security":"max-age=64072000; includeSubDomains; preload"}
+
+[debug] [2026-07-15T14:22:29.422Z] : http port : '3000' is not available. Hence port '3001' will be used instead.
+[debug] [2026-07-15T14:22:29.549Z] : No basic functions to add
+[info] [2026-07-15T14:22:31.486Z] : [react-plugin]: Starting the development server...
+
+[info] [2026-07-15T14:22:31.487Z] : 
+[info] [2026-07-15T14:22:31.487Z] : i Client[frontend]: Plugin : "zcatalyst-cli-plugin-react" is used for client serve
+[info] [2026-07-15T14:22:31.487Z] : 
+[debug] [2026-07-15T14:22:32.365Z] : No API Gateway configuration found. Skipping API Gateway rules
+[debug] [2026-07-15T14:22:32.444Z] : No API Gateway configuration found. Skipping API Gateway rules
+[info] [2026-07-15T14:22:32.553Z] : 
+[info] [2026-07-15T14:22:32.553Z] :  >>>>>>>>>>>>>> AppSail <<<<<<<<<<<<<< 
+[info] [2026-07-15T14:22:32.554Z] : i backend: http://localhost:3001
+[info] [2026-07-15T14:22:32.554Z] : 
+[info] [2026-07-15T14:22:32.554Z] : 
+[info] [2026-07-15T14:22:32.554Z] :  >>>>>>>>>>>>> Web Client <<<<<<<<<<<<
+[info] [2026-07-15T14:22:32.554Z] : i client[frontend]: http://localhost:3000/app/
+[info] [2026-07-15T14:22:32.554Z] : 
+[info] [2026-07-15T14:22:33.649Z] : [1784125353649]  "GET"  "/app/"
+[info] [2026-07-15T14:22:34.650Z] : [react-plugin]: Compiled successfully!
+[info] [2026-07-15T14:22:34.650Z] : [react-plugin]: 
+[info] [2026-07-15T14:22:34.650Z] : [react-plugin]: You can now view fron in the browser.
+[info] [2026-07-15T14:22:34.650Z] : [react-plugin]: 
+[info] [2026-07-15T14:22:34.651Z] : [react-plugin]:   http://localhost:3000/app/
+[info] [2026-07-15T14:22:34.651Z] : [react-plugin]: 
+[info] [2026-07-15T14:22:34.651Z] : [react-plugin]: Note that the development build is not optimized.
+[info] [2026-07-15T14:22:34.651Z] : [react-plugin]: To create a production build, use npm run build.
+[info] [2026-07-15T14:22:34.651Z] : [react-plugin]: 
+[info] [2026-07-15T14:22:34.890Z] : [1784125354890]  "GET"  "/app/main.67921616b80c41fcd2fa.hot-update.json"
+[info] [2026-07-15T14:22:35.025Z] : [1784125355025]  "GET"  "/app/static/js/bundle.js"
+[info] [2026-07-15T14:22:35.040Z] : [1784125355040]  Appsail[backend]  "GET"  "/app/main.67921616b80c41fcd2fa.hot-update.json"
+[info] [2026-07-15T14:22:35.388Z] : [1784125355388]  "GET"  "/app/"
+[info] [2026-07-15T14:22:35.478Z] : [1784125355478]  "GET"  "/app/manifest.json"
+[info] [2026-07-15T14:22:35.975Z] : [1784125355975]  "GET"  "/app/manifest.json"
+[info] [2026-07-15T14:22:35.976Z] : [1784125355976]  "GET"  "/app/static/js/bundle.js"
+[info] [2026-07-15T14:22:35.992Z] : [1784125355992]  "GET"  "/app/map.svg"
+[info] [2026-07-15T14:22:36.231Z] : [1784125356231]  "GET"  "/app/favicon.ico"
+[info] [2026-07-15T14:22:36.278Z] : [1784125356278]  Appsail[backend]  "GET"  "/api/dashboard/stats"
+[info] [2026-07-15T14:22:36.282Z] : [1784125356282]  Appsail[backend]  "GET"  "/api/dashboard/district-crimes?timeframe=30d"
+[info] [2026-07-15T14:22:36.284Z] : [1784125356284]  Appsail[backend]  "GET"  "/api/dashboard/trends"
+[info] [2026-07-15T14:22:36.388Z] : [1784125356388]  "GET"  "/app/logo192.png"
+[info] [2026-07-15T14:22:36.389Z] : [1784125356389]  "GET"  "/app/map.svg"
+[info] [2026-07-15T14:22:36.667Z] : [1784125356666]  "GET"  "/app/favicon.ico"
+[info] [2026-07-15T14:22:36.712Z] : [1784125356712]  Appsail[backend]  "GET"  "/api/dashboard/stats"
+[info] [2026-07-15T14:22:36.760Z] : [1784125356759]  "GET"  "/app/logo192.png"
+[info] [2026-07-15T14:22:37.812Z] : [1784125357812]  Appsail[backend]  "GET"  "/api/analytics/hotspots?"
+[info] [2026-07-15T14:22:37.814Z] : [1784125357814]  Appsail[backend]  "GET"  "/api/analytics/emerging-clusters"
+[info] [2026-07-15T14:22:59.591Z] : [1784125379590]  Appsail[backend]  "GET"  "/api/analytics/trends?granularity=month"
+[info] [2026-07-15T14:22:59.594Z] : [1784125379594]  Appsail[backend]  "GET"  "/api/analytics/festival-calendar"
+[info] [2026-07-15T14:24:03.990Z] : [1784125443989]  Appsail[backend]  "GET"  "/api/analytics/trends?granularity=week"
+[info] [2026-07-15T14:29:28.355Z] : [react-plugin]: Compiling...
+[info] [2026-07-15T14:29:30.362Z] : [react-plugin]: Compiled with warnings.
+
+[info] [2026-07-15T14:29:30.362Z] : [react-plugin]: [eslint] 
+src\pages\Analytics\TrendAnalysis.tsx
+  Line 9:10:   'TrendDataResponse' is defined but never used         @typescript-eslint/no-unused-vars
+  Line 9:61:   'FestivalCalendarResponse' is defined but never used  @typescript-eslint/no-unused-vars
+  Line 11:10:  'Dot' is defined but never used                       @typescript-eslint/no-unused-vars
+[info] [2026-07-15T14:29:30.362Z] : [react-plugin]: 
+Search for the keywords to learn more about each warning.
+[info] [2026-07-15T14:29:30.362Z] : [react-plugin]: To ignore, add // eslint-disable-next-line to the line before.
+
+[info] [2026-07-15T14:29:30.684Z] : [1784125770683]  "GET"  "/app/main.b0d1a3d5a9df23636f20.hot-update.json"
+[info] [2026-07-15T14:29:30.952Z] : [1784125770952]  "GET"  "/app/main.b0d1a3d5a9df23636f20.hot-update.js"
+[info] [2026-07-15T14:29:32.290Z] : [1784125772289]  Appsail[backend]  "GET"  "/api/analytics/trends?granularity=month"
+[info] [2026-07-15T14:29:32.291Z] : [1784125772291]  Appsail[backend]  "GET"  "/api/analytics/festival-calendar"
+[info] [2026-07-15T14:29:51.676Z] : [react-plugin]: Compiling...
+[info] [2026-07-15T14:29:52.331Z] : [react-plugin]: Compiled with warnings.
+
+[info] [2026-07-15T14:29:52.331Z] : [react-plugin]: [eslint] 
+src\pages\Analytics\TrendAnalysis.tsx
+  Line 9:10:   'TrendDataResponse' is defined but never used         @typescript-eslint/no-unused-vars
+  Line 9:61:   'FestivalCalendarResponse' is defined but never used  @typescript-eslint/no-unused-vars
+  Line 11:10:  'Dot' is defined but never used                       @typescript-eslint/no-unused-vars
+[info] [2026-07-15T14:29:52.331Z] : [react-plugin]: 
+Search for the keywords to learn more about each warning.
+[info] [2026-07-15T14:29:52.331Z] : [react-plugin]: To ignore, add // eslint-disable-next-line to the line before.
+
+[info] [2026-07-15T14:29:52.364Z] : [1784125792364]  "GET"  "/app/main.ac66ed9e7816e5fb0d5c.hot-update.json"
+[info] [2026-07-15T14:29:52.688Z] : [1784125792688]  "GET"  "/app/main.ac66ed9e7816e5fb0d5c.hot-update.js"
+[info] [2026-07-15T14:30:10.475Z] : [react-plugin]: Compiling...
+[info] [2026-07-15T14:30:11.090Z] : [react-plugin]: Compiled with warnings.
+
+[info] [2026-07-15T14:30:11.090Z] : [react-plugin]: [eslint] 
+src\pages\Analytics\TrendAnalysis.tsx
+  Line 9:10:  'TrendDataResponse' is defined but never used         @typescript-eslint/no-unused-vars
+  Line 9:61:  'FestivalCalendarResponse' is defined but never used  @typescript-eslint/no-unused-vars
+[info] [2026-07-15T14:30:11.090Z] : [react-plugin]: 
+Search for the keywords to learn more about each warning.
+[info] [2026-07-15T14:30:11.090Z] : [react-plugin]: To ignore, add // eslint-disable-next-line to the line before.
+
+[info] [2026-07-15T14:30:11.116Z] : [1784125811115]  "GET"  "/app/main.0e76ffc821139099b751.hot-update.json"
+[info] [2026-07-15T14:30:11.428Z] : [1784125811428]  "GET"  "/app/main.0e76ffc821139099b751.hot-update.js"
+[info] [2026-07-15T14:30:40.965Z] : [react-plugin]: Compiling...
+[info] [2026-07-15T14:30:41.614Z] : [react-plugin]: Compiled with warnings.
+
+[info] [2026-07-15T14:30:41.614Z] : [react-plugin]: [eslint] 
+src\pages\Analytics\TrendAnalysis.tsx
+  Line 9:10:  'TrendDataResponse' is defined but never used         @typescript-eslint/no-unused-vars
+  Line 9:61:  'FestivalCalendarResponse' is defined but never used  @typescript-eslint/no-unused-vars
+[info] [2026-07-15T14:30:41.614Z] : [react-plugin]: 
+Search for the keywords to learn more about each warning.
+[info] [2026-07-15T14:30:41.614Z] : [react-plugin]: To ignore, add // eslint-disable-next-line to the line before.
+
+[info] [2026-07-15T14:30:41.642Z] : [1784125841642]  "GET"  "/app/main.65c3efadb8c9a9aa2f16.hot-update.json"
+[info] [2026-07-15T14:30:41.959Z] : [1784125841959]  "GET"  "/app/main.65c3efadb8c9a9aa2f16.hot-update.js"
+[info] [2026-07-15T14:32:11.985Z] : [react-plugin]: Compiling...
+[info] [2026-07-15T14:32:12.664Z] : [react-plugin]: Compiled with warnings.
+
+[info] [2026-07-15T14:32:12.664Z] : [react-plugin]: [eslint] 
+src\pages\Analytics\TrendAnalysis.tsx
+  Line 9:10:  'TrendDataResponse' is defined but never used         @typescript-eslint/no-unused-vars
+  Line 9:61:  'FestivalCalendarResponse' is defined but never used  @typescript-eslint/no-unused-vars
+[info] [2026-07-15T14:32:12.664Z] : [react-plugin]: 
+Search for the keywords to learn more about each warning.
+[info] [2026-07-15T14:32:12.664Z] : [react-plugin]: To ignore, add // eslint-disable-next-line to the line before.
+
+[info] [2026-07-15T14:32:12.976Z] : [1784125932976]  "GET"  "/app/main.d0384269a0f23c9cc836.hot-update.json"
+[info] [2026-07-15T14:32:13.242Z] : [1784125933242]  "GET"  "/app/main.d0384269a0f23c9cc836.hot-update.js"
+[info] [2026-07-15T14:32:35.413Z] : [1784125955412]  Appsail[backend]  "GET"  "/api/analytics/trends?granularity=week"
+[info] [2026-07-15T14:32:43.161Z] : [1784125963160]  Appsail[backend]  "GET"  "/api/analytics/trends?granularity=month&crime_type=M"
+[info] [2026-07-15T14:32:43.669Z] : [1784125963669]  Appsail[backend]  "GET"  "/api/analytics/trends?granularity=month&crime_type=Mu"
+[info] [2026-07-15T14:32:43.747Z] : [1784125963747]  Appsail[backend]  "GET"  "/api/analytics/trends?granularity=month&crime_type=Mur"
+[info] [2026-07-15T14:32:44.048Z] : [1784125964047]  Appsail[backend]  "GET"  "/api/analytics/trends?granularity=month&crime_type=Murd"
+[info] [2026-07-15T14:32:44.314Z] : [1784125964314]  Appsail[backend]  "GET"  "/api/analytics/trends?granularity=month&crime_type=Murde"
+[info] [2026-07-15T14:32:44.409Z] : [1784125964409]  Appsail[backend]  "GET"  "/api/analytics/trends?granularity=month&crime_type=Murder"
+[info] [2026-07-15T14:33:12.010Z] : [1784125992010]  Appsail[backend]  "GET"  "/api/analytics/trends?granularity=month&crime_type=T"
+[info] [2026-07-15T14:33:13.172Z] : [1784125993171]  Appsail[backend]  "GET"  "/api/analytics/trends?granularity=month&crime_type=Th"
+[info] [2026-07-15T14:33:13.640Z] : [1784125993639]  Appsail[backend]  "GET"  "/api/analytics/trends?granularity=month&crime_type=The"
+[info] [2026-07-15T14:33:13.750Z] : [1784125993750]  Appsail[backend]  "GET"  "/api/analytics/trends?granularity=month&crime_type=Thef"
+[info] [2026-07-15T14:33:13.862Z] : [1784125993862]  Appsail[backend]  "GET"  "/api/analytics/trends?granularity=month&crime_type=Theft"
+[info] [2026-07-15T14:33:20.293Z] : [1784126000293]  Appsail[backend]  "GET"  "/api/analytics/trends?granularity=month&crime_type=Theft&district=B"
+[info] [2026-07-15T14:33:20.483Z] : [1784126000483]  Appsail[backend]  "GET"  "/api/analytics/trends?granularity=month&crime_type=Theft&district=Be"
+[info] [2026-07-15T14:33:20.705Z] : [1784126000705]  Appsail[backend]  "GET"  "/api/analytics/trends?granularity=month&crime_type=Theft&district=Bel"
+[info] [2026-07-15T14:33:21.146Z] : [1784126001145]  Appsail[backend]  "GET"  "/api/analytics/trends?granularity=month&crime_type=Theft&district=Bela"
+[info] [2026-07-15T14:33:21.538Z] : [1784126001538]  Appsail[backend]  "GET"  "/api/analytics/trends?granularity=month&crime_type=Theft&district=Belag"
+[info] [2026-07-15T14:33:21.682Z] : [1784126001681]  Appsail[backend]  "GET"  "/api/analytics/trends?granularity=month&crime_type=Theft&district=Belaga"
+[info] [2026-07-15T14:33:21.850Z] : [1784126001850]  Appsail[backend]  "GET"  "/api/analytics/trends?granularity=month&crime_type=Theft&district=Belagab"
+[info] [2026-07-15T14:33:22.119Z] : [1784126002119]  Appsail[backend]  "GET"  "/api/analytics/trends?granularity=month&crime_type=Theft&district=Belagabi"
+[info] [2026-07-15T14:33:23.450Z] : [1784126003450]  Appsail[backend]  "GET"  "/api/analytics/trends?granularity=month&crime_type=Theft&district=Belagav"
+[info] [2026-07-15T14:33:23.545Z] : [1784126003544]  Appsail[backend]  "GET"  "/api/analytics/trends?granularity=month&crime_type=Theft&district=Belagavi"
+[info] [2026-07-15T14:33:44.085Z] : [1784126024084]  Appsail[backend]  "GET"  "/api/analytics/offender-risk?page=1&page_size=20"
+[info] [2026-07-15T14:33:48.037Z] : [1784126028036]  Appsail[backend]  "GET"  "/api/analytics/hotspots?"
+[info] [2026-07-15T14:33:48.341Z] : [1784126028341]  Appsail[backend]  "GET"  "/api/analytics/emerging-clusters"
+[info] [2026-07-15T14:34:07.180Z] : [react-plugin]: Compiling...
+[info] [2026-07-15T14:34:07.398Z] : [react-plugin]: Compiled with warnings.
+
+[info] [2026-07-15T14:34:07.398Z] : [react-plugin]: [eslint] 
+src\pages\Analytics\TrendAnalysis.tsx
+  Line 9:10:  'TrendDataResponse' is defined but never used         @typescript-eslint/no-unused-vars
+  Line 9:61:  'FestivalCalendarResponse' is defined but never used  @typescript-eslint/no-unused-vars
+[info] [2026-07-15T14:34:07.398Z] : [react-plugin]: 
+Search for the keywords to learn more about each warning.
+[info] [2026-07-15T14:34:07.398Z] : [react-plugin]: To ignore, add // eslint-disable-next-line to the line before.
+
+[info] [2026-07-15T14:34:08.954Z] : [react-plugin]: Compiling...
+[info] [2026-07-15T14:34:09.263Z] : [1784126049263]  "GET"  "/app/"
+[info] [2026-07-15T14:34:09.267Z] : [react-plugin]: Compiled with warnings.
+
+[info] [2026-07-15T14:34:09.267Z] : [react-plugin]: [eslint] 
+src\pages\Analytics\TrendAnalysis.tsx
+  Line 9:10:  'TrendDataResponse' is defined but never used         @typescript-eslint/no-unused-vars
+  Line 9:61:  'FestivalCalendarResponse' is defined but never used  @typescript-eslint/no-unused-vars
+[info] [2026-07-15T14:34:09.267Z] : [react-plugin]: 
+Search for the keywords to learn more about each warning.
+[info] [2026-07-15T14:34:09.268Z] : [react-plugin]: To ignore, add // eslint-disable-next-line to the line before.
+
+[info] [2026-07-15T14:34:09.328Z] : [1784126049328]  "GET"  "/app/static/js/bundle.js"
+[info] [2026-07-15T14:34:09.841Z] : [1784126049840]  "GET"  "/app/map.svg"
+[info] [2026-07-15T14:34:10.142Z] : [1784126050142]  "GET"  "/app/manifest.json"
+[info] [2026-07-15T14:34:10.189Z] : [1784126050189]  Appsail[backend]  "GET"  "/api/dashboard/stats"
+[info] [2026-07-15T14:34:10.190Z] : [1784126050190]  Appsail[backend]  "GET"  "/api/dashboard/district-crimes?timeframe=30d"
+[info] [2026-07-15T14:34:10.191Z] : [1784126050191]  Appsail[backend]  "GET"  "/api/dashboard/trends"
+[info] [2026-07-15T14:34:10.235Z] : [1784126050235]  "GET"  "/app/favicon.ico"
+[info] [2026-07-15T14:34:10.453Z] : [1784126050453]  "GET"  "/app/logo192.png"
+[info] [2026-07-15T14:34:12.919Z] : [react-plugin]: Compiling...
+[info] [2026-07-15T14:34:13.062Z] : [react-plugin]: Compiled with warnings.
+
+[info] [2026-07-15T14:34:13.062Z] : [react-plugin]: [eslint] 
+src\pages\Analytics\TrendAnalysis.tsx
+  Line 9:10:  'TrendDataResponse' is defined but never used         @typescript-eslint/no-unused-vars
+  Line 9:61:  'FestivalCalendarResponse' is defined but never used  @typescript-eslint/no-unused-vars
+[info] [2026-07-15T14:34:13.063Z] : [react-plugin]: 
+Search for the keywords to learn more about each warning.
+[info] [2026-07-15T14:34:13.063Z] : [react-plugin]: To ignore, add // eslint-disable-next-line to the line before.
+
+[info] [2026-07-15T14:34:21.759Z] : [react-plugin]: Compiling...
+[info] [2026-07-15T14:34:21.969Z] : [react-plugin]: Compiled with warnings.
+
+[info] [2026-07-15T14:34:21.969Z] : [react-plugin]: [eslint] 
+src\pages\Analytics\TrendAnalysis.tsx
+  Line 9:10:  'TrendDataResponse' is defined but never used         @typescript-eslint/no-unused-vars
+  Line 9:61:  'FestivalCalendarResponse' is defined but never used  @typescript-eslint/no-unused-vars
+[info] [2026-07-15T14:34:21.969Z] : [react-plugin]: 
+Search for the keywords to learn more about each warning.
+[info] [2026-07-15T14:34:21.969Z] : [react-plugin]: To ignore, add // eslint-disable-next-line to the line before.
+
+[info] [2026-07-15T14:34:22.074Z] : [react-plugin]: Files successfully emitted, waiting for typecheck results...
+[info] [2026-07-15T14:34:23.253Z] : [1784126063253]  Appsail[backend]  "GET"  "/api/analytics/hotspots?"
+[info] [2026-07-15T14:34:23.561Z] : [1784126063560]  Appsail[backend]  "GET"  "/api/analytics/emerging-clusters"
+[info] [2026-07-15T14:34:24.696Z] : [react-plugin]: Compiling...
+[info] [2026-07-15T14:34:24.863Z] : [react-plugin]: Compiled with warnings.
+
+[info] [2026-07-15T14:34:24.863Z] : [react-plugin]: [eslint] 
+src\pages\Analytics\TrendAnalysis.tsx
+  Line 9:10:  'TrendDataResponse' is defined but never used         @typescript-eslint/no-unused-vars
+  Line 9:61:  'FestivalCalendarResponse' is defined but never used  @typescript-eslint/no-unused-vars
+[info] [2026-07-15T14:34:24.863Z] : [react-plugin]: 
+Search for the keywords to learn more about each warning.
+[info] [2026-07-15T14:34:24.864Z] : [react-plugin]: To ignore, add // eslint-disable-next-line to the line before.
+
+[info] [2026-07-15T14:34:30.721Z] : [react-plugin]: Compiling...
+[info] [2026-07-15T14:34:31.277Z] : [react-plugin]: Compiled with warnings.
+
+[info] [2026-07-15T14:34:31.277Z] : [react-plugin]: [eslint] 
+src\pages\Analytics\TrendAnalysis.tsx
+  Line 9:10:  'TrendDataResponse' is defined but never used         @typescript-eslint/no-unused-vars
+  Line 9:61:  'FestivalCalendarResponse' is defined but never used  @typescript-eslint/no-unused-vars
+[info] [2026-07-15T14:34:31.277Z] : [react-plugin]: 
+Search for the keywords to learn more about each warning.
+[info] [2026-07-15T14:34:31.278Z] : [react-plugin]: To ignore, add // eslint-disable-next-line to the line before.
+
+[info] [2026-07-15T14:34:31.312Z] : [1784126071312]  "GET"  "/app/main.0bb4ff5a456f9482735c.hot-update.json"
+[info] [2026-07-15T14:34:31.629Z] : [1784126071629]  "GET"  "/app/main.0bb4ff5a456f9482735c.hot-update.js"
+[info] [2026-07-15T14:36:26.591Z] : [1784126186590]  Appsail[backend]  "GET"  "/api/analytics/trends?granularity=month"
+[info] [2026-07-15T14:36:26.594Z] : [1784126186594]  Appsail[backend]  "GET"  "/api/analytics/festival-calendar"
+[info] [2026-07-15T14:42:14.980Z] : [react-plugin]: Compiling...
+[info] [2026-07-15T14:42:15.955Z] : [react-plugin]: Compiled with warnings.
+
+[info] [2026-07-15T14:42:15.956Z] : [react-plugin]: [eslint] 
+src\pages\Analytics\TrendAnalysis.tsx
+  Line 9:10:  'TrendDataResponse' is defined but never used         @typescript-eslint/no-unused-vars
+  Line 9:61:  'FestivalCalendarResponse' is defined but never used  @typescript-eslint/no-unused-vars
+[info] [2026-07-15T14:42:15.956Z] : [react-plugin]: 
+Search for the keywords to learn more about each warning.
+[info] [2026-07-15T14:42:15.956Z] : [react-plugin]: To ignore, add // eslint-disable-next-line to the line before.
+
+[info] [2026-07-15T14:42:16.276Z] : [1784126536275]  "GET"  "/app/main.c8e4a761f982eec64829.hot-update.json"
+[info] [2026-07-15T14:42:16.541Z] : [1784126536540]  "GET"  "/app/main.c8e4a761f982eec64829.hot-update.js"
+[info] [2026-07-15T14:42:17.315Z] : [1784126537314]  Appsail[backend]  "GET"  "/api/analytics/trends?granularity=month"
+[info] [2026-07-15T14:42:17.316Z] : [1784126537316]  Appsail[backend]  "GET"  "/api/analytics/festival-calendar"
+[info] [2026-07-15T14:42:20.170Z] : [react-plugin]: Compiling...
+[info] [2026-07-15T14:42:21.116Z] : [react-plugin]: Compiled with warnings.
+
+[info] [2026-07-15T14:42:21.116Z] : [react-plugin]: [eslint] 
+src\pages\Analytics\TrendAnalysis.tsx
+  Line 9:10:  'TrendDataResponse' is defined but never used         @typescript-eslint/no-unused-vars
+  Line 9:61:  'FestivalCalendarResponse' is defined but never used  @typescript-eslint/no-unused-vars
+[info] [2026-07-15T14:42:21.116Z] : [react-plugin]: 
+Search for the keywords to learn more about each warning.
+[info] [2026-07-15T14:42:21.116Z] : [react-plugin]: To ignore, add // eslint-disable-next-line to the line before.
+
+[info] [2026-07-15T14:42:21.147Z] : [1784126541147]  "GET"  "/app/main.854c5a370f86313a0d7e.hot-update.json"
+[info] [2026-07-15T14:42:21.456Z] : [1784126541456]  "GET"  "/app/main.854c5a370f86313a0d7e.hot-update.js"
+[info] [2026-07-15T14:42:21.989Z] : [1784126541989]  Appsail[backend]  "GET"  "/api/analytics/festival-calendar?"
+[info] [2026-07-15T14:42:32.117Z] : [react-plugin]: Compiling...
+[info] [2026-07-15T14:42:33.239Z] : [react-plugin]: Compiled with warnings.
+
+[info] [2026-07-15T14:42:33.239Z] : [react-plugin]: [eslint] 
+src\pages\Analytics\TrendAnalysis.tsx
+  Line 9:10:  'TrendDataResponse' is defined but never used         @typescript-eslint/no-unused-vars
+  Line 9:61:  'FestivalCalendarResponse' is defined but never used  @typescript-eslint/no-unused-vars
+[info] [2026-07-15T14:42:33.239Z] : [react-plugin]: 
+Search for the keywords to learn more about each warning.
+[info] [2026-07-15T14:42:33.240Z] : [react-plugin]: To ignore, add // eslint-disable-next-line to the line before.
+
+[info] [2026-07-15T14:42:33.267Z] : [1784126553266]  "GET"  "/app/main.dfc114d7378b540b8465.hot-update.json"
+[info] [2026-07-15T14:42:33.582Z] : [1784126553582]  "GET"  "/app/main.dfc114d7378b540b8465.hot-update.js"

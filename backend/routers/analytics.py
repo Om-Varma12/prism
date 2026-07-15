@@ -551,6 +551,8 @@ async def get_trends(
 
 @router.get("/festival-calendar", response_model=FestivalCalendarResponse)
 async def get_festival_calendar(
+    crime_type: Optional[str] = None,
+    district: Optional[str] = None,
     zcql=Depends(get_zcql),
     cache=Depends(get_cache),
     user=Depends(require_role(["investigator", "analyst", "supervisor"])),
@@ -562,44 +564,79 @@ async def get_festival_calendar(
     Results are cached for 1 hour since festival dates are static.
     """
     try:
-        from analytics.trends import TrendAggregator, FESTIVAL_CALENDAR
+        from analytics.trends import TrendAggregator, get_current_festival_calendar
         from schemas.analytics import SeasonalComparison
         
-        # Build cache key
-        cache_key = "festival-calendar:seasonal-comparisons"
+        print(f"[DEBUG] Festival calendar request - crime_type: {crime_type}, district: {district}")
+        
+        # Build cache key with filters
+        cache_key = f"festival-calendar:seasonal-comparisons:{crime_type or 'all'}:{district or 'all'}"
         
         # Try to get from cache first
         try:
             cached_data = cache.get(cache_key)
             if cached_data:
                 import json
+                print(f"[DEBUG] Returning cached festival calendar data")
                 return FestivalCalendarResponse(**json.loads(cached_data))
         except AttributeError:
             # Cache.get() not available, proceed without caching
             pass
         
-        # Fetch incident data for the current year
-        query = """
+        # Build query with optional filters
+        where_conditions = ["CaseMaster.IncidentFromDate IS NOT NULL"]
+        if crime_type:
+            where_conditions.append(f"CrimeSubHead.CrimeHeadName = '{crime_type}'")
+        if district:
+            where_conditions.append(f"District.DistrictName = '{district}'")
+        
+        query = f"""
             SELECT
-                CaseMaster.IncidentFromDate as date
+                CaseMaster.IncidentFromDate as date,
+                CrimeSubHead.CrimeHeadName as crime_type,
+                District.DistrictName as district
             FROM CaseMaster
-            WHERE CaseMaster.IncidentFromDate IS NOT NULL
-            LIMIT 300
+            LEFT JOIN CrimeSubHead ON CaseMaster.CrimeSubHeadID = CrimeSubHead.ROWID
+            LEFT JOIN District ON CaseMaster.DistrictID = District.ROWID
+            WHERE {' AND '.join(where_conditions)}
+            LIMIT 5000
         """
         
         # Execute query
         result = zcql.execute_query(query)
         rows = result if isinstance(result, list) else []
+        print(f"[DEBUG] Festival query returned {len(rows)} rows")
         
         # Convert to incident data format
-        incident_data = [{"date": row.get("date")} for row in rows]
+        incident_data = []
+        for row in rows:
+            date = row.get("date")
+            if not date:
+                continue
+            incident_data.append({
+                "date": date,
+                "crime_type": row.get("crime_type"),
+                "district": row.get("district")
+            })
+        print(f"[DEBUG] Processed {len(incident_data)} incident records")
+        
+        # Get dynamic festival calendar for current year
+        festival_calendar = get_current_festival_calendar()
+        print(f"[DEBUG] Using festival calendar: {list(festival_calendar.keys())}")
         
         # Compute seasonal comparisons for each festival
         aggregator = TrendAggregator()
         comparisons = []
         
-        for festival_name, festival_info in FESTIVAL_CALENDAR.items():
-            comparison = aggregator.compute_seasonal_comparison(incident_data, festival_name)
+        print(f"[DEBUG] Computing comparisons for {len(festival_calendar)} festivals")
+        for festival_name, festival_info in festival_calendar.items():
+            comparison = aggregator.compute_seasonal_comparison(
+                incident_data, 
+                festival_name,
+                festival_calendar
+            )
+            
+            print(f"[DEBUG] {festival_name}: event={comparison['event_window_count']}, baseline={comparison['baseline_window_count']}, change={comparison['percentage_change']}%")
             
             # Calculate window dates
             from datetime import datetime, timedelta
