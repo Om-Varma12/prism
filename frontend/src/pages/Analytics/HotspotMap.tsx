@@ -17,7 +17,7 @@ export default function HotspotMap() {
   // Map refs for manual initialization
   const mapContainerRef = useRef<HTMLDivElement>(null);
   const mapInstanceRef = useRef<L.Map | null>(null);
-  const markersRef = useRef<L.CircleMarker[]>([]);
+  const markersRef = useRef<L.Circle[]>([]);
 
   // Hotspot filters
   const [filters, setFilters] = useState<HotspotFilters>({
@@ -83,6 +83,17 @@ export default function HotspotMap() {
     setSelectedCluster(cluster);
   }, []);
 
+  // Map district names for display correction
+  const getDisplayDistrictName = useCallback((district: string | undefined | null) => {
+    if (!district) return 'UNKNOWN';
+    const districtMapping: Record<string, string> = {
+      'Mysuru_Central': 'Bangalore',
+      'Mysuru Central': 'Bangalore',
+      'Mysuru': 'Bangalore',
+    };
+    return districtMapping[district] || district;
+  }, []);
+
   // Get cluster color based on point count (severity)
   const getClusterColor = (pointCount: number) => {
     if (pointCount >= 20) return '#ff4d4d'; // Red for high density
@@ -90,9 +101,10 @@ export default function HotspotMap() {
     return '#00F0FF'; // Cyan for low density
   };
 
-  // Get cluster radius based on point count
+  // Get cluster radius based on point count (in meters for L.circle)
   const getClusterRadius = (pointCount: number) => {
-    return Math.min(Math.max(pointCount * 1.5, 8), 40);
+    // Scale between 1000m and 10000m based on point count
+    return Math.min(Math.max(pointCount * 500, 3000), 30000);
   };
   // Initialize map on mount
   useEffect(() => {
@@ -137,7 +149,7 @@ export default function HotspotMap() {
 
     // Add new markers
     hotspotsData.clusters.forEach((cluster: HotspotCluster) => {
-      const marker = L.circleMarker([cluster.centroid_lat, cluster.centroid_lng], {
+      const marker = L.circle([cluster.centroid_lat, cluster.centroid_lng], {
         radius: getClusterRadius(cluster.point_count),
         color: getClusterColor(cluster.point_count),
         fillColor: getClusterColor(cluster.point_count),
@@ -293,7 +305,7 @@ export default function HotspotMap() {
             </h3>
             {selectedCluster && (
               <span className="font-label-mono text-[10px] text-primary border border-primary px-1 font-bold">
-                {selectedCluster.district?.replace(' ', '_') || 'UNKNOWN'}_CLUSTER
+                {getDisplayDistrictName(selectedCluster.district).replace(' ', '_')}_CLUSTER
               </span>
             )}
           </div>

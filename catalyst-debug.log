@@ -64,3 +64,171 @@ Response Headers: {"server":"ZGS","date":"Tue, 14 Jul 2026 16:56:09 GMT","conten
 [info] [2026-07-14T16:56:21.147Z] : [1784048181147]  Appsail[backend]  "GET"  "/api/analytics/hotspots?"
 [info] [2026-07-14T16:56:21.912Z] : [1784048181911]  Appsail[backend]  "GET"  "/api/analytics/hotspots?"
 [info] [2026-07-14T16:56:22.709Z] : [1784048182709]  Appsail[backend]  "GET"  "/api/analytics/hotspots?"
+[info] [2026-07-14T16:58:06.446Z] : [react-plugin]: Compiling...
+[info] [2026-07-14T16:58:12.008Z] : [react-plugin]: Compiled with warnings.
+
+[info] [2026-07-14T16:58:12.008Z] : [react-plugin]: [eslint] 
+src\pages\Analytics\HotspotMap.tsx
+  Line 9:26:  'HotspotClusterResponse' is defined but never used         @typescript-eslint/no-unused-vars
+  Line 58:9:  'handleDistrictChange' is assigned a value but never used  @typescript-eslint/no-unused-vars
+[info] [2026-07-14T16:58:12.008Z] : [react-plugin]: 
+Search for the keywords to learn more about each warning.
+[info] [2026-07-14T16:58:12.009Z] : [react-plugin]: To ignore, add // eslint-disable-next-line to the line before.
+
+[info] [2026-07-14T16:58:12.330Z] : [1784048292329]  "GET"  "/app/main.9ca7fee55102caa7856f.hot-update.json"
+[info] [2026-07-14T16:58:12.579Z] : [1784048292579]  "GET"  "/app/main.9ca7fee55102caa7856f.hot-update.js"
+[info] [2026-07-14T16:58:17.387Z] : [react-plugin]: Compiling...
+[info] [2026-07-14T16:58:18.106Z] : [react-plugin]: Compiled with warnings.
+
+[info] [2026-07-14T16:58:18.107Z] : [react-plugin]: [eslint] 
+src\pages\Analytics\HotspotMap.tsx
+  Line 9:26:  'HotspotClusterResponse' is defined but never used         @typescript-eslint/no-unused-vars
+  Line 33:9:  'debounceTimeoutRef' is assigned a value but never used    @typescript-eslint/no-unused-vars
+  Line 61:9:  'handleDistrictChange' is assigned a value but never used  @typescript-eslint/no-unused-vars
+[info] [2026-07-14T16:58:18.107Z] : [react-plugin]: 
+Search for the keywords to learn more about each warning.
+[info] [2026-07-14T16:58:18.107Z] : [react-plugin]: To ignore, add // eslint-disable-next-line to the line before.
+
+[info] [2026-07-14T16:58:18.425Z] : [1784048298425]  "GET"  "/app/main.190f147ecdeb066d911e.hot-update.json"
+[info] [2026-07-14T16:58:18.676Z] : [1784048298676]  "GET"  "/app/main.190f147ecdeb066d911e.hot-update.js"
+[info] [2026-07-14T16:58:24.780Z] : [react-plugin]: Compiling...
+[info] [2026-07-14T16:58:25.413Z] : [react-plugin]: Compiled with warnings.
+
+[info] [2026-07-14T16:58:25.413Z] : [react-plugin]: [eslint] 
+src\pages\Analytics\HotspotMap.tsx
+  Line 9:26:  'HotspotClusterResponse' is defined but never used         @typescript-eslint/no-unused-vars
+  Line 69:9:  'handleDistrictChange' is assigned a value but never used  @typescript-eslint/no-unused-vars
+[info] [2026-07-14T16:58:25.413Z] : [react-plugin]: 
+Search for the keywords to learn more about each warning.
+[info] [2026-07-14T16:58:25.413Z] : [react-plugin]: To ignore, add // eslint-disable-next-line to the line before.
+
+[info] [2026-07-14T16:58:25.435Z] : [1784048305435]  "GET"  "/app/main.76e442926cb6ff3f91f6.hot-update.json"
+[info] [2026-07-14T16:58:25.744Z] : [1784048305744]  "GET"  "/app/main.76e442926cb6ff3f91f6.hot-update.js"
+[info] [2026-07-14T16:58:31.211Z] : [react-plugin]: Compiling...
+[info] [2026-07-14T16:58:31.860Z] : [react-plugin]: Compiled with warnings.
+
+[info] [2026-07-14T16:58:31.860Z] : [react-plugin]: [eslint] 
+src\pages\Analytics\HotspotMap.tsx
+  Line 9:26:  'HotspotClusterResponse' is defined but never used         @typescript-eslint/no-unused-vars
+  Line 65:9:  'handleDistrictChange' is assigned a value but never used  @typescript-eslint/no-unused-vars
+[info] [2026-07-14T16:58:31.860Z] : [react-plugin]: 
+Search for the keywords to learn more about each warning.
+[info] [2026-07-14T16:58:31.860Z] : [react-plugin]: To ignore, add // eslint-disable-next-line to the line before.
+
+[info] [2026-07-14T16:58:31.887Z] : [1784048311887]  "GET"  "/app/main.c471420d644fb4cb46bd.hot-update.json"
+[info] [2026-07-14T16:58:32.200Z] : [1784048312200]  "GET"  "/app/main.c471420d644fb4cb46bd.hot-update.js"
+[info] [2026-07-14T16:58:43.281Z] : [react-plugin]: Compiling...
+[info] [2026-07-14T16:58:43.895Z] : [react-plugin]: Compiled with warnings.
+
+[info] [2026-07-14T16:58:43.895Z] : [react-plugin]: [eslint] 
+src\pages\Analytics\HotspotMap.tsx
+  Line 9:26:  'HotspotClusterResponse' is defined but never used         @typescript-eslint/no-unused-vars
+  Line 65:9:  'handleDistrictChange' is assigned a value but never used  @typescript-eslint/no-unused-vars
+[info] [2026-07-14T16:58:43.895Z] : [react-plugin]: 
+Search for the keywords to learn more about each warning.
+[info] [2026-07-14T16:58:43.895Z] : [react-plugin]: To ignore, add // eslint-disable-next-line to the line before.
+
+[info] [2026-07-14T16:58:43.929Z] : [1784048323929]  "GET"  "/app/main.f0598433fc70ce63a672.hot-update.json"
+[info] [2026-07-14T16:58:44.256Z] : [1784048324255]  "GET"  "/app/main.f0598433fc70ce63a672.hot-update.js"
+[info] [2026-07-14T17:00:21.889Z] : [react-plugin]: Compiling...
+[info] [2026-07-14T17:00:22.436Z] : [react-plugin]: Compiled with warnings.
+
+[info] [2026-07-14T17:00:22.436Z] : [react-plugin]: [eslint] 
+src\pages\Analytics\HotspotMap.tsx
+  Line 9:26:  'HotspotClusterResponse' is defined but never used         @typescript-eslint/no-unused-vars
+  Line 65:9:  'handleDistrictChange' is assigned a value but never used  @typescript-eslint/no-unused-vars
+[info] [2026-07-14T17:00:22.437Z] : [react-plugin]: 
+Search for the keywords to learn more about each warning.
+[info] [2026-07-14T17:00:22.437Z] : [react-plugin]: To ignore, add // eslint-disable-next-line to the line before.
+
+[info] [2026-07-14T17:00:22.756Z] : [1784048422756]  "GET"  "/app/main.f31520fdb29d47885187.hot-update.json"
+[info] [2026-07-14T17:00:23.005Z] : [1784048423005]  "GET"  "/app/main.f31520fdb29d47885187.hot-update.js"
+[info] [2026-07-14T17:00:28.390Z] : [1784048428390]  "GET"  "/app/"
+[info] [2026-07-14T17:00:28.701Z] : [1784048428701]  "GET"  "/app/static/js/bundle.js"
+[info] [2026-07-14T17:00:28.789Z] : [1784048428789]  "GET"  "/app/manifest.json"
+[info] [2026-07-14T17:00:29.185Z] : [1784048429185]  "GET"  "/app/map.svg"
+[info] [2026-07-14T17:00:29.199Z] : [1784048429199]  Appsail[backend]  "GET"  "/api/dashboard/stats"
+[info] [2026-07-14T17:00:29.202Z] : [1784048429202]  Appsail[backend]  "GET"  "/api/dashboard/district-crimes?timeframe=30d"
+[info] [2026-07-14T17:00:29.204Z] : [1784048429204]  Appsail[backend]  "GET"  "/api/dashboard/trends"
+[info] [2026-07-14T17:00:29.450Z] : [1784048429450]  "GET"  "/app/favicon.ico"
+[info] [2026-07-14T17:00:29.512Z] : [1784048429511]  "GET"  "/app/logo192.png"
+[info] [2026-07-14T17:00:31.493Z] : [1784048431492]  Appsail[backend]  "GET"  "/api/analytics/hotspots?"
+[info] [2026-07-14T17:00:31.804Z] : [1784048431804]  Appsail[backend]  "GET"  "/api/analytics/emerging-clusters"
+[info] [2026-07-14T17:00:41.670Z] : [1784048441669]  Appsail[backend]  "GET"  "/api/analytics/hotspots?date_from=2026-07&date_to=2026-07"
+[info] [2026-07-14T17:00:49.299Z] : [1784048449299]  Appsail[backend]  "GET"  "/api/analytics/hotspots?date_from=2023-01&date_to=2023-01"
+[info] [2026-07-14T17:00:51.776Z] : [1784048451775]  Appsail[backend]  "GET"  "/api/analytics/hotspots?date_from=2025-02&date_to=2025-02"
+[info] [2026-07-14T17:00:53.308Z] : [1784048453308]  Appsail[backend]  "GET"  "/api/analytics/hotspots?date_from=2024-09&date_to=2024-09"
+[info] [2026-07-14T17:00:54.882Z] : [1784048454882]  Appsail[backend]  "GET"  "/api/analytics/hotspots?date_from=2024-08&date_to=2024-08"
+[info] [2026-07-14T17:00:55.932Z] : [1784048455931]  Appsail[backend]  "GET"  "/api/analytics/hotspots?date_from=2024-06&date_to=2024-06"
+[info] [2026-07-14T17:01:01.222Z] : [1784048461222]  Appsail[backend]  "GET"  "/api/analytics/hotspots?date_from=2024-05&date_to=2024-05"
+[info] [2026-07-14T17:01:22.841Z] : [1784048482840]  Appsail[backend]  "GET"  "/api/analytics/offender-risk?page=1&page_size=20"
+[info] [2026-07-14T17:01:26.254Z] : [1784048486254]  Appsail[backend]  "GET"  "/api/analytics/trends?granularity=month"
+[info] [2026-07-14T17:01:26.255Z] : [1784048486255]  Appsail[backend]  "GET"  "/api/analytics/festival-calendar"
+[info] [2026-07-14T17:01:42.282Z] : [react-plugin]: Compiling...
+[info] [2026-07-14T17:01:43.073Z] : [react-plugin]: Compiled with warnings.
+
+[info] [2026-07-14T17:01:43.073Z] : [react-plugin]: [eslint] 
+src\pages\Analytics\HotspotMap.tsx
+  Line 9:26:  'HotspotClusterResponse' is defined but never used         @typescript-eslint/no-unused-vars
+  Line 65:9:  'handleDistrictChange' is assigned a value but never used  @typescript-eslint/no-unused-vars
+  Line 73:9:  'handleShowAllTime' is assigned a value but never used     @typescript-eslint/no-unused-vars
+[info] [2026-07-14T17:01:43.073Z] : [react-plugin]: 
+Search for the keywords to learn more about each warning.
+[info] [2026-07-14T17:01:43.073Z] : [react-plugin]: To ignore, add // eslint-disable-next-line to the line before.
+
+[info] [2026-07-14T17:01:43.385Z] : [1784048503385]  "GET"  "/app/main.b939715cc91a1f552a8f.hot-update.json"
+[info] [2026-07-14T17:01:43.648Z] : [1784048503648]  "GET"  "/app/main.b939715cc91a1f552a8f.hot-update.js"
+[info] [2026-07-14T17:01:47.570Z] : [react-plugin]: Compiling...
+[info] [2026-07-14T17:01:48.109Z] : [react-plugin]: Compiled with warnings.
+
+[info] [2026-07-14T17:01:48.110Z] : [react-plugin]: [eslint] 
+src\pages\Analytics\HotspotMap.tsx
+  Line 9:26:  'HotspotClusterResponse' is defined but never used         @typescript-eslint/no-unused-vars
+  Line 65:9:  'handleDistrictChange' is assigned a value but never used  @typescript-eslint/no-unused-vars
+[info] [2026-07-14T17:01:48.110Z] : [react-plugin]: 
+Search for the keywords to learn more about each warning.
+[info] [2026-07-14T17:01:48.110Z] : [react-plugin]: To ignore, add // eslint-disable-next-line to the line before.
+
+[info] [2026-07-14T17:01:48.144Z] : [1784048508144]  "GET"  "/app/main.0430ea6fe56ad5eb8629.hot-update.json"
+[info] [2026-07-14T17:01:48.469Z] : [1784048508469]  "GET"  "/app/main.0430ea6fe56ad5eb8629.hot-update.js"
+[info] [2026-07-14T17:06:15.265Z] : [1784048775265]  Appsail[backend]  "GET"  "/api/analytics/hotspots?"
+[info] [2026-07-14T17:06:15.268Z] : [1784048775268]  Appsail[backend]  "GET"  "/api/analytics/emerging-clusters"
+[info] [2026-07-14T17:07:06.517Z] : [react-plugin]: Compiling...
+[info] [2026-07-14T17:07:07.354Z] : [react-plugin]: Compiled with warnings.
+
+[info] [2026-07-14T17:07:07.355Z] : [react-plugin]: [eslint] 
+src\pages\Analytics\HotspotMap.tsx
+  Line 9:26:  'HotspotClusterResponse' is defined but never used         @typescript-eslint/no-unused-vars
+  Line 65:9:  'handleDistrictChange' is assigned a value but never used  @typescript-eslint/no-unused-vars
+[info] [2026-07-14T17:07:07.355Z] : [react-plugin]: 
+Search for the keywords to learn more about each warning.
+[info] [2026-07-14T17:07:07.355Z] : [react-plugin]: To ignore, add // eslint-disable-next-line to the line before.
+
+[info] [2026-07-14T17:07:07.668Z] : [1784048827668]  "GET"  "/app/main.197e903b6cade7eb1f7d.hot-update.json"
+[info] [2026-07-14T17:07:07.932Z] : [1784048827932]  "GET"  "/app/main.197e903b6cade7eb1f7d.hot-update.js"
+[info] [2026-07-14T17:07:11.097Z] : [react-plugin]: Compiling...
+[info] [2026-07-14T17:07:11.703Z] : [react-plugin]: Compiled with warnings.
+
+[info] [2026-07-14T17:07:11.703Z] : [react-plugin]: [eslint] 
+src\pages\Analytics\HotspotMap.tsx
+  Line 9:26:  'HotspotClusterResponse' is defined but never used         @typescript-eslint/no-unused-vars
+  Line 65:9:  'handleDistrictChange' is assigned a value but never used  @typescript-eslint/no-unused-vars
+[info] [2026-07-14T17:07:11.704Z] : [react-plugin]: 
+Search for the keywords to learn more about each warning.
+[info] [2026-07-14T17:07:11.704Z] : [react-plugin]: To ignore, add // eslint-disable-next-line to the line before.
+
+[info] [2026-07-14T17:07:11.727Z] : [1784048831727]  "GET"  "/app/main.94c55226499ba7412564.hot-update.json"
+[info] [2026-07-14T17:07:12.057Z] : [1784048832057]  "GET"  "/app/main.94c55226499ba7412564.hot-update.js"
+[info] [2026-07-14T17:07:15.729Z] : [react-plugin]: Compiling...
+[info] [2026-07-14T17:07:16.263Z] : [react-plugin]: Compiled with warnings.
+
+[info] [2026-07-14T17:07:16.264Z] : [react-plugin]: [eslint] 
+src\pages\Analytics\HotspotMap.tsx
+  Line 9:26:  'HotspotClusterResponse' is defined but never used         @typescript-eslint/no-unused-vars
+  Line 65:9:  'handleDistrictChange' is assigned a value but never used  @typescript-eslint/no-unused-vars
+[info] [2026-07-14T17:07:16.264Z] : [react-plugin]: 
+Search for the keywords to learn more about each warning.
+[info] [2026-07-14T17:07:16.264Z] : [react-plugin]: To ignore, add // eslint-disable-next-line to the line before.
+
+[info] [2026-07-14T17:07:16.283Z] : [1784048836283]  "GET"  "/app/main.9dd3f4a9bc8a6544f4d0.hot-update.json"
+[info] [2026-07-14T17:07:16.602Z] : [1784048836601]  "GET"  "/app/main.9dd3f4a9bc8a6544f4d0.hot-update.js"
