@@ -22,19 +22,105 @@ TREND_CATEGORIES = {
     "Cyber Crime":   ["Online Fraud", "Cyber Crime"],
 }
 
-# Karnataka Festival Calendar (static dates for 2024-2025)
-FESTIVAL_CALENDAR = {
-    "Dasara": {"date": "2024-10-12", "month": 10, "day": 12},
-    "Diwali": {"date": "2024-11-01", "month": 11, "day": 1},
-    "Ugadi": {"date": "2024-04-09", "month": 4, "day": 9},
-    "Makara Sankranti": {"date": "2025-01-14", "month": 1, "day": 14},
-    "Ganesh Chaturthi": {"date": "2024-09-07", "month": 9, "day": 7},
-    "Eid al-Fitr": {"date": "2024-04-10", "month": 4, "day": 10},
-    "Eid al-Adha": {"date": "2024-06-17", "month": 6, "day": 17},
-    "Christmas": {"date": "2024-12-25", "month": 12, "day": 25},
-    "Republic Day": {"date": "2025-01-26", "month": 1, "day": 26},
-    "Independence Day": {"date": "2024-08-15", "month": 8, "day": 15},
-}
+# Karnataka Festival Calendar (dynamic calculation)
+def get_festival_dates(year: int) -> dict:
+    """
+    Calculate festival dates dynamically for a given year.
+    
+    Args:
+        year: Year to calculate festivals for
+        
+    Returns:
+        Dictionary of festival names with their dates
+    """
+    from datetime import date
+    
+    # Fixed date festivals
+    festivals = {
+        "Republic Day": date(year, 1, 26),
+        "Independence Day": date(year, 8, 15),
+        "Christmas": date(year, 12, 25),
+        "Makara Sankranti": date(year, 1, 14),  # Solar festival
+    }
+    
+    # Religious festivals (simplified calculations - can be enhanced with proper libraries)
+    # Note: These are approximate dates. For production, consider using libraries like 'holidays'
+    # or proper lunar calendar calculations for religious festivals.
+    
+    # Ugadi (Kannada New Year) - typically March/April
+    # For 2026, approximate date
+    if year == 2024:
+        festivals["Ugadi"] = date(2024, 4, 9)
+    elif year == 2025:
+        festivals["Ugadi"] = date(2025, 3, 30)
+    elif year == 2026:
+        festivals["Ugadi"] = date(2026, 4, 8)
+    else:
+        festivals["Ugadi"] = date(year, 4, 9)
+    
+    # Ganesh Chaturthi - 4th day of waxing moon in Bhadrapada (typically September)
+    if year == 2024:
+        festivals["Ganesh Chaturthi"] = date(2024, 9, 7)
+    elif year == 2025:
+        festivals["Ganesh Chaturthi"] = date(2025, 8, 27)
+    elif year == 2026:
+        festivals["Ganesh Chaturthi"] = date(2026, 9, 15)
+    else:
+        festivals["Ganesh Chaturthi"] = date(year, 9, 19)
+    
+    # Dasara (Dussehra) - 10th day of Navratri (typically October)
+    if year == 2024:
+        festivals["Dasara"] = date(2024, 10, 12)
+    elif year == 2025:
+        festivals["Dasara"] = date(2025, 10, 2)
+    elif year == 2026:
+        festivals["Dasara"] = date(2026, 10, 20)
+    else:
+        festivals["Dasara"] = date(year, 10, 2)
+    
+    # Diwali - varies based on lunar calendar (typically October/November)
+    if year == 2024:
+        festivals["Diwali"] = date(2024, 11, 1)
+    elif year == 2025:
+        festivals["Diwali"] = date(2025, 10, 20)
+    elif year == 2026:
+        festivals["Diwali"] = date(2026, 11, 8)
+    else:
+        festivals["Diwali"] = date(year, 10, 20)
+    
+    # Eid dates (approximate - these vary based on moon sighting)
+    # Can be enhanced with proper Islamic calendar calculation
+    if year == 2024:
+        festivals["Eid al-Fitr"] = date(2024, 4, 10)
+        festivals["Eid al-Adha"] = date(2024, 6, 17)
+    elif year == 2025:
+        festivals["Eid al-Fitr"] = date(2025, 3, 30)
+        festivals["Eid al-Adha"] = date(2025, 6, 6)
+    elif year == 2026:
+        festivals["Eid al-Fitr"] = date(2026, 3, 20)
+        festivals["Eid al-Adha"] = date(2026, 5, 29)
+    else:
+        festivals["Eid al-Fitr"] = date(year, 3, 30)
+        festivals["Eid al-Adha"] = date(year, 6, 6)
+    
+    # Convert to required format
+    return {
+        name: {
+            "date": festival_date.strftime("%Y-%m-%d"),
+            "month": festival_date.month,
+            "day": festival_date.day
+        }
+        for name, festival_date in festivals.items()
+    }
+
+def get_current_festival_calendar() -> dict:
+    """Get festival calendar for current year."""
+    from datetime import datetime
+    current_year = datetime.now().year
+    return get_festival_dates(current_year)
+
+# Keep old constant for backward compatibility (deprecated)
+FESTIVAL_CALENDAR = get_current_festival_calendar()
 
 Granularity = Literal["month", "week"]
 
@@ -101,7 +187,13 @@ class TrendAggregator:
             
             # Parse date and format based on granularity
             try:
-                date_obj = datetime.strptime(date_str, "%Y-%m-%d")
+                # Try parsing with time component first
+                try:
+                    date_obj = datetime.strptime(date_str, "%Y-%m-%d %H:%M:%S")
+                except ValueError:
+                    # Fall back to date-only format
+                    date_obj = datetime.strptime(date_str, "%Y-%m-%d")
+                
                 if granularity == "month":
                     period_key = date_obj.strftime("%Y-%m")
                 else:  # week
@@ -109,7 +201,8 @@ class TrendAggregator:
                     period_key = f"{date_obj.year}-W{date_obj.isocalendar()[1]:02d}"
                 
                 grouped[period_key][crime_type] += 1
-            except ValueError:
+            except ValueError as e:
+                print(f"[DEBUG] Date parsing failed for '{date_str}': {e}")
                 continue
 
         # Convert to list of data points
@@ -131,25 +224,30 @@ class TrendAggregator:
         self,
         incident_data: list[dict],
         festival_name: str,
+        festival_calendar: dict = None,
     ) -> dict:
         """
         Compute crime count comparison for festival window vs baseline.
         
         Args:
             incident_data: List of incident dictionaries with date
-            festival_name: Name of festival from FESTIVAL_CALENDAR
+            festival_name: Name of festival
+            festival_calendar: Optional festival calendar (uses current year if not provided)
         
         Returns:
             Dictionary with event_window_count, baseline_window_count, percentage_change
         """
-        if festival_name not in FESTIVAL_CALENDAR:
+        if festival_calendar is None:
+            festival_calendar = get_current_festival_calendar()
+        
+        if festival_name not in festival_calendar:
             return {
                 "event_window_count": 0,
                 "baseline_window_count": 0,
                 "percentage_change": 0.0,
             }
 
-        festival = FESTIVAL_CALENDAR[festival_name]
+        festival = festival_calendar[festival_name]
         festival_date = datetime.strptime(festival["date"], "%Y-%m-%d")
         
         # Calculate ±7-day window around festival
@@ -164,10 +262,17 @@ class TrendAggregator:
             if not date_str:
                 continue
             try:
-                incident_date = datetime.strptime(date_str, "%Y-%m-%d")
+                # Try parsing with time component first
+                try:
+                    incident_date = datetime.strptime(date_str, "%Y-%m-%d %H:%M:%S")
+                except ValueError:
+                    # Fall back to date-only format
+                    incident_date = datetime.strptime(date_str, "%Y-%m-%d")
+                
                 if window_start <= incident_date <= window_end:
                     event_window_count += 1
-            except ValueError:
+            except ValueError as e:
+                print(f"[DEBUG] Failed to parse incident date '{date_str}': {e}")
                 continue
         
         # Calculate baseline (same 14-day window in different month)
@@ -181,10 +286,17 @@ class TrendAggregator:
             if not date_str:
                 continue
             try:
-                incident_date = datetime.strptime(date_str, "%Y-%m-%d")
+                # Try parsing with time component first
+                try:
+                    incident_date = datetime.strptime(date_str, "%Y-%m-%d %H:%M:%S")
+                except ValueError:
+                    # Fall back to date-only format
+                    incident_date = datetime.strptime(date_str, "%Y-%m-%d")
+                
                 if baseline_start <= incident_date <= baseline_end:
                     baseline_window_count += 1
-            except ValueError:
+            except ValueError as e:
+                print(f"[DEBUG] Failed to parse incident date '{date_str}': {e}")
                 continue
         
         # Calculate percentage change

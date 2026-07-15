@@ -7,6 +7,7 @@ import React, { useState, useCallback } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { analyticsService } from '../../services/analytics.service';
 import { TrendDataResponse, TrendFilters, TrendGranularity, FestivalCalendarResponse, TrendPoint, SeasonalComparison } from '../../types/analytics';
+import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 
 export default function TrendAnalysis() {
   // Trend filters
@@ -25,10 +26,10 @@ export default function TrendAnalysis() {
     queryFn: () => analyticsService.getTrends(filters),
   });
 
-  // Fetch festival calendar
+  // Fetch festival calendar with filters
   const { data: festivalData } = useQuery({
-    queryKey: ['festival-calendar'],
-    queryFn: () => analyticsService.getFestivalCalendar(),
+    queryKey: ['festival-calendar', filters],
+    queryFn: () => analyticsService.getFestivalCalendar(filters),
   });
 
   // Handle granularity change
@@ -117,25 +118,74 @@ export default function TrendAnalysis() {
         </h3>
         
         {trendsLoading ? (
-          <div className="flex items-center justify-center h-64">
+          <div className="flex items-center justify-center h-80">
             <span className="text-primary font-body-sm text-body-sm">Loading trends...</span>
           </div>
         ) : (
-          <div className="h-64 flex items-center justify-center text-on-surface-variant">
-            <div className="text-center">
-              <p className="font-label-mono text-label-mono mb-2">CHART VISUALIZATION</p>
-              <p className="font-body-sm text-body-sm">Install Recharts: npm install recharts</p>
-              {trendsData && (
-                <p className="mt-2 text-on-surface">
-                  {trendsData.data.length} data points ({filters.granularity} granularity)
-                </p>
-              )}
-              {trendsData && showForecast && (
-                <p className="mt-1 text-primary">
-                  {trendsData.data.filter((d: TrendPoint) => d.is_forecast).length} forecast points
-                </p>
-              )}
-            </div>
+          <div className="h-80">
+            <ResponsiveContainer width="100%" height="100%">
+              <LineChart data={trendsData?.data || []}>
+                <CartesianGrid strokeDasharray="3 3" stroke="#333" vertical={false} />
+                <XAxis 
+                  dataKey="date" 
+                  stroke="#888"
+                  tick={{ fill: '#888', fontSize: 11 }}
+                  axisLine={{ stroke: '#333' }}
+                />
+                <YAxis 
+                  stroke="#888"
+                  tick={{ fill: '#888', fontSize: 11 }}
+                  axisLine={{ stroke: '#333' }}
+                />
+                <Tooltip 
+                  contentStyle={{ 
+                    backgroundColor: '#1a1a1a', 
+                    border: '1px solid #333',
+                    borderRadius: '4px',
+                    padding: '12px'
+                  }}
+                  itemStyle={{ color: '#fff', fontSize: '12px' }}
+                  labelStyle={{ color: '#888', fontSize: '11px' }}
+                  formatter={(value: any, name: any) => {
+                    if (name === 'Crime Count') {
+                      return [value, 'Historical'];
+                    }
+                    if (name === 'Forecast') {
+                      return [value, 'Forecast'];
+                    }
+                    return [value, name];
+                  }}
+                />
+                <Legend 
+                  wrapperStyle={{ paddingTop: '10px' }}
+                  iconType="line"
+                />
+                <Line 
+                  type="monotone" 
+                  dataKey="count" 
+                  stroke="#00F0FF" 
+                  strokeWidth={3}
+                  dot={false}
+                  name="Crime Count"
+                  activeDot={{ r: 5, stroke: '#00F0FF', strokeWidth: 2, fill: '#1a1a1a' }}
+                  connectNulls={true}
+                />
+                {showForecast && (
+                  <Line 
+                    type="monotone" 
+                    dataKey="count" 
+                    stroke="#ff4d4d" 
+                    strokeWidth={2}
+                    strokeDasharray="6 4"
+                    dot={false}
+                    name="Forecast"
+                    data={trendsData?.data?.filter((d: TrendPoint) => d.is_forecast) || []}
+                    activeDot={{ r: 5, stroke: '#ff4d4d', strokeWidth: 2, fill: '#1a1a1a' }}
+                    connectNulls={true}
+                  />
+                )}
+              </LineChart>
+            </ResponsiveContainer>
           </div>
         )}
       </div>
@@ -148,34 +198,81 @@ export default function TrendAnalysis() {
         
         {festivalData?.comparisons.length === 0 ? (
           <div className="text-on-surface-variant font-body-sm text-body-sm">
-            No seasonal data available
+            No seasonal data available. Try adjusting filters or date range.
           </div>
         ) : (
-          <div className="space-y-3">
+          <div className="space-y-4">
             {festivalData?.comparisons.map((comparison: SeasonalComparison) => (
               <div
                 key={comparison.event_name}
-                className="flex items-center justify-between p-3 border border-outline-variant bg-surface-variant"
+                className="border border-outline-variant bg-surface-variant p-4"
               >
-                <div>
-                  <div className="font-body-sm text-body-sm font-semibold text-on-surface">
-                    {comparison.event_name}
-                  </div>
-                  <div className="font-label-mono text-label-mono text-on-surface-variant text-[10px]">
-                    {comparison.event_date}
-                  </div>
-                </div>
-                <div className="text-right">
-                  <div className="font-data-mono-bold text-data-mono-bold text-on-surface">
-                    {comparison.event_window_count} vs {comparison.baseline_window_count}
+                {/* Festival Header */}
+                <div className="flex items-center justify-between mb-3">
+                  <div>
+                    <div className="font-body-sm text-body-sm font-semibold text-on-surface text-lg">
+                      {comparison.event_name}
+                    </div>
+                    <div className="font-label-mono text-label-mono text-on-surface-variant text-xs">
+                      {comparison.event_date} • Window: {comparison.window_start} to {comparison.window_end}
+                    </div>
                   </div>
                   <div
-                    className={`font-label-mono text-label-mono text-[10px] ${
-                      comparison.percentage_change > 0 ? 'text-error' : 'text-primary'
+                    className={`px-3 py-1 rounded-none font-label-mono text-label-mono text-sm ${
+                      comparison.percentage_change > 20 ? 'bg-error/20 text-error' :
+                      comparison.percentage_change < -20 ? 'bg-primary/20 text-primary' :
+                      'bg-outline-variant/20 text-on-surface-variant'
                     }`}
                   >
                     {comparison.percentage_change > 0 ? '+' : ''}{comparison.percentage_change.toFixed(1)}%
                   </div>
+                </div>
+                
+                {/* Comparison Bar Chart */}
+                <div className="space-y-2">
+                  <div className="flex items-center gap-4">
+                    <div className="w-32 font-label-mono text-label-mono text-on-surface-variant text-xs">
+                      Festival Window
+                    </div>
+                    <div className="flex-1 bg-surface h-6 rounded-none overflow-hidden">
+                      <div
+                        className="h-full bg-primary transition-all duration-300"
+                        style={{
+                          width: `${Math.min((comparison.event_window_count / Math.max(comparison.baseline_window_count, 1)) * 100, 100)}%`
+                        }}
+                      />
+                    </div>
+                    <div className="w-16 text-right font-data-mono-bold text-data-mono-bold text-on-surface text-sm">
+                      {comparison.event_window_count}
+                    </div>
+                  </div>
+                  
+                  <div className="flex items-center gap-4">
+                    <div className="w-32 font-label-mono text-label-mono text-on-surface-variant text-xs">
+                      Baseline
+                    </div>
+                    <div className="flex-1 bg-surface h-6 rounded-none overflow-hidden">
+                      <div
+                        className="h-full bg-outline-variant transition-all duration-300"
+                        style={{
+                          width: `${Math.min((comparison.baseline_window_count / Math.max(comparison.event_window_count, 1)) * 100, 100)}%`
+                        }}
+                      />
+                    </div>
+                    <div className="w-16 text-right font-data-mono-bold text-data-mono-bold text-on-surface-variant text-sm">
+                      {comparison.baseline_window_count}
+                    </div>
+                  </div>
+                </div>
+                
+                {/* Insight Text */}
+                <div className="mt-3 font-body-sm text-body-sm text-on-surface-variant text-xs">
+                  {comparison.percentage_change > 20 
+                    ? `⚠️ High crime spike detected during ${comparison.event_name}`
+                    : comparison.percentage_change < -20
+                    ? `✓ Lower crime rate during ${comparison.event_name}`
+                    : `Normal crime pattern around ${comparison.event_name}`
+                  }
                 </div>
               </div>
             ))}

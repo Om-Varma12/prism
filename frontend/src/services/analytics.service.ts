@@ -62,9 +62,14 @@ export const analyticsService = {
   /**
    * Get seasonal event comparisons for Karnataka festivals
    */
-  getFestivalCalendar: async (): Promise<FestivalCalendarResponse> => {
+  getFestivalCalendar: async (filters?: TrendFilters): Promise<FestivalCalendarResponse> => {
+    const params = new URLSearchParams();
+    
+    if (filters?.crime_type) params.append('crime_type', filters.crime_type);
+    if (filters?.district) params.append('district', filters.district);
+    
     const response = await apiClient.get<FestivalCalendarResponse>(
-      '/api/analytics/festival-calendar'
+      `/api/analytics/festival-calendar?${params.toString()}`
     );
     return response.data;
   },

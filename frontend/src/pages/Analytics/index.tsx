@@ -63,14 +63,14 @@ export default function AnalyticsPage() {
           >
             Trend Analysis
           </button>
-          <button
+          {/* <button
             onClick={() => setActiveTab('offenders')}
             className={`pb-sm border-b-2 transition-colors cursor-pointer ${
               activeTab === 'offenders' ? 'border-primary text-primary' : 'border-transparent text-on-surface-variant hover:text-on-surface'
             }`}
           >
             Offender Risk Board
-          </button>
+          </button> */}
         </div>
       </header>
 
