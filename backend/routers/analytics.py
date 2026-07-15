@@ -308,20 +308,42 @@ async def get_emerging_clusters(
         # Execute query
         result = zcql.execute_query(query)
         rows = result if isinstance(result, list) else []
+        print(f"[DEBUG] Emerging clusters query returned {len(rows)} rows")
+        
+        # Show sample row for debugging
+        if rows:
+            print(f"[DEBUG] Sample emerging cluster row: {rows[0]}")
         
         # Convert to response format
         alerts = []
         for row in rows:
+            # Handle nested ZCQL response structure
+            crime_alerts = row.get("crime_alerts", {})
+            crime_sub_head = row.get("CrimeSubHead", {})
+            district_data = row.get("District", {})
+            
+            # Extract with proper None handling
+            crime_type_raw = crime_sub_head.get("CrimeHeadName")
+            district_raw = district_data.get("DistrictName")
+            
+            # Use "Unknown" for None values to satisfy Pydantic string type
+            crime_type = crime_type_raw if crime_type_raw else "Unknown"
+            district = district_raw if district_raw else "Unknown"
+            
+            spike_ratio = row.get("spike_ratio") or crime_alerts.get("spike_ratio", 0.0)
+            
+            print(f"[DEBUG] Processed alert: crime_type={crime_type} (raw={crime_type_raw}), district={district} (raw={district_raw}), spike_ratio={spike_ratio}")
+            
             alerts.append(CrimeAlert(
-                alert_id=row.get("alert_id"),
-                crime_type=row.get("crime_type", "Unknown"),
-                district=row.get("district", "Unknown"),
-                spike_ratio=row.get("spike_ratio", 0.0),
+                alert_id=row.get("alert_id") or crime_alerts.get("ROWID"),
+                crime_type=crime_type,
+                district=district,
+                spike_ratio=spike_ratio,
                 baseline_count=row.get("baseline_count"),  # Will be None since column doesn't exist
                 current_count=row.get("current_count"),  # Will be None since column doesn't exist
-                detected_at=row.get("detected_at"),
-                acknowledged=bool(row.get("acknowledged", 0)),
-                severity=row.get("severity", "HIGH"),
+                detected_at=row.get("detected_at") or crime_alerts.get("created_at"),
+                acknowledged=bool(row.get("acknowledged", 0) or crime_alerts.get("is_acknowledged", 0)),
+                severity=row.get("severity") or crime_alerts.get("severity", "HIGH"),
             ))
         
         response = CrimeAlertResponse(
@@ -347,6 +369,105 @@ async def get_emerging_clusters(
             total_alerts=0,
             generated_at=datetime.utcnow(),
         )
+
+
+@router.get("/test/insert-crime-alerts")
+async def insert_test_crime_alerts(
+    zcql=Depends(get_zcql),
+):
+    """
+    Insert sample crime alerts for testing emerging clusters.
+    """
+    try:
+        # Get sample crime types and districts
+        crime_types_query = "SELECT ROWID, CrimeHeadName FROM CrimeSubHead LIMIT 5"
+        crime_types_result = zcql.execute_query(crime_types_query)
+        crime_types = crime_types_result if isinstance(crime_types_result, list) else []
+        
+        districts_query = "SELECT ROWID, DistrictName FROM District LIMIT 5"
+        districts_result = zcql.execute_query(districts_query)
+        districts = districts_result if isinstance(districts_result, list) else []
+        
+        print(f"[DEBUG] Crime types: {crime_types}")
+        print(f"[DEBUG] Districts: {districts}")
+        
+        if not crime_types or not districts:
+            return {"status": "error", "message": "No crime types or districts found"}
+        
+        # Insert sample alerts with valid foreign keys
+        from datetime import datetime, timedelta
+        sample_alerts = [
+            {
+                "district_id": int(districts[0].get("District", {}).get("ROWID", 0)),
+                "crime_sub_head_id": int(crime_types[0].get("CrimeSubHead", {}).get("ROWID", 0)),
+                "spike_ratio": 3.5,
+                "severity": "HIGH",
+                "alert_message": f"{crime_types[0].get('CrimeSubHead', {}).get('CrimeHeadName')} up 350% in {districts[0].get('District', {}).get('DistrictName')}",
+                "is_acknowledged": 0,
+                "created_at": datetime.utcnow().strftime("%Y-%m-%d %H:%M:%S")
+            },
+            {
+                "district_id": int(districts[1].get("District", {}).get("ROWID", 0)),
+                "crime_sub_head_id": int(crime_types[1].get("CrimeSubHead", {}).get("ROWID", 0)),
+                "spike_ratio": 4.2,
+                "severity": "HIGH",
+                "alert_message": f"{crime_types[1].get('CrimeSubHead', {}).get('CrimeHeadName')} up 420% in {districts[1].get('District', {}).get('DistrictName')}",
+                "is_acknowledged": 0,
+                "created_at": (datetime.utcnow() - timedelta(hours=2)).strftime("%Y-%m-%d %H:%M:%S")
+            },
+            {
+                "district_id": int(districts[2].get("District", {}).get("ROWID", 0)),
+                "crime_sub_head_id": int(crime_types[2].get("CrimeSubHead", {}).get("ROWID", 0)),
+                "spike_ratio": 2.8,
+                "severity": "HIGH",
+                "alert_message": f"{crime_types[2].get('CrimeSubHead', {}).get('CrimeHeadName')} up 280% in {districts[2].get('District', {}).get('DistrictName')}",
+                "is_acknowledged": 0,
+                "created_at": (datetime.utcnow() - timedelta(hours=4)).strftime("%Y-%m-%d %H:%M:%S")
+            },
+        ]
+        
+        inserted_count = 0
+        for alert in sample_alerts:
+            insert_query = f"""
+                INSERT INTO crime_alerts (district_id, crime_sub_head_id, spike_ratio, severity, alert_message, is_acknowledged, created_at)
+                VALUES ({alert['district_id']}, {alert['crime_sub_head_id']}, {alert['spike_ratio']}, '{alert['severity']}', '{alert['alert_message']}', {alert['is_acknowledged']}, '{alert['created_at']}')
+            """
+            try:
+                zcql.execute_query(insert_query)
+                inserted_count += 1
+                print(f"[DEBUG] Inserted alert: {alert['alert_message']}")
+            except Exception as e:
+                print(f"[DEBUG] Failed to insert alert: {e}")
+        
+        return {
+            "status": "success",
+            "message": f"Inserted {inserted_count} sample crime alerts",
+            "inserted_count": inserted_count
+        }
+    except Exception as exc:
+        print(f"[Warning] Failed to insert test crime alerts: {exc}")
+        return {"status": "error", "message": str(exc)}
+
+
+@router.get("/test/clean-crime-alerts")
+async def clean_crime_alerts(
+    zcql=Depends(get_zcql),
+):
+    """
+    Delete all crime_alerts for testing purposes.
+    """
+    try:
+        # Delete all crime_alerts (simpler approach for testing)
+        delete_query = "DELETE FROM crime_alerts"
+        result = zcql.execute_query(delete_query)
+        
+        return {
+            "status": "success",
+            "message": "Deleted all crime alerts"
+        }
+    except Exception as exc:
+        print(f"[Warning] Failed to clean crime alerts: {exc}")
+        return {"status": "error", "message": str(exc)}
 
 
 @router.get("/trends", response_model=TrendDataResponse)
