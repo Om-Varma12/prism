@@ -384,9 +384,12 @@ async def insert_test_crime_alerts(
         crime_types_result = zcql.execute_query(crime_types_query)
         crime_types = crime_types_result if isinstance(crime_types_result, list) else []
         
-        districts_query = "SELECT DistrictID, DistrictName FROM District LIMIT 5"
+        districts_query = "SELECT ROWID, DistrictName FROM District LIMIT 5"
         districts_result = zcql.execute_query(districts_query)
         districts = districts_result if isinstance(districts_result, list) else []
+        
+        print(f"[DEBUG] Crime types: {crime_types}")
+        print(f"[DEBUG] Districts: {districts}")
         
         if not crime_types or not districts:
             return {"status": "error", "message": "No crime types or districts found"}
@@ -395,29 +398,29 @@ async def insert_test_crime_alerts(
         from datetime import datetime, timedelta
         sample_alerts = [
             {
-                "district_id": districts[0].get("DistrictID"),
-                "crime_sub_head_id": crime_types[0].get("ROWID"),
+                "district_id": int(districts[0].get("District", {}).get("ROWID", 0)),
+                "crime_sub_head_id": int(crime_types[0].get("CrimeSubHead", {}).get("ROWID", 0)),
                 "spike_ratio": 3.5,
                 "severity": "HIGH",
-                "alert_message": f"{crime_types[0].get('CrimeHeadName')} up 350% in {districts[0].get('DistrictName')}",
+                "alert_message": f"{crime_types[0].get('CrimeSubHead', {}).get('CrimeHeadName')} up 350% in {districts[0].get('District', {}).get('DistrictName')}",
                 "is_acknowledged": 0,
                 "created_at": datetime.utcnow().strftime("%Y-%m-%d %H:%M:%S")
             },
             {
-                "district_id": districts[1].get("DistrictID"),
-                "crime_sub_head_id": crime_types[1].get("ROWID"),
+                "district_id": int(districts[1].get("District", {}).get("ROWID", 0)),
+                "crime_sub_head_id": int(crime_types[1].get("CrimeSubHead", {}).get("ROWID", 0)),
                 "spike_ratio": 4.2,
                 "severity": "HIGH",
-                "alert_message": f"{crime_types[1].get('CrimeHeadName')} up 420% in {districts[1].get('DistrictName')}",
+                "alert_message": f"{crime_types[1].get('CrimeSubHead', {}).get('CrimeHeadName')} up 420% in {districts[1].get('District', {}).get('DistrictName')}",
                 "is_acknowledged": 0,
                 "created_at": (datetime.utcnow() - timedelta(hours=2)).strftime("%Y-%m-%d %H:%M:%S")
             },
             {
-                "district_id": districts[2].get("DistrictID"),
-                "crime_sub_head_id": crime_types[2].get("ROWID"),
+                "district_id": int(districts[2].get("District", {}).get("ROWID", 0)),
+                "crime_sub_head_id": int(crime_types[2].get("CrimeSubHead", {}).get("ROWID", 0)),
                 "spike_ratio": 2.8,
                 "severity": "HIGH",
-                "alert_message": f"{crime_types[2].get('CrimeHeadName')} up 280% in {districts[2].get('DistrictName')}",
+                "alert_message": f"{crime_types[2].get('CrimeSubHead', {}).get('CrimeHeadName')} up 280% in {districts[2].get('District', {}).get('DistrictName')}",
                 "is_acknowledged": 0,
                 "created_at": (datetime.utcnow() - timedelta(hours=4)).strftime("%Y-%m-%d %H:%M:%S")
             },
