@@ -563,6 +563,8 @@ async def get_festival_calendar(
     Returns crime rate in ±7-day window around festivals vs yearly baseline.
     Results are cached for 1 hour since festival dates are static.
     """
+    from datetime import datetime, timedelta
+    
     try:
         from analytics.trends import TrendAggregator, get_current_festival_calendar
         from schemas.analytics import SeasonalComparison
@@ -596,8 +598,9 @@ async def get_festival_calendar(
                 CrimeSubHead.CrimeHeadName as crime_type,
                 District.DistrictName as district
             FROM CaseMaster
-            LEFT JOIN CrimeSubHead ON CaseMaster.CrimeSubHeadID = CrimeSubHead.ROWID
-            LEFT JOIN District ON CaseMaster.DistrictID = District.ROWID
+            LEFT JOIN CrimeSubHead ON CaseMaster.CrimeMinorHeadID = CrimeSubHead.ROWID
+            LEFT JOIN Unit ON CaseMaster.PoliceStationID = Unit.ROWID
+            LEFT JOIN District ON Unit.DistrictID = District.ROWID
             WHERE {' AND '.join(where_conditions)}
             LIMIT 5000
         """
@@ -639,7 +642,6 @@ async def get_festival_calendar(
             print(f"[DEBUG] {festival_name}: event={comparison['event_window_count']}, baseline={comparison['baseline_window_count']}, change={comparison['percentage_change']}%")
             
             # Calculate window dates
-            from datetime import datetime, timedelta
             festival_date = datetime.strptime(festival_info["date"], "%Y-%m-%d")
             window_start = festival_date - timedelta(days=7)
             window_end = festival_date + timedelta(days=7)
