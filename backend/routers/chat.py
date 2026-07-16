@@ -1,10 +1,11 @@
 """
 Chat router for intelligent query processing.
 """
-from fastapi import APIRouter, Depends, Request
-from datetime import datetime
+from fastapi import APIRouter, Depends, Request, BackgroundTasks
+from datetime import datetime, timezone
 import uuid
 from typing import Optional
+import tempfile
 
 from services.llm_client import CatalystLLMClient
 from agents.text_to_sql.agent import TextToSQLAgent
@@ -19,7 +20,7 @@ from schemas.chat import (
     SessionMessage,
     SessionMessagesResponse,
 )
-from core.database import get_zcql
+from core.database import get_zcql, get_stratus
 from core.security import require_role
 from fastapi.responses import StreamingResponse
 import json
@@ -63,6 +64,82 @@ def flatten_zcql_results(results: list) -> list:
             flattened.append({"value": row})
     
     return flattened
+
+
+def upload_pdf_to_stratus(
+    pdf_buffer,
+    session_id: str,
+    stratus_instance,
+    max_retries: int = 3
+) -> bool:
+    """
+    Upload PDF to Stratus bucket with retry logic.
+    
+    Args:
+        pdf_buffer: BytesIO buffer containing PDF data
+        session_id: Conversation session ID for filename
+        stratus_instance: Stratus service instance
+        max_retries: Maximum number of upload attempts
+    
+    Returns:
+        bool: True if upload succeeded, False otherwise
+    """
+    print(f"[Stratus Upload] Function called with session_id: {session_id}")
+    bucket_name = 'chat-pdfs'
+    object_key = f'chat-{session_id}.pdf'
+    
+    # Prepare metadata (only simple string values)
+    metadata = {
+        'conversation_id': session_id,
+        'created_at': datetime.now(timezone.utc).strftime("%Y%m%d_%H%M%S"),
+        'user_id': 'dev_user'
+    }
+    
+    # Upload options with overwrite enabled
+    options = {
+        'overwrite': 'true',
+        'content_type': 'application/pdf',  # Separate from metadata
+        'meta_data': metadata
+    }
+    
+    # Create temporary file from BytesIO
+    temp_file = None
+    try:
+        temp_file = tempfile.NamedTemporaryFile(delete=False, suffix='.pdf')
+        temp_file.write(pdf_buffer.getvalue())
+        temp_file.close()
+        
+        for attempt in range(max_retries):
+            try:
+                # Get bucket instance
+                bucket = stratus_instance.bucket(bucket_name)
+                
+                # Open file in binary mode for upload
+                with open(temp_file.name, 'rb') as file:
+                    # Upload with file object
+                    result = bucket.put_object(
+                        object_key,
+                        file,
+                        options
+                    )
+                
+                print(f"[Stratus Upload] Successfully uploaded {object_key} (attempt {attempt + 1})")
+                return True
+                
+            except Exception as e:
+                print(f"[Stratus Upload] Error on attempt {attempt + 1}/{max_retries}: {e}")
+        
+        print(f"[Stratus Upload] Failed after {max_retries} attempts")
+        return False
+        
+    finally:
+        # Clean up temporary file
+        if temp_file and temp_file.name:
+            try:
+                import os
+                os.unlink(temp_file.name)
+            except Exception as e:
+                print(f"[Stratus Upload] Failed to delete temp file: {e}")
 
 
 @router.post("/query", response_model=ChatQueryResponse)
@@ -476,7 +553,9 @@ async def debug_query(zcql = Depends(get_zcql)):
 async def export_chat_pdf(
     session_id: str,
     request: Request,
-    zcql = Depends(get_zcql)
+    background_tasks: BackgroundTasks,
+    zcql = Depends(get_zcql),
+    stratus = Depends(get_stratus)
 ):
     """
     Export conversation to PDF with title, date/time, and all content except SQL.
@@ -652,6 +731,39 @@ async def export_chat_pdf(
         
         # Build PDF
         doc.build(story)
+        
+        # Upload PDF to Stratus in background (non-blocking)
+        try:
+            print(f"[Stratus Upload] Initiating background upload for session: {session_id}")
+            print(f"[Stratus Upload] Buffer size: {len(buffer.getvalue())} bytes")
+            
+            # Create a copy of the buffer for upload
+            upload_buffer = BytesIO(buffer.getvalue())
+            
+            # TEMPORARY: Test synchronous upload to isolate issue
+            print(f"[Stratus Upload] Testing synchronous upload...")
+            result = upload_pdf_to_stratus(
+                pdf_buffer=upload_buffer,
+                session_id=session_id,
+                stratus_instance=stratus,
+                max_retries=3
+            )
+            print(f"[Stratus Upload] Synchronous upload result: {result}")
+            
+            # Add to FastAPI background tasks (commented out for testing)
+            # background_tasks.add_task(
+            #     upload_pdf_to_stratus,
+            #     pdf_buffer=upload_buffer,
+            #     session_id=session_id,
+            #     stratus_instance=stratus,
+            #     max_retries=3
+            # )
+            # print(f"[Stratus Upload] Background task added successfully")
+        except Exception as e:
+            import traceback
+            print(f"[Stratus Upload] Failed to initiate background upload: {e}")
+            print(f"[Stratus Upload] Traceback: {traceback.format_exc()}")
+            # Continue with PDF download response regardless
         
         # Return PDF as response
         buffer.seek(0)

@@ -33,3 +33,14 @@ def get_cache(request: Request):
     except Exception:
         app = zcatalyst_sdk.initialize()
     return app.cache()
+
+def get_stratus(request: Request):
+    """
+    FastAPI dependency that initializes the Zoho Catalyst SDK
+    and returns the Stratus service instance.
+    """
+    try:
+        app = zcatalyst_sdk.initialize(req=request)
+    except Exception:
+        app = zcatalyst_sdk.initialize()
+    return app.stratus()
