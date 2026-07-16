@@ -55,3 +55,34 @@ Response Headers: {"server":"ZGS","date":"Thu, 16 Jul 2026 04:21:14 GMT","conten
 [info] [2026-07-16T04:21:20.118Z] : [1784175680118]  Appsail[backend]  "GET"  "/api/dashboard/trends"
 [info] [2026-07-16T04:21:20.297Z] : [1784175680297]  "GET"  "/app/favicon.ico"
 [info] [2026-07-16T04:21:20.299Z] : [1784175680298]  "GET"  "/app/logo192.png"
+[info] [2026-07-16T04:22:06.576Z] : [1784175726575]  Appsail[backend]  "GET"  "/api/analytics/hotspots?"
+[info] [2026-07-16T04:22:06.886Z] : [1784175726886]  Appsail[backend]  "GET"  "/api/analytics/emerging-clusters"
+[info] [2026-07-16T04:22:29.162Z] : [1784175749162]  Appsail[backend]  "GET"  "/api/analytics/offender-risk?page=1&page_size=20"
+[info] [2026-07-16T04:22:30.982Z] : [1784175750982]  Appsail[backend]  "GET"  "/api/analytics/trends?granularity=month"
+[info] [2026-07-16T04:22:31.298Z] : [1784175751298]  Appsail[backend]  "GET"  "/api/analytics/festival-calendar?"
+[info] [2026-07-16T04:22:56.766Z] : [react-plugin]: Compiling...
+[info] [2026-07-16T04:23:01.064Z] : [react-plugin]: Compiled successfully!
+[info] [2026-07-16T04:23:01.065Z] : [react-plugin]: 
+[info] [2026-07-16T04:23:01.065Z] : [react-plugin]: You can now view fron in the browser.
+[info] [2026-07-16T04:23:01.065Z] : [react-plugin]: 
+[info] [2026-07-16T04:23:01.065Z] : [react-plugin]:   http://localhost:3000/app/
+[info] [2026-07-16T04:23:01.065Z] : [react-plugin]: 
+[info] [2026-07-16T04:23:01.065Z] : [react-plugin]: Note that the development build is not optimized.
+[info] [2026-07-16T04:23:01.066Z] : [react-plugin]: To create a production build, use npm run build.
+[info] [2026-07-16T04:23:01.066Z] : [react-plugin]: 
+[info] [2026-07-16T04:23:01.378Z] : [1784175781377]  "GET"  "/app/main.82b05ce00db5a898944e.hot-update.json"
+[info] [2026-07-16T04:23:01.643Z] : [1784175781643]  "GET"  "/app/main.82b05ce00db5a898944e.hot-update.js"
+[info] [2026-07-16T04:25:13.648Z] : [1784175913647]  Appsail[backend]  "GET"  "/api/network/graph?view=all"
+[info] [2026-07-16T04:25:13.652Z] : [1784175913652]  Appsail[backend]  "GET"  "/api/network/graph?date_from=2026-06-16&date_to=2026-07-16&view=all"
+[info] [2026-07-16T04:25:17.255Z] : [1784175917255]  Appsail[backend]  "GET"  "/api/chat/history"
+[info] [2026-07-16T04:25:17.563Z] : [1784175917563]  Appsail[backend]  "POST"  "/api/chat/new"
+[info] [2026-07-16T04:25:18.107Z] : [1784175918107]  Appsail[backend]  "GET"  "/api/chat/history"
+[info] [2026-07-16T04:25:18.110Z] : [1784175918110]  Appsail[backend]  "GET"  "/api/chat/messages?session_id=6aba947c-8b6d-4553-9554-ad5d899885bd"
+[info] [2026-07-16T04:25:19.962Z] : [1784175919962]  "GET"  "/app/map.svg"
+[info] [2026-07-16T04:25:54.679Z] : [1784175954679]  Appsail[backend]  "GET"  "/api/dashboard/district-crimes?timeframe=7d"
+[info] [2026-07-16T04:26:00.268Z] : [1784175960268]  Appsail[backend]  "GET"  "/api/dashboard/district-crimes?timeframe=24h"
+[info] [2026-07-16T04:29:33.192Z] : [1784176173192]  Appsail[backend]  "GET"  "/api/chat/history"
+[info] [2026-07-16T04:29:33.208Z] : [1784176173207]  Appsail[backend]  "POST"  "/api/chat/new"
+[info] [2026-07-16T04:29:33.684Z] : [1784176173684]  Appsail[backend]  "GET"  "/api/chat/messages?session_id=2ce9026f-ec95-4d4f-bad2-6799a1bea16b"
+[info] [2026-07-16T04:29:34.022Z] : [1784176174021]  Appsail[backend]  "GET"  "/api/chat/history"
+[info] [2026-07-16T04:29:34.023Z] : [1784176174023]  Appsail[backend]  "GET"  "/api/chat/messages?session_id=cd7ef3f5-09ce-4686-bf57-8366d8bd3278"

@@ -5,6 +5,7 @@ from fastapi import APIRouter, Depends, Request
 from datetime import datetime
 import uuid
 from typing import Optional
+import asyncio
 
 from services.llm_client import CatalystLLMClient
 from agents.text_to_sql.agent import TextToSQLAgent
@@ -19,7 +20,7 @@ from schemas.chat import (
     SessionMessage,
     SessionMessagesResponse,
 )
-from core.database import get_zcql
+from core.database import get_zcql, get_stratus
 from core.security import require_role
 from fastapi.responses import StreamingResponse
 import json
@@ -63,6 +64,75 @@ def flatten_zcql_results(results: list) -> list:
             flattened.append({"value": row})
     
     return flattened
+
+
+async def upload_pdf_to_stratus(
+    pdf_buffer,
+    session_id: str,
+    stratus_instance,
+    max_retries: int = 3,
+    timeout: int = 30
+) -> bool:
+    """
+    Upload PDF to Stratus bucket with retry logic.
+    
+    Args:
+        pdf_buffer: BytesIO buffer containing PDF data
+        session_id: Conversation session ID for filename
+        stratus_instance: Stratus service instance
+        max_retries: Maximum number of upload attempts
+        timeout: Timeout in seconds for each upload attempt
+    
+    Returns:
+        bool: True if upload succeeded, False otherwise
+    """
+    bucket_name = 'chat-pdfs'
+    object_key = f'chat-{session_id}.pdf'
+    
+    # Prepare metadata
+    metadata = {
+        'conversation_id': session_id,
+        'created_at': datetime.utcnow().isoformat(),
+        'user_id': 'dev_user',
+        'content_type': 'application/pdf'
+    }
+    
+    # Upload options with overwrite enabled
+    options = {
+        'overwrite': 'true',
+        'content_type': 'application/pdf',
+        'meta_data': metadata
+    }
+    
+    for attempt in range(max_retries):
+        try:
+            # Get bucket instance
+            bucket = stratus_instance.bucket(bucket_name)
+            
+            # Reset buffer position before upload
+            pdf_buffer.seek(0)
+            
+            # Upload with timeout
+            result = await asyncio.wait_for(
+                asyncio.to_thread(
+                    bucket.put_object,
+                    object_key,
+                    pdf_buffer,
+                    options
+                ),
+                timeout=timeout
+            )
+            
+            print(f"[Stratus Upload] Successfully uploaded {object_key} (attempt {attempt + 1})")
+            return True
+            
+        except asyncio.TimeoutError:
+            print(f"[Stratus Upload] Timeout on attempt {attempt + 1}/{max_retries}")
+        except Exception as e:
+            print(f"[Stratus Upload] Error on attempt {attempt + 1}/{max_retries}: {e}")
+    
+    print(f"[Stratus Upload] Failed after {max_retries} attempts")
+    return False
 
 
 @router.post("/query", response_model=ChatQueryResponse)
@@ -476,7 +546,8 @@ async def debug_query(zcql = Depends(get_zcql)):
 async def export_chat_pdf(
     session_id: str,
     request: Request,
-    zcql = Depends(get_zcql)
+    zcql = Depends(get_zcql),
+    stratus = Depends(get_stratus)
 ):
     """
     Export conversation to PDF with title, date/time, and all content except SQL.
@@ -652,6 +723,23 @@ async def export_chat_pdf(
         
         # Build PDF
         doc.build(story)
+        
+        # Upload PDF to Stratus in background (non-blocking)
+        try:
+            # Create a copy of the buffer for upload
+            upload_buffer = BytesIO(buffer.getvalue())
+            
+            # Upload in background without blocking response
+            asyncio.create_task(upload_pdf_to_stratus(
+                pdf_buffer=upload_buffer,
+                session_id=session_id,
+                stratus_instance=stratus,
+                max_retries=3,
+                timeout=30
+            ))
+        except Exception as e:
+            print(f"[Stratus Upload] Failed to initiate background upload: {e}")
+            # Continue with PDF download response regardless
         
         # Return PDF as response
         buffer.seek(0)
