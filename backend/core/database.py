@@ -56,6 +56,6 @@ def get_cache_segment(request: Request):
         app = zcatalyst_sdk.initialize()
     
     cache_service = app.cache()
-    # Use specific segment ID instead of default
-    segment_service = cache_service.segment(segment_id='46143000000079007')
+    # Use default segment
+    segment_service = cache_service.segment()
     return segment_service

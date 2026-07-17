@@ -10,8 +10,9 @@ from typing import Optional
 from fastapi import APIRouter, Depends
 
 from agents.network_agent.graph_builder import NetworkGraphBuilder
-from core.database import get_zcql
+from core.database import get_zcql, get_cache_segment
 from core.security import require_role
+from services.cache_service import CacheService, generate_cache_key
 from schemas.network import (
     AccusedProfileResponse,
     DensestNode,
@@ -49,6 +50,7 @@ async def get_network_graph(
     date_to: Optional[str] = None,
     view: GraphView = "all",
     zcql=Depends(get_zcql),
+    cache_segment=Depends(get_cache_segment),
     user=Depends(require_role(["investigator", "analyst", "supervisor"])),
 ):
     """
@@ -57,14 +59,29 @@ async def get_network_graph(
     Builds the co-accused graph from Catalyst data with optional filters.
     Filters are applied as ZCQL WHERE clauses to limit the result set.
     """
+    cache = CacheService(cache_segment)
+    
+    # Check cache
+    cache_key = generate_cache_key("network:graph", crime_type, district, date_from, date_to, view)
+    cached_graph = cache.get(cache_key)
+    if cached_graph:
+        print(f"[Cache] Hit for network graph with filters: {crime_type}, {district}")
+        return GraphResponse(**cached_graph)
+    
     try:
-        return NetworkGraphBuilder(zcql).build_graph(
+        response = NetworkGraphBuilder(zcql).build_graph(
             crime_type=crime_type,
             district=district,
             date_from=date_from,
             date_to=date_to,
             view=view,
         )
+        
+        # Cache the response for 6 hours
+        cache.put(cache_key, response.model_dump(), expiry_in_hours=6)
+        print(f"[Cache] Stored network graph with filters: {crime_type}, {district}")
+        
+        return response
     except Exception as exc:
         print(f"[Warning] Failed to build network graph: {exc}")
         return _empty_graph_response()
@@ -75,6 +92,7 @@ async def get_accused_profile(
     accused_id: int,
     row_id: Optional[int] = None,
     zcql=Depends(get_zcql),
+    cache_segment=Depends(get_cache_segment),
     user=Depends(require_role(["investigator", "analyst", "supervisor"])),
 ):
     """
@@ -82,6 +100,15 @@ async def get_accused_profile(
     
     Can query by either accused_id (AccusedMasterID) or row_id (Accused.ROWID).
     """
+    cache = CacheService(cache_segment)
+    
+    # Check cache
+    cache_key = f"network:profile:{accused_id}:{row_id or 'default'}"
+    cached_profile = cache.get(cache_key)
+    if cached_profile:
+        print(f"[Cache] Hit for accused profile: {accused_id}")
+        return AccusedProfileResponse(**cached_profile)
+    
     try:
         # Use row_id if provided, otherwise use accused_id
         if row_id is not None:
@@ -232,6 +259,12 @@ async def get_accused_profile(
             last_seen_date=last_seen_date,
             aliases=[],
         )
+        
+        # Cache the response for 2 hours
+        cache.put(cache_key, response.model_dump(), expiry_in_hours=2)
+        print(f"[Cache] Stored accused profile: {accused_id}")
+        
+        return response
     except Exception as exc:
         print(f"[Warning] Failed to build accused profile: {exc}")
         return AccusedProfileResponse(
@@ -289,6 +322,7 @@ async def search_accused(
     date_from: Optional[str] = None,
     date_to: Optional[str] = None,
     zcql=Depends(get_zcql),
+    cache_segment=Depends(get_cache_segment),
     user=Depends(require_role(["investigator", "analyst", "supervisor"])),
 ):
     """
@@ -297,6 +331,15 @@ async def search_accused(
     Results are ranked by FIR count and latest FIR date.
     Optional filters (crime_type, district, date_from, date_to) can be applied.
     """
+    cache = CacheService(cache_segment)
+    
+    # Check cache
+    cache_key = generate_cache_key("network:search", q, limit, crime_type, district, date_from, date_to)
+    cached_search = cache.get(cache_key)
+    if cached_search:
+        print(f"[Cache] Hit for search: {q}")
+        return SearchResponse(**cached_search)
+    
     try:
         if not q or len(q.strip()) < 2:
             return SearchResponse(results=[])
@@ -391,6 +434,10 @@ async def search_accused(
             }
             for acc_id, info in sorted_results
         ]
+
+        # Cache the response for 1 hour
+        cache.put(cache_key, {"results": results}, expiry_in_hours=1)
+        print(f"[Cache] Stored search results: {q}")
 
         return SearchResponse(results=results)
     except Exception as exc:
