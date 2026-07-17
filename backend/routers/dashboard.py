@@ -2,8 +2,9 @@ from fastapi import APIRouter, Depends, Request
 from schemas.dashboard import (
     DashboardStatsResponse, DistrictCrimeResponse, AlertResponse, TrendResponse
 )
-from core.database import get_datastore, get_zcql
+from core.database import get_datastore, get_zcql, get_cache_segment
 from core.security import require_role
+from services.cache_service import CacheService
 from datetime import datetime, timedelta
 from analytics.trends import (
     DISTRICT_CENTROIDS, TREND_CATEGORIES, normalize, compute_trend, format_time_ago
@@ -17,8 +18,18 @@ router = APIRouter(prefix="/api/dashboard", tags=["dashboard"])
 async def get_dashboard_stats(
     request: Request,
     zcql=Depends(get_zcql),
+    cache_segment=Depends(get_cache_segment),
     user=Depends(require_role(["investigator", "analyst", "supervisor"]))
 ):
+    cache = CacheService(cache_segment)
+    
+    # Check cache
+    cache_key = "dashboard:stats"
+    cached_stats = cache.get(cache_key)
+    if cached_stats:
+        print(f"[Cache] Hit for dashboard stats")
+        return DashboardStatsResponse(**cached_stats)
+    
     try:
         query = "SELECT * FROM dashboard_stats ORDER BY computed_at DESC LIMIT 1"
         result = zcql.execute_query(query)
@@ -53,13 +64,20 @@ async def get_dashboard_stats(
         active_cases = 0
     
     # print(f"Final stats - total_firs: {total_firs}, active_cases: {active_cases}")
-    return DashboardStatsResponse(
+    
+    response = DashboardStatsResponse(
         total_firs=total_firs,
         active_cases=active_cases,
         high_risk_offender_count=0,
         active_alert_count=0,
         computed_at=datetime.utcnow()
     )
+    
+    # Cache the response for 1 hour
+    cache.put(cache_key, response.model_dump(), expiry_in_hours=1)
+    print(f"[Cache] Stored dashboard stats")
+    
+    return response
 
 
 @router.get("/district-crimes", response_model=list[DistrictCrimeResponse])
@@ -67,8 +85,18 @@ async def get_district_crimes(
     timeframe: str = "30d",
     request: Request = None,
     zcql=Depends(get_zcql),
+    cache_segment=Depends(get_cache_segment),
     user=Depends(require_role(["investigator", "analyst", "supervisor"]))
 ):
+    cache = CacheService(cache_segment)
+    
+    # Check cache
+    cache_key = f"dashboard:district:{timeframe}"
+    cached_crimes = cache.get(cache_key)
+    if cached_crimes:
+        print(f"[Cache] Hit for district crimes: {timeframe}")
+        return [DistrictCrimeResponse(**item) for item in cached_crimes]
+    
     timeframe_days = {"24h": 1, "7d": 7, "30d": 30}
     days = timeframe_days.get(timeframe, 30)
     since = datetime.utcnow() - timedelta(days=days)
@@ -130,6 +158,11 @@ async def get_district_crimes(
             lng=centroid["lng"]
         ))
     
+    # Cache the result for 2 hours
+    crimes_data = [crime.dict() for crime in results]
+    cache.put(cache_key, crimes_data, expiry_in_hours=2)
+    print(f"[Cache] Stored district crimes: {timeframe}")
+    
     return sorted(results, key=lambda x: x.total_firs, reverse=True)
 
 
@@ -138,6 +171,7 @@ async def get_active_alerts(
     limit: int = 10,
     request: Request = None,
     zcql=Depends(get_zcql),
+    cache_segment=Depends(get_cache_segment),
     user=Depends(require_role(["investigator", "analyst", "supervisor"]))
 ):
     try:
@@ -197,6 +231,7 @@ async def get_active_alerts(
 async def get_crime_trends(
     request: Request = None,
     zcql=Depends(get_zcql),
+    cache_segment=Depends(get_cache_segment),
     user=Depends(require_role(["investigator", "analyst", "supervisor"]))
 ):
     try:

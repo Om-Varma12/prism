@@ -20,13 +20,26 @@ from schemas.chat import (
     SessionMessage,
     SessionMessagesResponse,
 )
-from core.database import get_zcql, get_stratus
+from core.database import get_zcql, get_stratus, get_cache_segment
 from core.security import require_role
 from fastapi.responses import StreamingResponse
+from services.cache_service import CacheService, generate_cache_key
 import json
 
 
 router = APIRouter(prefix="/api/chat", tags=["chat"])
+
+
+def invalidate_session_cache(cache: CacheService, session_id: str):
+    """
+    Invalidate cache for a specific session.
+    
+    Args:
+        cache: CacheService instance
+        session_id: Session ID to invalidate
+    """
+    cache.delete(f"chat:messages:{session_id}")
+    print(f"[Cache] Invalidated session messages cache: {session_id}")
 
 
 def flatten_zcql_results(results: list) -> list:
@@ -146,7 +159,8 @@ def upload_pdf_to_stratus(
 async def chat_query(
     request: ChatQueryRequest,
     http_request: Request,
-    zcql = Depends(get_zcql)
+    zcql = Depends(get_zcql),
+    cache_segment = Depends(get_cache_segment)
 ):
     """
     Main chat query endpoint.
@@ -159,6 +173,16 @@ async def chat_query(
     """
     import re
     import random
+    
+    # Initialize cache service
+    cache = CacheService(cache_segment)
+    
+    # Check cache for existing response
+    cache_key = generate_cache_key("chat:query", request.query, request.session_id)
+    cached_response = cache.get(cache_key)
+    if cached_response:
+        print(f"[Cache] Hit for query: {request.query}")
+        return ChatQueryResponse(**cached_response)
     
     # Initialize agents
     llm_client = CatalystLLMClient()
@@ -295,8 +319,16 @@ async def chat_query(
             INSERT INTO conversations (conversation_id, user_id, session_id, role, content, sql_generated, created_at, table_data_json, entities_json, follow_ups_json, sources_json, scanned_records)
             VALUES ({asst_conv_id}, 'dev_user', '{request.session_id}', 'assistant', '{asst_content}', '{sql_escaped}', '{ts}', '{table_data_json}', '{entities_json}', '{follow_ups_json}', '{sources_json}', {scanned_records})
         """)
+        
+        # Invalidate session messages cache when new message added
+        invalidate_session_cache(cache, request.session_id)
     except Exception as e:
         print(f"[Warning] Failed to save to conversations table: {e}")
+    
+    # Cache the response
+    response_dict = response.dict()
+    cache.put(cache_key, response_dict, expiry_in_hours=48)
+    print(f"[Cache] Stored response for query: {request.query}")
     
     return response
 
@@ -304,7 +336,8 @@ async def chat_query(
 @router.get("/history", response_model=ChatHistoryResponse)
 async def chat_history(
     http_request: Request,
-    zcql = Depends(get_zcql)
+    zcql = Depends(get_zcql),
+    cache_segment = Depends(get_cache_segment)
 ):
     """
     Get conversation history for the current user.
@@ -312,6 +345,15 @@ async def chat_history(
     Returns one item per unique session_id, titled by the first user message,
     grouped into Today / Previous 7 Days / Older categories.
     """
+    cache = CacheService(cache_segment)
+    
+    # Check cache
+    cache_key = "chat:history:all"
+    cached_history = cache.get(cache_key)
+    if cached_history:
+        print(f"[Cache] Hit for conversation history")
+        return ChatHistoryResponse(conversations=cached_history)
+    
     try:
         # Fetch one row per session: the oldest user message (used as title)
         query = """
@@ -367,6 +409,11 @@ async def chat_history(
         # Sort newest first within each category
         categorized.sort(key=lambda x: x.created_at, reverse=True)
 
+        # Cache result
+        conversations_data = [conv.dict() for conv in categorized]
+        cache.put(cache_key, conversations_data, expiry_in_hours=24)
+        print(f"[Cache] Stored conversation history")
+
         return ChatHistoryResponse(conversations=categorized)
 
     except Exception as e:
@@ -377,12 +424,22 @@ async def chat_history(
 @router.get("/messages", response_model=SessionMessagesResponse)
 async def get_session_messages(
     session_id: str,
-    zcql = Depends(get_zcql)
+    zcql = Depends(get_zcql),
+    cache_segment = Depends(get_cache_segment)
 ):
     """
     Return all messages for a given session_id in chronological order.
     Used by the frontend to restore a previous conversation.
     """
+    cache = CacheService(cache_segment)
+    
+    # Check cache
+    cache_key = f"chat:messages:{session_id}"
+    cached_messages = cache.get(cache_key)
+    if cached_messages:
+        print(f"[Cache] Hit for session messages: {session_id}")
+        return SessionMessagesResponse(session_id=session_id, messages=cached_messages)
+    
     try:
         escaped_sid = session_id.replace("'", "''")
         query = f"""
@@ -410,6 +467,11 @@ async def get_session_messages(
                 scanned_records=r.get("scanned_records") or row.get("scanned_records"),
             ))
 
+        # Cache result
+        messages_data = [msg.dict() for msg in messages]
+        cache.put(cache_key, messages_data, expiry_in_hours=2)
+        print(f"[Cache] Stored session messages: {session_id}")
+
         return SessionMessagesResponse(session_id=session_id, messages=messages)
 
     except Exception as e:
@@ -418,12 +480,18 @@ async def get_session_messages(
 
 
 @router.post("/new", response_model=NewConversationResponse)
-async def new_conversation():
+async def new_conversation(cache_segment = Depends(get_cache_segment)):
     """
     Create a new conversation session.
 
     Generates a new UUID for the session_id.
     """
+    cache = CacheService(cache_segment)
+    
+    # Invalidate conversation history cache
+    cache.delete("chat:history:all")
+    print(f"[Cache] Invalidated conversation history cache")
+    
     return NewConversationResponse(session_id=str(uuid.uuid4()))
 
 
