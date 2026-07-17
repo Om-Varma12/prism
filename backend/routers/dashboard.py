@@ -24,7 +24,7 @@ async def get_dashboard_stats(
     cache = CacheService(cache_segment)
     
     # Check cache
-    cache_key = "dashboard:stats"
+    cache_key = generate_cache_key("dashboard:stats")
     cached_stats = cache.get(cache_key)
     if cached_stats:
         print(f"[Cache] Hit for dashboard stats")
@@ -91,7 +91,7 @@ async def get_district_crimes(
     cache = CacheService(cache_segment)
     
     # Check cache
-    cache_key = f"dashboard:district:{timeframe}"
+    cache_key = generate_cache_key("dashboard:district", timeframe)
     cached_crimes = cache.get(cache_key)
     if cached_crimes:
         print(f"[Cache] Hit for district crimes: {timeframe}")

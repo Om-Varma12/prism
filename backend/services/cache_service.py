@@ -80,6 +80,21 @@ class CacheService:
             print(f"[Cache] Delete error for key {key}: {e}")
             return False
     
+    def flush_all(self) -> bool:
+        """Flush all cached values in the segment."""
+        if self.disabled:
+            return False
+        try:
+            # Catalyst Cache doesn't have a direct flush method
+            # We need to get all keys and delete them one by one
+            # For now, we'll log this as a limitation
+            print(f"[Cache] Flush all - Catalyst Cache doesn't support direct flush")
+            print(f"[Cache] To clear cache, use the Catalyst console or delete individual keys")
+            return False
+        except Exception as e:
+            print(f"[Cache] Flush all error: {e}")
+            return False
+    
     def get_value(self, key: str) -> Optional[str]:
         """Get raw string value."""
         if self.disabled:

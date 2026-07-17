@@ -103,7 +103,7 @@ async def get_accused_profile(
     cache = CacheService(cache_segment)
     
     # Check cache
-    cache_key = f"network:profile:{accused_id}:{row_id or 'default'}"
+    cache_key = generate_cache_key("network:profile", accused_id, row_id or 'default')
     cached_profile = cache.get(cache_key)
     if cached_profile:
         print(f"[Cache] Hit for accused profile: {accused_id}")

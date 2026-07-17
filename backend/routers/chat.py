@@ -348,7 +348,7 @@ async def chat_history(
     cache = CacheService(cache_segment)
     
     # Check cache
-    cache_key = "chat:history:all"
+    cache_key = generate_cache_key("chat:history", "all")
     cached_history = cache.get(cache_key)
     if cached_history:
         print(f"[Cache] Hit for conversation history")
@@ -434,7 +434,7 @@ async def get_session_messages(
     cache = CacheService(cache_segment)
     
     # Check cache
-    cache_key = f"chat:messages:{session_id}"
+    cache_key = generate_cache_key("chat:messages", session_id)
     cached_messages = cache.get(cache_key)
     if cached_messages:
         print(f"[Cache] Hit for session messages: {session_id}")
@@ -511,7 +511,7 @@ async def set_session_data(
         value: Data value (JSON string)
     """
     cache = CacheService(cache_segment)
-    cache_key = f"session:{session_id}:{key}"
+    cache_key = generate_cache_key("session", session_id, key)
     cache.put(cache_key, value, expiry_in_hours=2)
     print(f"[Cache] Stored session data: {session_id}:{key}")
     return {"success": True}
@@ -531,7 +531,7 @@ async def get_session_data(
         key: Data key
     """
     cache = CacheService(cache_segment)
-    cache_key = f"session:{session_id}:{key}"
+    cache_key = generate_cache_key("session", session_id, key)
     value = cache.get(cache_key)
     print(f"[Cache] Retrieved session data: {session_id}:{key}")
     return {"value": value}

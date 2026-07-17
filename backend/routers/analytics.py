@@ -271,7 +271,7 @@ async def get_emerging_clusters(
         from schemas.analytics import CrimeAlert
         
         # Build cache key with hourly granularity
-        cache_key = f"analytics:emerging:{datetime.utcnow().strftime('%Y%m%d%H')}"
+        cache_key = generate_cache_key("analytics:emerging", datetime.utcnow().strftime('%Y%m%d%H'))
         
         # Try to get from cache first
         cached_alerts = cache.get(cache_key)
@@ -941,7 +941,7 @@ async def get_socioeconomic(
         import os
         
         # Build cache key
-        cache_key = "analytics:socioeconomic:district-data"
+        cache_key = generate_cache_key("analytics:socioeconomic", "district-data")
         
         # Try to get from cache first
         cached_socio = cache.get(cache_key)
