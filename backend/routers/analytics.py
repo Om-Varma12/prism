@@ -9,8 +9,9 @@ from typing import Optional
 
 from fastapi import APIRouter, Depends
 
-from core.database import get_zcql, get_cache
+from core.database import get_zcql, get_cache_segment
 from core.security import require_role
+from services.cache_service import CacheService, generate_cache_key
 from schemas.analytics import (
     CrimeAlertResponse,
     FestivalCalendarResponse,
@@ -132,15 +133,17 @@ async def get_hotspots(
     date_to: Optional[str] = None,
     district: Optional[str] = None,
     zcql=Depends(get_zcql),
-    cache=Depends(get_cache),
+    cache_segment=Depends(get_cache_segment),
     user=Depends(require_role(["investigator", "analyst", "supervisor"])),
 ):
     """
     Get spatial crime hotspots using DBSCAN clustering.
     
     Returns cluster centroids, point counts, bounding radius, and dominant crime type.
-    Results are cached for 5 minutes based on filter combination.
+    Results are cached for 24 hours based on filter combination.
     """
+    cache = CacheService(cache_segment)
+    
     try:
         from analytics.hotspot import HotspotAnalyzer
         from schemas.analytics import HotspotFilters
@@ -151,18 +154,14 @@ async def get_hotspots(
         if date_to and len(date_to) == 7:  # YYYY-MM format
             _, date_to = convert_month_to_date_range(date_to)
         
-        # Build cache key from filter combination
-        cache_key = f"hotspots:{date_from or 'all'}:{date_to or 'all'}:{district or 'all'}"
+        # Generate cache key from filter combination
+        cache_key = generate_cache_key("analytics:hotspots", date_from, date_to, district)
         
         # Try to get from cache first
-        try:
-            cached_data = cache.get(cache_key)
-            if cached_data:
-                import json
-                return HotspotClusterResponse(**json.loads(cached_data))
-        except AttributeError:
-            # Cache.get() not available, proceed without caching
-            pass
+        cached_hotspots = cache.get(cache_key)
+        if cached_hotspots:
+            print(f"[Cache] Hit for hotspots with filters: {date_from}, {date_to}, {district}")
+            return HotspotClusterResponse(**cached_hotspots)
         
         # Build ZCQL query to fetch incident data
         # Note: Using LIMIT to respect 300-row limit
@@ -244,13 +243,9 @@ async def get_hotspots(
             generated_at=datetime.utcnow(),
         )
         
-        # Cache the response for 5 minutes (300 seconds)
-        try:
-            import json
-            cache.set(cache_key, json.dumps(response.model_dump()), 300)
-        except AttributeError:
-            # Cache.set() not available, proceed without caching
-            pass
+        # Cache the response for 24 hours
+        cache.put(cache_key, response.model_dump(), expiry_in_hours=24)
+        print(f"[Cache] Stored hotspots with filters: {date_from}, {date_to}, {district}")
         
         return response
     except Exception as exc:
@@ -261,30 +256,28 @@ async def get_hotspots(
 @router.get("/emerging-clusters", response_model=CrimeAlertResponse)
 async def get_emerging_clusters(
     zcql=Depends(get_zcql),
-    cache=Depends(get_cache),
+    cache_segment=Depends(get_cache_segment),
     user=Depends(require_role(["investigator", "analyst", "supervisor"])),
 ):
     """
     Get emerging crime clusters from the crime_alerts table.
     
     Returns unacknowledged, high-severity alerts where crime rate is significantly
-    above historical baseline (spike_ratio > 2.0). Results are cached for 5 minutes.
+    above historical baseline (spike_ratio > 2.0). Results are cached for 6 hours.
     """
+    cache = CacheService(cache_segment)
+    
     try:
         from schemas.analytics import CrimeAlert
         
-        # Build cache key
-        cache_key = "emerging-clusters:unacknowledged:high-severity"
+        # Build cache key with hourly granularity
+        cache_key = f"analytics:emerging:{datetime.utcnow().strftime('%Y%m%d%H')}"
         
         # Try to get from cache first
-        try:
-            cached_data = cache.get(cache_key)
-            if cached_data:
-                import json
-                return CrimeAlertResponse(**json.loads(cached_data))
-        except AttributeError:
-            # Cache.get() not available, proceed without caching
-            pass
+        cached_alerts = cache.get(cache_key)
+        if cached_alerts:
+            print(f"[Cache] Hit for emerging clusters")
+            return CrimeAlertResponse(**cached_alerts)
         
         # Query crime_alerts table for unacknowledged, high-severity alerts
         query = """
@@ -352,13 +345,9 @@ async def get_emerging_clusters(
             generated_at=datetime.utcnow(),
         )
         
-        # Cache the response for 5 minutes (300 seconds)
-        try:
-            import json
-            cache.set(cache_key, json.dumps(response.model_dump()), 300)
-        except AttributeError:
-            # Cache.set() not available, proceed without caching
-            pass
+        # Cache the response for 6 hours
+        cache.put(cache_key, response.model_dump(), expiry_in_hours=6)
+        print(f"[Cache] Stored emerging clusters")
         
         return response
     except Exception as exc:
@@ -476,7 +465,7 @@ async def get_trends(
     crime_type: Optional[str] = None,
     district: Optional[str] = None,
     zcql=Depends(get_zcql),
-    cache=Depends(get_cache),
+    cache_segment=Depends(get_cache_segment),
     user=Depends(require_role(["investigator", "analyst", "supervisor"])),
 ):
     """
@@ -484,8 +473,10 @@ async def get_trends(
     
     Returns historical data and forecasted values for the next 30 days.
     Forecasted data is visually distinct from historical data.
-    Results are cached for 5 minutes based on filter combination.
+    Results are cached for 12 hours based on filter combination.
     """
+    cache = CacheService(cache_segment)
+    
     try:
         from analytics.trends import TrendAggregator
         from schemas.analytics import TrendFilters
@@ -494,18 +485,14 @@ async def get_trends(
         if granularity not in ["month", "week"]:
             granularity = "month"
         
-        # Build cache key from filter combination
-        cache_key = f"trends:{granularity}:{crime_type or 'all'}:{district or 'all'}"
+        # Generate cache key from filter combination
+        cache_key = generate_cache_key("analytics:trends", granularity, crime_type, district)
         
         # Try to get from cache first
-        try:
-            cached_data = cache.get(cache_key)
-            if cached_data:
-                import json
-                return TrendDataResponse(**json.loads(cached_data))
-        except AttributeError:
-            # Cache.get() not available, proceed without caching
-            pass
+        cached_trends = cache.get(cache_key)
+        if cached_trends:
+            print(f"[Cache] Hit for trends with filters: {granularity}, {crime_type}, {district}")
+            return TrendDataResponse(**cached_trends)
         
         # Build ZCQL query to fetch incident data
         query = """
@@ -656,13 +643,9 @@ async def get_trends(
             generated_at=datetime.utcnow(),
         )
         
-        # Cache the response for 5 minutes (300 seconds)
-        try:
-            import json
-            cache.set(cache_key, json.dumps(response.model_dump()), 300)
-        except AttributeError:
-            # Cache.set() not available, proceed without caching
-            pass
+        # Cache the response for 12 hours
+        cache.put(cache_key, response.model_dump(), expiry_in_hours=12)
+        print(f"[Cache] Stored trends with filters: {granularity}, {crime_type}, {district}")
         
         return response
     except Exception as exc:

@@ -27,4 +27,4 @@ COPY . .
 EXPOSE 3001
 
 # Run the application with uvicorn
-CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "${X_ZOHO_CATALYST_LISTEN_PORT:-3001}"]
+CMD ["sh", "-c", "uvicorn main:app --host 0.0.0.0 --port ${X_ZOHO_CATALYST_LISTEN_PORT:-3001}"]
