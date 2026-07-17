@@ -58,14 +58,19 @@ function App() {
   // On mount, check for an existing Catalyst session
   // Skip authentication check for local development
   useEffect(() => {
-    if (isLocalDevelopment()) {
-      setIsLoggedIn(true);
-      setChecking(false);
-    } else {
-      const sessionActive = isCatalystSessionActive();
-      setIsLoggedIn(sessionActive);
-      setChecking(false);
-    }
+    // Bypass login screen - direct login
+    setIsLoggedIn(true);
+    setChecking(false);
+    
+    // Original authentication logic (commented out)
+    // if (isLocalDevelopment()) {
+    //   setIsLoggedIn(true);
+    //   setChecking(false);
+    // } else {
+    //   const sessionActive = isCatalystSessionActive();
+    //   setIsLoggedIn(sessionActive);
+    //   setChecking(false);
+    // }
   }, []);
 
   const handleLogout = () => {

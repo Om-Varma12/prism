@@ -53,7 +53,7 @@ export default function Sidebar({ currentScreen, onNavigate, onLogout }: Sidebar
             PRISM
           </h1>
           <p className="font-label-mono text-label-mono text-on-surface-variant">
-            Operator 724
+            OM
           </p>
         </div>
       </div>
