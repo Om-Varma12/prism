@@ -470,7 +470,8 @@ export default function ChatScreen({ onNavigate: _onNavigate }: ChatScreenProps)
 
     setIsExporting(true);
     try {
-      const response = await fetch(`http://localhost:3001/api/chat/export-pdf?session_id=${activeSessionId}`);
+      const apiBaseUrl = process.env.REACT_APP_API_URL || 'http://localhost:3001';
+      const response = await fetch(`${apiBaseUrl}/api/chat/export-pdf?session_id=${activeSessionId}`);
       if (!response.ok) throw new Error('Failed to export PDF');
       const blob = await response.blob();
       const url = window.URL.createObjectURL(blob);
