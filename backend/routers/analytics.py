@@ -271,7 +271,7 @@ async def get_emerging_clusters(
         from schemas.analytics import CrimeAlert
         
         # Build cache key with hourly granularity
-        cache_key = f"analytics:emerging:{datetime.utcnow().strftime('%Y%m%d%H')}"
+        cache_key = generate_cache_key("analytics:emerging", datetime.utcnow().strftime('%Y%m%d%H'))
         
         # Try to get from cache first
         cached_alerts = cache.get(cache_key)
@@ -658,7 +658,7 @@ async def get_festival_calendar(
     crime_type: Optional[str] = None,
     district: Optional[str] = None,
     zcql=Depends(get_zcql),
-    cache=Depends(get_cache),
+    cache_segment=Depends(get_cache_segment),
     user=Depends(require_role(["investigator", "analyst", "supervisor"])),
 ):
     """
@@ -667,6 +667,7 @@ async def get_festival_calendar(
     Returns crime rate in ±7-day window around festivals vs yearly baseline.
     Results are cached for 1 hour since festival dates are static.
     """
+    cache = CacheService(cache_segment)
     from datetime import datetime, timedelta
     
     try:
@@ -676,18 +677,13 @@ async def get_festival_calendar(
         print(f"[DEBUG] Festival calendar request - crime_type: {crime_type}, district: {district}")
         
         # Build cache key with filters
-        cache_key = f"festival-calendar:seasonal-comparisons:{crime_type or 'all'}:{district or 'all'}"
+        cache_key = generate_cache_key("analytics:festival-calendar", crime_type, district)
         
         # Try to get from cache first
-        try:
-            cached_data = cache.get(cache_key)
-            if cached_data:
-                import json
-                print(f"[DEBUG] Returning cached festival calendar data")
-                return FestivalCalendarResponse(**json.loads(cached_data))
-        except AttributeError:
-            # Cache.get() not available, proceed without caching
-            pass
+        cached_festival = cache.get(cache_key)
+        if cached_festival:
+            print(f"[Cache] Hit for festival calendar with filters: {crime_type}, {district}")
+            return FestivalCalendarResponse(**cached_festival)
         
         # Build query with optional filters
         where_conditions = ["CaseMaster.IncidentFromDate IS NOT NULL"]
@@ -775,13 +771,9 @@ async def get_festival_calendar(
             generated_at=datetime.utcnow(),
         )
         
-        # Cache the response for 1 hour (3600 seconds) since festival dates are static
-        try:
-            import json
-            cache.set(cache_key, json.dumps(response.model_dump()), 3600)
-        except AttributeError:
-            # Cache.set() not available, proceed without caching
-            pass
+        # Cache the response for 24 hours since festival dates are static
+        cache.put(cache_key, response.model_dump(), expiry_in_hours=24)
+        print(f"[Cache] Stored festival calendar with filters: {crime_type}, {district}")
         
         return response
     except Exception as exc:
@@ -800,7 +792,7 @@ async def get_offender_risk(
     page: int = 1,
     page_size: int = 20,
     zcql=Depends(get_zcql),
-    cache=Depends(get_cache),
+    cache_segment=Depends(get_cache_segment),
     user=Depends(require_role(["investigator", "analyst", "supervisor"])),
 ):
     """
@@ -810,6 +802,7 @@ async def get_offender_risk(
     MO tags, absconding status, and FIR count.
     Results are cached for 10 minutes based on filter combination.
     """
+    cache = CacheService(cache_segment)
     try:
         from schemas.analytics import OffenderRisk, OffenderRiskFilters
         
@@ -820,17 +813,13 @@ async def get_offender_risk(
             page_size = 20
         
         # Build cache key from filter combination
-        cache_key = f"offender-risk:{district or 'all'}:{min_risk_score or 'all'}:{is_absconding or 'all'}:{page}:{page_size}"
+        cache_key = generate_cache_key("analytics:offender-risk", district, min_risk_score, is_absconding, page, page_size)
         
         # Try to get from cache first
-        try:
-            cached_data = cache.get(cache_key)
-            if cached_data:
-                import json
-                return OffenderRiskResponse(**json.loads(cached_data))
-        except AttributeError:
-            # Cache.get() not available, proceed without caching
-            pass
+        cached_risk = cache.get(cache_key)
+        if cached_risk:
+            print(f"[Cache] Hit for offender risk with filters: {district}, {min_risk_score}")
+            return OffenderRiskResponse(**cached_risk)
         
         # Build ZCQL query to fetch risk_scores data
         query = """
@@ -920,13 +909,9 @@ async def get_offender_risk(
             generated_at=datetime.utcnow(),
         )
         
-        # Cache the response for 10 minutes (600 seconds)
-        try:
-            import json
-            cache.set(cache_key, json.dumps(response.model_dump()), 600)
-        except AttributeError:
-            # Cache.set() not available, proceed without caching
-            pass
+        # Cache the response for 4 hours
+        cache.put(cache_key, response.model_dump(), expiry_in_hours=4)
+        print(f"[Cache] Stored offender risk with filters: {district}, {min_risk_score}")
         
         return response
     except Exception as exc:
@@ -937,7 +922,7 @@ async def get_offender_risk(
 @router.get("/socioeconomic", response_model=SocioeconomicResponse)
 async def get_socioeconomic(
     zcql=Depends(get_zcql),
-    cache=Depends(get_cache),
+    cache_segment=Depends(get_cache_segment),
     user=Depends(require_role(["analyst", "supervisor"])),
 ):
     """
@@ -946,24 +931,23 @@ async def get_socioeconomic(
     Returns literacy rate, urbanization percentage, and population
     for Karnataka districts. Role-gated to Analyst/Supervisor only.
     Server-side enforcement - Investigators receive 403.
-    Results are cached for 1 hour since data is static.
+    Results are cached for 24 hours since data is static.
     """
+    cache = CacheService(cache_segment)
+    
     try:
         from schemas.analytics import DistrictSocioeconomic
         import json
         import os
         
         # Build cache key
-        cache_key = "socioeconomic:district-data"
+        cache_key = generate_cache_key("analytics:socioeconomic", "district-data")
         
         # Try to get from cache first
-        try:
-            cached_data = cache.get(cache_key)
-            if cached_data:
-                return SocioeconomicResponse(**json.loads(cached_data))
-        except AttributeError:
-            # Cache.get() not available, proceed without caching
-            pass
+        cached_socio = cache.get(cache_key)
+        if cached_socio:
+            print(f"[Cache] Hit for socioeconomic data")
+            return SocioeconomicResponse(**cached_socio)
         
         # Load static socioeconomic data from JSON file
         json_path = os.path.join(os.path.dirname(__file__), "..", "data", "district_socioeconomic.json")
@@ -994,12 +978,9 @@ async def get_socioeconomic(
             generated_at=datetime.utcnow(),
         )
         
-        # Cache the response for 1 hour (3600 seconds) since data is static
-        try:
-            cache.set(cache_key, json.dumps(response.model_dump()), 3600)
-        except AttributeError:
-            # Cache.set() not available, proceed without caching
-            pass
+        # Cache the response for 24 hours since data is static
+        cache.put(cache_key, response.model_dump(), expiry_in_hours=24)
+        print(f"[Cache] Stored socioeconomic data")
         
         return response
     except Exception as exc:

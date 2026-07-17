@@ -4,7 +4,7 @@ from schemas.dashboard import (
 )
 from core.database import get_datastore, get_zcql, get_cache_segment
 from core.security import require_role
-from services.cache_service import CacheService
+from services.cache_service import CacheService, generate_cache_key
 from datetime import datetime, timedelta
 from analytics.trends import (
     DISTRICT_CENTROIDS, TREND_CATEGORIES, normalize, compute_trend, format_time_ago
@@ -24,7 +24,7 @@ async def get_dashboard_stats(
     cache = CacheService(cache_segment)
     
     # Check cache
-    cache_key = "dashboard:stats"
+    cache_key = generate_cache_key("dashboard:stats")
     cached_stats = cache.get(cache_key)
     if cached_stats:
         print(f"[Cache] Hit for dashboard stats")
@@ -91,7 +91,7 @@ async def get_district_crimes(
     cache = CacheService(cache_segment)
     
     # Check cache
-    cache_key = f"dashboard:district:{timeframe}"
+    cache_key = generate_cache_key("dashboard:district", timeframe)
     cached_crimes = cache.get(cache_key)
     if cached_crimes:
         print(f"[Cache] Hit for district crimes: {timeframe}")
