@@ -20,9 +20,10 @@ class DateTimeEncoder(json.JSONEncoder):
 class CacheService:
     """Wrapper for Catalyst Cache operations with JSON serialization."""
     
-    def __init__(self, segment_service):
+    def __init__(self, segment_service, max_cache_size_kb: int = 100):
         self.segment = segment_service
         self.disabled = os.getenv("DISABLE_CACHE", "false").lower() == "true"
+        self.max_cache_size_bytes = max_cache_size_kb * 1024
     
     def get(self, key: str) -> Optional[Any]:
         """Get cached value and deserialize JSON."""
@@ -48,8 +49,17 @@ class CacheService:
             return False
         try:
             json_value = json.dumps(value, cls=DateTimeEncoder)
+            
+            # Check if value size exceeds limit
+            value_size = len(json_value.encode('utf-8'))
+            if value_size > self.max_cache_size_bytes:
+                size_kb = value_size / 1024
+                max_kb = self.max_cache_size_bytes / 1024
+                print(f"[Cache] Skip caching {key}: value size {size_kb:.2f}KB exceeds limit {max_kb}KB")
+                return False
+            
             self.segment.put(key, json_value, expiry_in_hours)
-            print(f"[Cache] Put success for key: {key}")
+            print(f"[Cache] Put success for key: {key} ({size_kb:.2f}KB)")
             return True
         except Exception as e:
             print(f"[Cache] Put error for key {key}: {e}")
@@ -61,8 +71,17 @@ class CacheService:
             return False
         try:
             json_value = json.dumps(value, cls=DateTimeEncoder)
+            
+            # Check if value size exceeds limit
+            value_size = len(json_value.encode('utf-8'))
+            if value_size > self.max_cache_size_bytes:
+                size_kb = value_size / 1024
+                max_kb = self.max_cache_size_bytes / 1024
+                print(f"[Cache] Skip updating {key}: value size {size_kb:.2f}KB exceeds limit {max_kb}KB")
+                return False
+            
             self.segment.update(key, json_value, expiry_in_hours)
-            print(f"[Cache] Update success for key: {key}")
+            print(f"[Cache] Update success for key: {key} ({size_kb:.2f}KB)")
             return True
         except Exception as e:
             print(f"[Cache] Update error for key {key}: {e}")

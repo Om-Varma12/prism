@@ -4,7 +4,7 @@ from schemas.dashboard import (
 )
 from core.database import get_datastore, get_zcql, get_cache_segment
 from core.security import require_role
-from services.cache_service import CacheService
+from services.cache_service import CacheService, generate_cache_key
 from datetime import datetime, timedelta
 from analytics.trends import (
     DISTRICT_CENTROIDS, TREND_CATEGORIES, normalize, compute_trend, format_time_ago
