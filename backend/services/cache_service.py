@@ -33,7 +33,10 @@ class CacheService:
             if result is None:
                 return None
             if result and 'cache_value' in result:
-                return json.loads(result['cache_value'])
+                cache_value = result['cache_value']
+                if cache_value is None:
+                    return None
+                return json.loads(cache_value)
             return None
         except Exception as e:
             print(f"[Cache] Get error for key {key}: {e}")
@@ -100,8 +103,10 @@ def generate_cache_key(prefix: str, *args) -> str:
         *args: Variable arguments to include in the key
         
     Returns:
-        Formatted cache key with MD5 hash
+        Formatted cache key with shortened MD5 hash
     """
     key_string = ":".join(str(arg) for arg in args)
     hash_value = hashlib.md5(key_string.encode()).hexdigest()
-    return f"{prefix}:{hash_value}"
+    # Use first 12 characters of hash to avoid cache key length limits
+    short_hash = hash_value[:12]
+    return f"{prefix}:{short_hash}"
