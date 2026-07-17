@@ -495,6 +495,48 @@ async def new_conversation(cache_segment = Depends(get_cache_segment)):
     return NewConversationResponse(session_id=str(uuid.uuid4()))
 
 
+@router.post("/session/set")
+async def set_session_data(
+    session_id: str,
+    key: str,
+    value: str,
+    cache_segment = Depends(get_cache_segment)
+):
+    """
+    Store session data in cache.
+    
+    Args:
+        session_id: Session identifier
+        key: Data key
+        value: Data value (JSON string)
+    """
+    cache = CacheService(cache_segment)
+    cache_key = f"session:{session_id}:{key}"
+    cache.put(cache_key, value, expiry_in_hours=2)
+    print(f"[Cache] Stored session data: {session_id}:{key}")
+    return {"success": True}
+
+
+@router.get("/session/get")
+async def get_session_data(
+    session_id: str,
+    key: str,
+    cache_segment = Depends(get_cache_segment)
+):
+    """
+    Retrieve session data from cache.
+    
+    Args:
+        session_id: Session identifier
+        key: Data key
+    """
+    cache = CacheService(cache_segment)
+    cache_key = f"session:{session_id}:{key}"
+    value = cache.get(cache_key)
+    print(f"[Cache] Retrieved session data: {session_id}:{key}")
+    return {"value": value}
+
+
 @router.get("/db-status")
 async def db_status(zcql = Depends(get_zcql)):
     """Diagnostic endpoint to count rows in core tables."""

@@ -4,6 +4,7 @@ Cache service wrapper for Catalyst Cache operations with JSON serialization.
 
 import json
 import hashlib
+import os
 from typing import Optional, Any
 
 
@@ -12,9 +13,12 @@ class CacheService:
     
     def __init__(self, segment_service):
         self.segment = segment_service
+        self.disabled = os.getenv("DISABLE_CACHE", "false").lower() == "true"
     
     def get(self, key: str) -> Optional[Any]:
         """Get cached value and deserialize JSON."""
+        if self.disabled:
+            return None
         try:
             result = self.segment.get(key)
             if result and 'cache_value' in result:
@@ -26,6 +30,8 @@ class CacheService:
     
     def put(self, key: str, value: Any, expiry_in_hours: int = 48) -> bool:
         """Cache value with JSON serialization."""
+        if self.disabled:
+            return False
         try:
             json_value = json.dumps(value)
             self.segment.put(key, json_value, expiry_in_hours)
@@ -37,6 +43,8 @@ class CacheService:
     
     def update(self, key: str, value: Any, expiry_in_hours: int = 48) -> bool:
         """Update cached value with JSON serialization."""
+        if self.disabled:
+            return False
         try:
             json_value = json.dumps(value)
             self.segment.update(key, json_value, expiry_in_hours)
@@ -48,6 +56,8 @@ class CacheService:
     
     def delete(self, key: str) -> bool:
         """Delete cached value."""
+        if self.disabled:
+            return False
         try:
             self.segment.delete(key)
             print(f"[Cache] Delete success for key: {key}")
@@ -58,6 +68,8 @@ class CacheService:
     
     def get_value(self, key: str) -> Optional[str]:
         """Get raw string value."""
+        if self.disabled:
+            return None
         try:
             result = self.segment.get_value(key)
             if result and 'cache_value' in result:
