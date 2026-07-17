@@ -6,6 +6,15 @@ import json
 import hashlib
 import os
 from typing import Optional, Any
+from datetime import datetime
+
+
+class DateTimeEncoder(json.JSONEncoder):
+    """Custom JSON encoder to handle datetime objects."""
+    def default(self, obj):
+        if isinstance(obj, datetime):
+            return obj.isoformat()
+        return super().default(obj)
 
 
 class CacheService:
@@ -21,6 +30,8 @@ class CacheService:
             return None
         try:
             result = self.segment.get(key)
+            if result is None:
+                return None
             if result and 'cache_value' in result:
                 return json.loads(result['cache_value'])
             return None
@@ -33,7 +44,7 @@ class CacheService:
         if self.disabled:
             return False
         try:
-            json_value = json.dumps(value)
+            json_value = json.dumps(value, cls=DateTimeEncoder)
             self.segment.put(key, json_value, expiry_in_hours)
             print(f"[Cache] Put success for key: {key}")
             return True
@@ -46,7 +57,7 @@ class CacheService:
         if self.disabled:
             return False
         try:
-            json_value = json.dumps(value)
+            json_value = json.dumps(value, cls=DateTimeEncoder)
             self.segment.update(key, json_value, expiry_in_hours)
             print(f"[Cache] Update success for key: {key}")
             return True
