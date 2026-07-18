@@ -36,12 +36,14 @@ router = APIRouter(prefix="/api/chat", tags=["chat"])
 def invalidate_session_cache(cache: CacheService, session_id: str):
     """
     Invalidate cache for a specific session.
+    Uses the same hashed key as the messages endpoint so the cache is actually cleared.
     
     Args:
         cache: CacheService instance
         session_id: Session ID to invalidate
     """
-    cache.delete(f"chat:messages:{session_id}")
+    cache_key = generate_cache_key("chat:messages", session_id)
+    cache.delete(cache_key)
     print(f"[Cache] Invalidated session messages cache: {session_id}")
 
 
@@ -547,6 +549,7 @@ async def get_session_messages(
         FROM conversations
         WHERE session_id = '{escaped_sid}' AND user_id = 'dev_user'
         ORDER BY created_at ASC
+        LIMIT 500
         """
         result = zcql.execute_query(query)
         rows = result if isinstance(result, list) else []
