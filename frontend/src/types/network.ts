@@ -90,7 +90,8 @@ export interface CrimeTypeSummary {
 }
 
 export interface AccusedProfileResponse {
-  accused_id: number;
+  accused_id?: number | null;
+  row_id?: number | null;
   name: string;
   age?: number | null;
   gender?: string | null;
@@ -107,7 +108,8 @@ export interface AccusedProfileResponse {
 }
 
 export interface NetworkSearchResult {
-  accused_id: number;
+  accused_id?: number | null;
+  row_id?: number | null;
   name: string;
   fir_count: number;
   risk_score: number;

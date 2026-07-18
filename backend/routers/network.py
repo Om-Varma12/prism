@@ -110,11 +110,24 @@ async def get_accused_profile(
         return AccusedProfileResponse(**cached_profile)
     
     try:
-        # Use row_id if provided, otherwise use accused_id
+        # Use row_id if provided; fall back to accused_id
+        # accused_id may be 0 when the caller only knows the row_id (no AccusedMasterID)
         if row_id is not None:
             where_clause = f"Accused.ROWID = {row_id}"
-        else:
+        elif accused_id and accused_id != 0:
             where_clause = f"Accused.AccusedMasterID = {accused_id}"
+        else:
+            return AccusedProfileResponse(
+                accused_id=None,
+                row_id=row_id,
+                name="Unknown accused",
+                fir_count=0,
+                firs=[],
+                co_accused=[],
+                crime_types=[],
+                risk_score=0,
+                is_absconding=False,
+            )
         
         # Query accused basic info with FIR history (max 3 joins)
         # ZCQL: use ROWID for PK joins, max 4 joins total
@@ -142,7 +155,8 @@ async def get_accused_profile(
         
         if not accused_rows:
             return AccusedProfileResponse(
-                accused_id=accused_id,
+                accused_id=accused_id if accused_id and accused_id != 0 else None,
+                row_id=row_id,
                 name="Unknown accused",
                 fir_count=0,
                 firs=[],
@@ -160,15 +174,21 @@ async def get_accused_profile(
         gender = _gender_label(gender_id)
         
         # Check absconding status in a separate query (to stay within 4-join limit)
+        # Only meaningful if we have an AccusedMasterID
+        resolved_accused_id = _to_int(_value(first_row, "Accused", "AccusedMasterID", "AccusedMasterID")) or (accused_id if accused_id and accused_id != 0 else None)
+        resolved_row_id = _to_int(_value(first_row, "Accused", "Accused_ROWID", "Accused_ROWID")) or row_id
         arrest_query = f"""
             SELECT ArrestSurrenderID
             FROM ArrestSurrender
-            WHERE ArrestSurrender.AccusedMasterID = {accused_id}
+            WHERE ArrestSurrender.AccusedMasterID = {resolved_accused_id}
             LIMIT 1
-        """
+        """ if resolved_accused_id else None
         try:
-            arrest_result = zcql.execute_query(arrest_query)
-            is_absconding = not (arrest_result and isinstance(arrest_result, list) and len(arrest_result) > 0)
+            if arrest_query:
+                arrest_result = zcql.execute_query(arrest_query)
+                is_absconding = not (arrest_result and isinstance(arrest_result, list) and len(arrest_result) > 0)
+            else:
+                is_absconding = True
         except Exception:
             is_absconding = True
         
@@ -246,7 +266,8 @@ async def get_accused_profile(
         risk_score = min(100, fir_count * 15 + (50 if is_absconding else 0))
         
         return AccusedProfileResponse(
-            accused_id=accused_id,
+            accused_id=resolved_accused_id,
+            row_id=resolved_row_id,
             name=name,
             age=age,
             gender=gender,
@@ -267,8 +288,11 @@ async def get_accused_profile(
         return response
     except Exception as exc:
         print(f"[Warning] Failed to build accused profile: {exc}")
+        import traceback
+        traceback.print_exc()
         return AccusedProfileResponse(
-            accused_id=accused_id,
+            accused_id=accused_id if accused_id and accused_id != 0 else None,
+            row_id=row_id,
             name="Unknown accused",
             fir_count=0,
             firs=[],
@@ -349,9 +373,10 @@ async def search_accused(
         # Build WHERE clauses for filters
         where_clauses = []
         if crime_type:
-            # Get CrimeMinorHeadID for the crime type
+            # IMPORTANT: CaseMaster.CrimeMinorHeadID stores CrimeSubHead.ROWID (the physical PK),
+            # NOT CrimeSubHead.CrimeSubHeadID. We must query ROWID to get matching values.
             crime_type_query = f"""
-                SELECT CrimeSubHead.CrimeSubHeadID
+                SELECT CrimeSubHead.ROWID
                 FROM CrimeSubHead
                 WHERE CrimeSubHead.CrimeHeadName = '{crime_type}'
                 LIMIT 100
@@ -359,12 +384,12 @@ async def search_accused(
             try:
                 crime_type_result = zcql.execute_query(crime_type_query)
                 crime_type_ids = [
-                    _to_int(_value(row, "CrimeSubHead", "CrimeSubHeadID", "CrimeSubHeadID"))
+                    _to_int(_value(row, "CrimeSubHead", "ROWID", "ROWID"))
                     for row in (crime_type_result if isinstance(crime_type_result, list) else [])
                 ]
                 crime_type_ids = [cid for cid in crime_type_ids if cid is not None]
                 if crime_type_ids:
-                    where_clauses.append(f"CaseMaster.CrimeMinorHeadID IN ({','.join(map(str, crime_type_ids))})")
+                    where_clauses.append(f"CaseMaster.CrimeMinorHeadID IN ({','.join(map(str, crime_type_ids))})") 
             except Exception:
                 pass
         
@@ -389,6 +414,7 @@ async def search_accused(
         # ZCQL: use * wildcard (not %), no complex aggregates in search
         search_query = f"""
             SELECT
+                Accused.ROWID as Accused_ROWID,
                 Accused.AccusedMasterID,
                 Accused.AccusedName,
                 Accused.AgeYear,
@@ -404,35 +430,45 @@ async def search_accused(
         result = zcql.execute_query(search_query)
         rows = result if isinstance(result, list) else []
         
-        # Deduplicate rows by AccusedMasterID and aggregate FIR count client-side
+        # Deduplicate rows by AccusedMasterID (or ROWID as fallback) and aggregate FIR count
         seen_ids: dict = {}
         for row in rows:
             acc_id = _to_int(_value(row, "Accused", "AccusedMasterID", "AccusedMasterID"))
+            row_id_val = _to_int(_value(row, "Accused", "ROWID", "Accused_ROWID"))
+            # Use AccusedMasterID as dedup key when available, otherwise use ROWID
+            key = acc_id if acc_id is not None else row_id_val
+            if key is None:
+                continue
             name = _value(row, "Accused", "AccusedName", "AccusedName") or "Unknown"
             incident_date = _value(row, "CaseMaster", "IncidentFromDate", "IncidentFromDate")
-            if acc_id is None:
-                continue
-            if acc_id not in seen_ids:
-                seen_ids[acc_id] = {"name": name, "fir_count": 0, "last_fir_date": None}
-            seen_ids[acc_id]["fir_count"] += 1
+            if key not in seen_ids:
+                seen_ids[key] = {
+                    "name": name,
+                    "fir_count": 0,
+                    "last_fir_date": None,
+                    "accused_id": acc_id,
+                    "row_id": row_id_val,
+                }
+            seen_ids[key]["fir_count"] += 1
             if incident_date and (
-                not seen_ids[acc_id]["last_fir_date"]
-                or str(incident_date) > str(seen_ids[acc_id]["last_fir_date"])
+                not seen_ids[key]["last_fir_date"]
+                or str(incident_date) > str(seen_ids[key]["last_fir_date"])
             ):
-                seen_ids[acc_id]["last_fir_date"] = incident_date
+                seen_ids[key]["last_fir_date"] = incident_date
 
         # Sort by fir_count descending, take top `limit`
         sorted_results = sorted(seen_ids.items(), key=lambda kv: kv[1]["fir_count"], reverse=True)[:limit]
 
         results = [
             {
-                "accused_id": acc_id,
+                "accused_id": info["accused_id"],
+                "row_id": info["row_id"],
                 "name": info["name"],
                 "fir_count": info["fir_count"],
                 "risk_score": min(100, info["fir_count"] * 15),
                 "last_fir_date": info["last_fir_date"],
             }
-            for acc_id, info in sorted_results
+            for _key, info in sorted_results
         ]
 
         # Cache the response for 1 hour

@@ -246,6 +246,9 @@ class NetworkGraphBuilder:
         nodes = resolved_nodes
         edges = list(edges_by_pair.values())
         
+        # Assign gang clusters before view filtering so cluster sizes are available
+        CommunityDetector.assign_clusters_to_nodes(nodes, edges)
+
         # Apply view-specific filtering
         if view == "repeat":
             repeat_node_ids = {node.id for node in nodes if node.fir_count >= 2}
@@ -254,12 +257,26 @@ class NetworkGraphBuilder:
                 edge for edge in edges
                 if edge.source in repeat_node_ids and edge.target in repeat_node_ids
             ]
+        elif view == "clusters":
+            # Keep only nodes that belong to a gang cluster of size >= 2
+            cluster_sizes = CommunityDetector.get_cluster_metadata(nodes)
+            gang_node_ids = {
+                node.id for node in nodes
+                if node.gang_cluster is not None and cluster_sizes.get(node.gang_cluster, 0) >= 2
+            }
+            nodes = [node for node in nodes if node.id in gang_node_ids]
+            edges = [
+                edge for edge in edges
+                if edge.source in gang_node_ids and edge.target in gang_node_ids
+            ]
         
-        # Apply crime type filtering (client-side, since we can't join CrimeSubHead in main query)
+        # Apply crime type filtering (post-processing, since CrimeSubHead can't be joined in main query
+        # without exceeding ZCQL's 4-join limit).
+        # IMPORTANT: CaseMaster.CrimeMinorHeadID stores CrimeSubHead.ROWID (the physical PK),
+        # NOT CrimeSubHead.CrimeSubHeadID (the logical/small int column). We must select ROWID.
         if crime_type:
-            # Get CrimeMinorHeadID values for the specified crime type
             crime_type_query = f"""
-                SELECT CrimeSubHead.CrimeSubHeadID
+                SELECT CrimeSubHead.ROWID
                 FROM CrimeSubHead
                 WHERE CrimeSubHead.CrimeHeadName = '{crime_type}'
                 LIMIT 100
@@ -267,11 +284,12 @@ class NetworkGraphBuilder:
             try:
                 crime_type_result = self.zcql.execute_query(crime_type_query)
                 target_crime_type_ids = [
-                    self._to_int(self._value(row, "CrimeSubHead", "CrimeSubHeadID", "CrimeSubHeadID"))
+                    self._to_int(self._value(row, "CrimeSubHead", "ROWID", "ROWID"))
                     for row in (crime_type_result if isinstance(crime_type_result, list) else [])
                 ]
                 target_crime_type_ids = [cid for cid in target_crime_type_ids if cid is not None]
-                
+                print(f"[DEBUG] Crime type '{crime_type}' resolved to ROWIDs: {target_crime_type_ids}")
+
                 if target_crime_type_ids:
                     # Filter nodes by crime type using tracked crime_types_by_resolved_id
                     nodes = [
@@ -288,8 +306,10 @@ class NetworkGraphBuilder:
             except Exception as exc:
                 print(f"[Warning] Failed to filter by crime type: {exc}")
         
-        # Assign gang clusters for all views (used in clusters view)
-        CommunityDetector.assign_clusters_to_nodes(nodes, edges)
+        # Community detection already ran above before view filtering.
+        # Re-run only if the node list has changed (crime_type or view filter was applied).
+        if crime_type or view in ("repeat", "clusters"):
+            CommunityDetector.assign_clusters_to_nodes(nodes, edges)
         
         # Compute centrality metrics and attach to nodes
         CentralityComputer.attach_centrality_to_nodes(nodes, edges)

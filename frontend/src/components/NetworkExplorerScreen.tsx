@@ -5,7 +5,6 @@
 
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { MOCK_SUSPECTS } from '../data/mockData';
 import { SuspectProfile } from '../types';
 import { useNetworkGraph, useAccusedProfile, useSearchAccused } from '../hooks/useNetworkGraph';
 import { NetworkGraphFilters, NetworkGraphView, NetworkGraphNode } from '../types/network';
@@ -76,49 +75,42 @@ export default function NetworkExplorerScreen() {
   const [selectedAccusedId, setSelectedAccusedId] = useState<number | null>(null);
   const [selectedRowId, setSelectedRowId] = useState<number | null>(null);
   const [showProfilePanel, setShowProfilePanel] = useState(false);
-  const [profileSearchQuery, setProfileSearchQuery] = useState('');
   
   // Fetch live graph data
   const { data: graphData, isLoading, error } = useNetworkGraph(filters);
 
-  // Use live API data when available, fallback to mock for empty/error states
+  // Use live API data when available
   const nodes = graphData?.nodes || [];
   const edges = graphData?.edges || [];
 
-  // Fetch accused profile when a node is selected
+  // Fetch accused profile when a node or search result is selected
   const { data: profileData, isLoading: profileLoading, error: profileError } = useAccusedProfile(selectedAccusedId, selectedRowId);
 
-  // Search for accused by name when node lacks accused_id
-  const { data: profileSearchResults, isLoading: profileSearchLoading } = useSearchAccused(profileSearchQuery);
 
-  // When search results come back, use the first result to fetch profile
-  useEffect(() => {
-    if (profileSearchResults && profileSearchResults.results.length > 0) {
-      const firstResult = profileSearchResults.results[0];
-      setSelectedAccusedId(firstResult.accused_id);
-      setProfileSearchQuery(''); // Clear search after getting ID
+  const handleNodeClick = (nodeId: string) => {
+    setSelectedNodeId(nodeId);
+    // Find corresponding node data
+    const node = nodes.find((n: NetworkGraphNode) => n.id === nodeId);
+    if (node && node.type === 'accused') {
+      if (node.accused_id) {
+        // Node has an AccusedMasterID — use it directly
+        setSelectedAccusedId(node.accused_id);
+        setSelectedRowId(null);
+      } else {
+        // No AccusedMasterID — parse the ROWID embedded in the node ID (format: accused_{ROWID})
+        const rowIdStr = node.id.replace('accused_', '');
+        const parsedRowId = parseInt(rowIdStr, 10);
+        if (!isNaN(parsedRowId)) {
+          setSelectedRowId(parsedRowId);
+          setSelectedAccusedId(null);
+        } else {
+          setSelectedRowId(null);
+          setSelectedAccusedId(null);
+        }
+      }
+      setShowProfilePanel(true);
     }
-  }, [profileSearchResults]);
-
-   const handleNodeClick = (nodeId: string) => {
-     setSelectedNodeId(nodeId);
-     // Find corresponding node data
-     const node = nodes.find((n: NetworkGraphNode) => n.id === nodeId);
-     if (node && node.type === 'accused') {
-       // Extract accused_id from node and fetch real profile
-       if (node.accused_id) {
-         setSelectedAccusedId(node.accused_id);
-         setSelectedRowId(null);
-       } else {
-         // No accused_id - search by name to get the ID
-         setProfileSearchQuery(node.label);
-         setSelectedAccusedId(null);
-         setSelectedRowId(null);
-       }
-       // Always show the profile panel with available node data
-       setShowProfilePanel(true);
-     }
-   };
+  };
 
   return (
     <div className="flex-1 flex flex-col relative h-screen bg-[#0A0C10]">
@@ -226,8 +218,22 @@ export default function NetworkExplorerScreen() {
                           onClick={() => {
                             setSearchQuery(result.name);
                             setShowSearchResults(false);
-                            setSelectedAccusedId(result.accused_id);
-                            setSelectedNodeId(null);
+
+                            // Try to find and highlight the node in the graph
+                            const foundNode = nodes.find((n: any) =>
+                              (result.accused_id && n.accused_id === result.accused_id) ||
+                              (result.row_id && n.id === `accused_${result.row_id}`)
+                            );
+                            setSelectedNodeId(foundNode ? foundNode.id : null);
+
+                            // Set the correct identifiers for profile loading
+                            if (result.accused_id) {
+                              setSelectedAccusedId(result.accused_id);
+                              setSelectedRowId(null);
+                            } else if (result.row_id) {
+                              setSelectedRowId(result.row_id);
+                              setSelectedAccusedId(null);
+                            }
                             setShowProfilePanel(true);
                           }}
                         >
@@ -292,26 +298,6 @@ export default function NetworkExplorerScreen() {
             </div>
           </div>
 
-          {/* Legend */}
-          <div className="mt-auto p-4 border-t border-[#252830] bg-[#0c0e15]">
-            <h4 className="text-xs font-semibold text-on-surface-variant mb-3 uppercase tracking-wider">
-              Legend
-            </h4>
-            <ul className="flex flex-col gap-2 text-sm text-on-surface">
-              <li className="flex items-center gap-3">
-                <div className="w-3 h-3 rounded-full bg-[#ffb4ab] border border-[#93000a]"></div>
-                <span>Accused</span>
-              </li>
-              <li className="flex items-center gap-3">
-                <div className="w-3 h-3 bg-[#44474f] border border-[#191c22]"></div>
-                <span>Crime Incident</span>
-              </li>
-              <li className="flex items-center gap-3">
-                <div className="w-3 h-3 bg-[#b3c5ff] border border-[#003fa4] rotate-45"></div>
-                <span>Location</span>
-              </li>
-            </ul>
-          </div>
         </div>
 
         {/* RIGHT FLOATING PANEL: Entity Details */}

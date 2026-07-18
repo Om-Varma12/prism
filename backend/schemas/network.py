@@ -120,7 +120,8 @@ class CrimeTypeSummary(BaseModel):
 class AccusedProfileResponse(BaseModel):
     """Response body for GET /api/network/profile/{accused_id}."""
 
-    accused_id: int
+    accused_id: Optional[int] = None
+    row_id: Optional[int] = None
     name: str
     age: Optional[int] = None
     gender: Optional[str] = None
@@ -139,7 +140,8 @@ class AccusedProfileResponse(BaseModel):
 class SearchResult(BaseModel):
     """Single accused search result."""
 
-    accused_id: int
+    accused_id: Optional[int] = None
+    row_id: Optional[int] = None
     name: str
     fir_count: int
     risk_score: float = 0

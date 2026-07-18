@@ -31,13 +31,19 @@ export const networkService = {
   },
 
   /**
-   * Get a single accused profile by ID
+   * Get a single accused profile by ID or ROWID.
+   * When accusedId is null (node has no AccusedMasterID), pass 0 as the path param
+   * and supply row_id as a query param — the backend resolves by ROWID in that case.
    */
-  getProfile: async (accusedId: number, rowId?: number): Promise<AccusedProfileResponse> => {
+  getProfile: async (accusedId: number | null, rowId?: number): Promise<AccusedProfileResponse> => {
     const params = new URLSearchParams();
     if (rowId) params.append('row_id', rowId.toString());
+    // Use 0 as sentinel when we only have a row_id; backend handles accused_id=0 gracefully
+    const idParam = accusedId ?? 0;
     const queryString = params.toString();
-    const url = queryString ? `/api/network/profile/${accusedId}?${queryString}` : `/api/network/profile/${accusedId}`;
+    const url = queryString
+      ? `/api/network/profile/${idParam}?${queryString}`
+      : `/api/network/profile/${idParam}`;
     const response = await apiClient.get<AccusedProfileResponse>(url);
     return response.data;
   },
