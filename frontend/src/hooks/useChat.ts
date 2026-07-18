@@ -150,7 +150,7 @@ export const useChat = () => {
 
   // Update messages when sessionData changes (from react-query)
   useEffect(() => {
-    if (sessionData && sessionData.messages && activeSessionId) {
+    if (sessionData && sessionData.session_id === activeSessionId && sessionData.messages && activeSessionId) {
       const rows = sessionData.messages;
       
       const restored: ChatMessage[] = rows.map((row: any, idx: number) => {
