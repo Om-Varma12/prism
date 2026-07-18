@@ -549,7 +549,7 @@ async def get_session_messages(
         FROM conversations
         WHERE session_id = '{escaped_sid}' AND user_id = 'dev_user'
         ORDER BY created_at ASC
-        LIMIT 500
+        LIMIT 300
         """
         result = zcql.execute_query(query)
         rows = result if isinstance(result, list) else []

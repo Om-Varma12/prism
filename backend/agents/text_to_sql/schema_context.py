@@ -326,6 +326,16 @@ Gravity:
 WORKING EXAMPLE QUERIES
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
+Query: "How many FIRs are registered in Bengaluru Urban? / Find the number of FIRs in Bengaluru"
+SELECT CaseMaster.CrimeNo, CrimeSubHead.CrimeHeadName, District.DistrictName, CaseStatusMaster.CaseStatusName
+FROM CaseMaster
+INNER JOIN Unit ON CaseMaster.PoliceStationID = Unit.ROWID
+INNER JOIN District ON Unit.DistrictID = District.ROWID
+INNER JOIN CrimeSubHead ON CaseMaster.CrimeMinorHeadID = CrimeSubHead.ROWID
+INNER JOIN CaseStatusMaster ON CaseMaster.CaseStatusID = CaseStatusMaster.ROWID
+WHERE District.DistrictName = 'Bengaluru Urban'
+LIMIT 50
+
 Query: "Show me robbery cases in Bengaluru North"
 SELECT CaseMaster.CrimeNo, CrimeSubHead.CrimeHeadName, District.DistrictName, CaseStatusMaster.CaseStatusName
 FROM CaseMaster
@@ -356,13 +366,14 @@ INNER JOIN District ON Unit.DistrictID = District.ROWID
 WHERE Accused.AccusedName LIKE '*Raju*'
 LIMIT 50
 
-Query: "Count FIRs per district"
+Query: "Get district-wise crime statistics / Show the breakdown of total crime cases across all districts"
 SELECT District.DistrictName, COUNT(CaseMaster.ROWID) as case_count
 FROM CaseMaster
 INNER JOIN Unit ON CaseMaster.PoliceStationID = Unit.ROWID
 INNER JOIN District ON Unit.DistrictID = District.ROWID
 GROUP BY District.DistrictName
 ORDER BY case_count DESC
+
 
 Query: "Theft cases where accused is absconding"
 SELECT CaseMaster.CrimeNo, Accused.AccusedName, Accused.AgeYear, District.DistrictName
