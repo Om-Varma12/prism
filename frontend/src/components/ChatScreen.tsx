@@ -225,7 +225,8 @@ function ResultTable({ message }: { message: ChatMessage }) {
             {message.tableData.map((row, idx) => (
               <tr key={idx} className="border-b transition-colors hover:bg-teal-300/[0.04]" style={{ borderColor: 'rgba(27,30,38,0.6)' }}>
                 {columns.map((col, ci) => {
-                  const val = row[col] ?? 'N/A';
+                  const rawVal = row[col];
+                  const val = String(rawVal !== null && rawVal !== undefined ? rawVal : 'N/A');
                   const sStyle = getCellStyle(col, val);
                   const isStatus = Object.keys(sStyle).length > 0;
                   return (
@@ -235,7 +236,7 @@ function ResultTable({ message }: { message: ChatMessage }) {
                           {val}
                         </span>
                       ) : (
-                        <span style={{ color: ci === 0 ? shell.teal : undefined }} className={ci === 0 ? 'font-medium' : 'text-slate-300'}>
+                        <span style={{ color: ci === 0 ? shell.teal : '#cbd5e1' }} className={ci === 0 ? 'font-medium' : ''}>
                           {val}
                         </span>
                       )}
