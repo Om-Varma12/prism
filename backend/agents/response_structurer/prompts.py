@@ -29,10 +29,13 @@ CRITICAL RULES:
 RESPONSE_USER_PROMPT_TEMPLATE = """
 Original Question: {query}
 
-Query Results ({record_count} records returned):
+Query Results ({record_count} records shown — these are the actual matching records):
 {results}
 
 Summarize the findings in plain language. Do not mention table names, column names, or any technical terms.
+- Use the record count and the data shown to answer the question accurately.
+- If record_count is 50 and all rows share a common attribute, you may say "at least 50 ...".
+- Do NOT invent numbers that are not in the data.
 """
 
 EMPTY_RESULTS_PROMPT_TEMPLATE = """

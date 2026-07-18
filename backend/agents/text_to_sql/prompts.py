@@ -69,6 +69,15 @@ ZCQL HARD RULES — violating any of these will break the pipeline:
 26. ZCQL functions: MIN(), MAX(), COUNT(), SUM(), AVG(), DISTINCT
     - Multiple functions can be used on same column
     - AVG() works on Date, DateTime, Boolean, and numeric types (ZCQL V2)
+27. COUNT vs row-level SELECT — IMPORTANT:
+    - For "how many / count" questions (e.g. "how many FIRs in Mysuru?"): PREFER a row-level SELECT
+      with LIMIT rather than COUNT(*). The total count is inferred from the number of rows returned.
+      ✅ PREFER:  SELECT CaseMaster.CrimeNo, District.DistrictName FROM CaseMaster
+                  JOIN District ON District.ROWID = CaseMaster.DistrictID
+                  WHERE District.DistrictName = 'Mysuru' LIMIT 50
+      ❌ AVOID:   SELECT COUNT(CaseMaster.ROWID), District.DistrictName FROM CaseMaster ...
+    - ONLY use COUNT / GROUP BY for explicit statistical/breakdown questions such as:
+        "crime count per district", "how many FIRs per crime type", "district-wise breakdown"
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 COLUMN HALLUCINATION IS THE #1 ERROR.

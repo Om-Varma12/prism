@@ -155,16 +155,22 @@ class ResponseStructurer:
     
     def _is_aggregation_result(self, raw_results: List[Dict[str, Any]]) -> bool:
         """
-        Detect if results are from a COUNT/SUM/AVG aggregation with no row-level columns.
-        e.g. [{"COUNT(*)": 4}] or [{"CaseMaster_COUNT(*)": 4}]
+        Detect if results contain aggregate function columns (COUNT, SUM, AVG, MIN, MAX).
+        This includes pure aggregations (SELECT COUNT(*)) and GROUP BY results
+        (SELECT COUNT(*), DistrictName ... GROUP BY ...).
+        When ANY key is an aggregate function, the result is not row-level data
+        and should not be rendered as a table.
         """
         if not raw_results:
             return False
         first_row = raw_results[0]
         keys = list(first_row.keys())
-        # Aggregation if the only keys are aggregate function names
+        if not keys:
+            return False
         agg_keywords = ('COUNT', 'SUM', 'AVG', 'MIN', 'MAX')
-        return all(any(kw in k.upper() for kw in agg_keywords) for k in keys if k)
+        # If ANY key is an aggregate function, treat as aggregation — no table
+        return any(any(kw in k.upper() for kw in agg_keywords) for k in keys if k)
+
 
     def _format_table_data(
         self,
