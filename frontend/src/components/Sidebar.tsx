@@ -104,7 +104,6 @@ export default function Sidebar({ currentScreen, onNavigate, onLogout }: Sidebar
           </li>
           <li>
             <button
-              onClick={onLogout}
               className="w-full text-left px-4 py-3 flex items-center gap-3 text-error hover:bg-error/10 transition-colors duration-150 rounded-btn cursor-pointer font-bold"
             >
               <span className="material-symbols-outlined text-[20px]">logout</span>

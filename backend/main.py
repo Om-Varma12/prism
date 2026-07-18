@@ -5,6 +5,7 @@ from apscheduler.schedulers.asyncio import AsyncIOScheduler
 from apscheduler.triggers.interval import IntervalTrigger
 import asyncio
 from dotenv import load_dotenv
+import os
 load_dotenv()
 
 from tests.db.data_insertion import router as insertion_router
@@ -67,6 +68,24 @@ async def shutdown_event():
     scheduler.shutdown()
     print("[Shutdown] APScheduler stopped")
 
+
+# Temporary CORS debugging middleware
+@app.middleware("http")
+async def cors_debug_middleware(request: Request, call_next):
+    """Temporary middleware to log CORS headers for debugging."""
+    origin = request.headers.get("origin", "None")
+    host = request.headers.get("host", "None")
+    print(f"[CORS Debug] Request - Origin: {origin}, Host: {host}")
+    
+    response = await call_next(request)
+    
+    access_control_allow_origin = response.headers.get("access-control-allow-origin", "None")
+    print(f"[CORS Debug] Response - Access-Control-Allow-Origin: {access_control_allow_origin}")
+    
+    return response
+
+
+
 app.include_router(router=insertion_router)
 app.include_router(router=truncate_router)
 app.include_router(router=schema_router)
@@ -83,13 +102,34 @@ app.include_router(router=auto_sync_router)
 app.include_router(router=chat_router)
 app.include_router(router=populate_network_router)
 
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=["*"],
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
-)
+
+
+# Conditional CORS middleware registration
+ENABLE_FASTAPI_CORS = os.getenv("ENABLE_FASTAPI_CORS", "true").lower() == "true"
+
+if ENABLE_FASTAPI_CORS:
+    app.add_middleware(
+        CORSMiddleware,
+        allow_origins=[
+            "https://prism.onslate.in",
+            "https://prism-snhszbyd.onslate.in",
+        ],
+        allow_credentials=True,
+        allow_methods=["*"],
+        allow_headers=["*"],
+    )
+    print("[CORS] FastAPI CORSMiddleware enabled")
+else:
+    print("[CORS] FastAPI CORSMiddleware disabled (ENABLE_FASTAPI_CORS=false)")
+
+@app.get("/debug/headers")
+def debug_headers(request: Request):
+    """Debug endpoint to return request headers for CORS troubleshooting."""
+    return {
+        "request_origin": request.headers.get("origin", "None"),
+        "request_host": request.headers.get("host", "None"),
+        "request_headers": dict(request.headers)
+    }
 
 @app.get("/")
 def home(request: Request):

@@ -1,4 +1,4 @@
-auth
+auth logout remove
 
 chat interface: failed to process request
 
@@ -13,3 +13,13 @@ prism icon line small to match chat interface
 
 
 kannada language support
+
+update project structure
+
+make proper readme
+
+update main.py origin
+
+new session not working
+
+change the methods to get and post properly

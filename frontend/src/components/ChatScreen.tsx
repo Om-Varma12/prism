@@ -368,7 +368,7 @@ function Avatar({ kind, className = '' }: { kind: 'ai' | 'user'; className?: str
   if (kind === 'user') {
     return (
       <div className={`flex h-7 w-7 shrink-0 items-center justify-center rounded-lg border ${className}`} style={{ backgroundColor: `${shell.blueMuted}33`, borderColor: `${shell.blueMuted}66` }}>
-        <span className="text-[10px] font-bold" style={{ color: shell.blue }}>JD</span>
+        <span className="text-[10px] font-bold" style={{ color: shell.blue }}>OM</span>
       </div>
     );
   }
