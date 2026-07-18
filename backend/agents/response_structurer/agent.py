@@ -43,39 +43,49 @@ class ResponseStructurer:
         tables_accessed = metadata.get("tables_accessed", [])
         sql_query = metadata.get("sql_query", "")
         
+        # Detect aggregation/count-only result (no row-level data to table)
+        is_aggregation = self._is_aggregation_result(raw_results)
+        
         # Handle empty results
         if not raw_results or record_count == 0:
             return self._handle_empty_results(query, tables_accessed)
         
-        # Format results for LLM
-        results_str = json.dumps(raw_results[:10], indent=2)  # Limit to 10 results
+        # Format results for LLM (limit to 10 rows for prompt size)
+        results_str = json.dumps(raw_results[:10], indent=2)
         
         # Build user prompt
         user_prompt = RESPONSE_USER_PROMPT_TEMPLATE.format(
             query=query,
             results=results_str,
             record_count=record_count,
-            tables_accessed=", ".join(tables_accessed)
         )
         
-        # Call LLM
+        # Call LLM for a clean natural-language response_text and follow_ups
         try:
             response = self.llm_client.chat_completion_json(
                 system_prompt=RESPONSE_SYSTEM_PROMPT,
                 user_prompt=user_prompt,
-                temperature=0.5,
-                max_tokens=1024
+                temperature=0.4,
+                max_tokens=512
             )
-            
-            return {
-                "response_text": response.get("response_text", ""),
-                "table_data": self._format_table_data(raw_results[:10]),  # Limit to 10
-                "entities": self._clean_entities(response.get("entities", [])),
-                "follow_ups": response.get("follow_ups", [])
-            }
+            response_text = response.get("response_text", "")
+            follow_ups = response.get("follow_ups", [])
         except Exception as e:
-            # Fallback to raw data display on LLM failure
-            return self._fallback_response(query, raw_results, str(e))
+            response_text = f"Found {record_count} record(s) matching your query."
+            follow_ups = ["Show more details", "Filter by district", "Sort by date"]
+        
+        # Build table data: skip table for pure aggregation results
+        if is_aggregation:
+            table_data = []
+        else:
+            table_data = self._format_table_data(raw_results[:50])
+        
+        return {
+            "response_text": response_text,
+            "table_data": table_data,
+            "entities": [],
+            "follow_ups": follow_ups,
+        }
     
     def _clean_entities(self, raw_entities: Any) -> List[Dict[str, str]]:
         if not isinstance(raw_entities, list):
@@ -143,35 +153,50 @@ class ResponseStructurer:
                 ]
             }
     
+    def _is_aggregation_result(self, raw_results: List[Dict[str, Any]]) -> bool:
+        """
+        Detect if results are from a COUNT/SUM/AVG aggregation with no row-level columns.
+        e.g. [{"COUNT(*)": 4}] or [{"CaseMaster_COUNT(*)": 4}]
+        """
+        if not raw_results:
+            return False
+        first_row = raw_results[0]
+        keys = list(first_row.keys())
+        # Aggregation if the only keys are aggregate function names
+        agg_keywords = ('COUNT', 'SUM', 'AVG', 'MIN', 'MAX')
+        return all(any(kw in k.upper() for kw in agg_keywords) for k in keys if k)
+
     def _format_table_data(
         self,
         raw_results: List[Dict[str, Any]]
-    ) -> List[Dict[str, str]]:
+    ) -> List[Dict[str, Any]]:
         """
-        Format raw database results into table data format.
+        Format raw database results into a dynamic table for display.
+        Preserves actual column names from the query instead of hardcoding FIR fields.
         
         Args:
             raw_results: Raw database results
             
         Returns:
-            Formatted table data with firNo, crimeType, district, status
+            List of row dicts with cleaned, human-readable keys
         """
+        if not raw_results:
+            return []
+        
         table_data = []
-        
         for row in raw_results:
-            # Extract common fields, handle missing keys gracefully
-            fir_no = row.get("CrimeNo") or row.get("CaseNo") or row.get("ROWID", "N/A")
-            crime_type = row.get("CrimeHeadName") or row.get("CrimeType") or "Unknown"
-            district = row.get("DistrictName") or row.get("district") or "Unknown"
-            status = row.get("CaseStatusName") or row.get("status") or "Unknown"
-            
-            table_data.append({
-                "firNo": str(fir_no),
-                "crimeType": str(crime_type),
-                "district": str(district),
-                "status": str(status)
-            })
-        
+            cleaned_row = {}
+            for key, value in row.items():
+                # Clean up key: strip table prefix (e.g. "CaseMaster_CrimeNo" -> "CrimeNo")
+                clean_key = key
+                if '_' in key:
+                    parts = key.split('_', 1)
+                    # Only strip the prefix if the first part looks like a table name (Title case)
+                    if parts[0] and parts[0][0].isupper():
+                        clean_key = parts[1]
+                cleaned_row[clean_key] = str(value) if value is not None else "N/A"
+            if cleaned_row:
+                table_data.append(cleaned_row)
         return table_data
     
     def _fallback_response(

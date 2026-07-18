@@ -75,6 +75,9 @@ class TextToSQLAgent:
         entities = response.get("entities", [])
         confidence = response.get("confidence", 0.0)
         
+        # Sanitize query (removes semicolon, auto-appends LIMIT if needed)
+        zcql_query = sanitize_query(zcql_query)
+        
         # Validate the generated query
         is_valid, error_message = validate_query(zcql_query)
         
@@ -97,6 +100,9 @@ class TextToSQLAgent:
                 intent = retry_response.get("intent", intent)
                 entities = retry_response.get("entities", entities)
                 confidence = retry_response.get("confidence", confidence)
+                
+                # Sanitize query
+                zcql_query = sanitize_query(zcql_query)
                 
                 # Re-validate
                 is_valid, error_message = validate_query(zcql_query)

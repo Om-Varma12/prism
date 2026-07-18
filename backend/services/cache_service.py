@@ -52,8 +52,8 @@ class CacheService:
             
             # Check if value size exceeds limit
             value_size = len(json_value.encode('utf-8'))
+            size_kb = value_size / 1024
             if value_size > self.max_cache_size_bytes:
-                size_kb = value_size / 1024
                 max_kb = self.max_cache_size_bytes / 1024
                 print(f"[Cache] Skip caching {key}: value size {size_kb:.2f}KB exceeds limit {max_kb}KB")
                 return False
@@ -74,8 +74,8 @@ class CacheService:
             
             # Check if value size exceeds limit
             value_size = len(json_value.encode('utf-8'))
+            size_kb = value_size / 1024
             if value_size > self.max_cache_size_bytes:
-                size_kb = value_size / 1024
                 max_kb = self.max_cache_size_bytes / 1024
                 print(f"[Cache] Skip updating {key}: value size {size_kb:.2f}KB exceeds limit {max_kb}KB")
                 return False

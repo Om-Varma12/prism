@@ -1,7 +1,7 @@
 <!-- in chat if user is asking normal things like greeting and etc, no need for agent to make sql query
 kannada language support -->
 prism icon line small to match chat interface
-change the methods to get and post properly
+<!-- change the methods to get and post properly -->
 
 
 <!-- new session not working -->
