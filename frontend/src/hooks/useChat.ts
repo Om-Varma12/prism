@@ -23,11 +23,19 @@ export const useChat = () => {
   const isNewSession = useRef(true);
   const isInitialized = useRef(false);
 
-  // Generate session ID on mount
+  // Generate session ID on mount or load from URL
   useEffect(() => {
     const initSession = async () => {
       if (isInitialized.current) return;
       isInitialized.current = true;
+
+      const urlParams = new URLSearchParams(window.location.search);
+      const urlSessionId = urlParams.get('session_id');
+      if (urlSessionId) {
+        setActiveSessionId(urlSessionId);
+        isNewSession.current = false;
+        return;
+      }
 
       try {
         const { session_id } = await newConversationMutation.mutateAsync();
@@ -41,6 +49,38 @@ export const useChat = () => {
     };
     initSession();
   }, []);
+
+  // Synchronize URL with the active session ID when it changes
+  useEffect(() => {
+    if (activeSessionId) {
+      const url = new URL(window.location.href);
+      if (url.searchParams.get('page') === 'chat') {
+        const currentSessionId = url.searchParams.get('session_id');
+        if (currentSessionId !== activeSessionId) {
+          url.searchParams.set('session_id', activeSessionId);
+          if (!currentSessionId) {
+            window.history.replaceState({}, '', url.pathname + url.search);
+          } else {
+            window.history.pushState({}, '', url.pathname + url.search);
+          }
+        }
+      }
+    }
+  }, [activeSessionId]);
+
+  // Synchronize activeSessionId with URL session_id changes (e.g. Back/Forward)
+  useEffect(() => {
+    const handlePopState = () => {
+      const urlParams = new URLSearchParams(window.location.search);
+      const urlSessionId = urlParams.get('session_id');
+      if (urlParams.get('page') === 'chat' && urlSessionId && urlSessionId !== activeSessionId) {
+        setActiveSessionId(urlSessionId);
+        isNewSession.current = false;
+      }
+    };
+    window.addEventListener('popstate', handlePopState);
+    return () => window.removeEventListener('popstate', handlePopState);
+  }, [activeSessionId]);
 
   /**
    * Send a message to the chat API
@@ -150,7 +190,7 @@ export const useChat = () => {
 
   // Update messages when sessionData changes (from react-query)
   useEffect(() => {
-    if (sessionData && sessionData.messages && activeSessionId) {
+    if (sessionData && sessionData.session_id === activeSessionId && sessionData.messages && activeSessionId) {
       const rows = sessionData.messages;
       
       const restored: ChatMessage[] = rows.map((row: any, idx: number) => {

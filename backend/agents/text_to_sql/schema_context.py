@@ -84,6 +84,35 @@ TABLE: District  [geography]
     Active           BIT
   JOIN PATTERN: District.ROWID = Unit.DistrictID
   NOTE: There is NO DistrictID column on CaseMaster. Always go CaseMaster → Unit → District.
+  ⚠️ DISTRICT NAME SPELLING MAPPING:
+    Users frequently misspell or use old names for districts. You MUST map user terms to the exact database values below:
+    - User query: "Bangalore", "Bengaluru", "Bangalore City", "Bengaluru City" → 'Bengaluru Urban'
+    - User query: "Bangalore Rural", "Bengaluru Rural" → 'Bengaluru Rural'
+    - User query: "Mysore", "Mysuru" → 'Mysuru'
+    - User query: "Mangalore", "Mangaluru", "South Kannada", "South Canara" → 'Dakshina Kannada'
+    - User query: "Belgaum", "Belagavi" → 'Belagavi'
+    - User query: "Gulbarga", "Kalaburagi" → 'Kalaburagi'
+    - User query: "Dharwad", "Dharwar" → 'Dharwad'
+    - User query: "Hubli", "Hubballi" → 'Hubballi-Dharwad'
+    - User query: "Udipi", "Udupi" → 'Udupi'
+    - User query: "Shimoga", "Shivamogga" → 'Shivamogga'
+    - User query: "Tumkur", "Tumakuru" → 'Tumakuru'
+    - User query: "Karwar", "North Kannada" → 'Uttara Kannada'
+    - User query: "Coorg", "Kodagu" → 'Kodagu'
+    - User query: "Chickmagalur", "Chikkamagaluru" → 'Chikkamagaluru'
+    - User query: "Chikballapur", "Chikkaballapura" → 'Chikkaballapura'
+    - User query: "Ramnagara", "Ramanagara" → 'Ramanagara'
+    - User query: "Bijapur", "Vijayapura" → 'Vijayapura'
+    - User query: "Bellary", "Ballari" → 'Ballari'
+    - User query: "Chitradurga" → 'Chitradurga'
+    - User query: "Davanagere", "Davangere" → 'Davangere'
+    - User query: "Kolar" → 'Kolar'
+    - User query: "Mandya" → 'Mandya'
+    - User query: "Chamarajanagar" → 'Chamarajanagar'
+    - User query: "Bagalkot" → 'Bagalkot'
+    - User query: "Gadag" → 'Gadag'
+    - User query: "Haveri" → 'Haveri'
+    - User query: "Hassan" → 'Hassan'
 
 TABLE: State
   COLUMNS:

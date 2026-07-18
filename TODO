@@ -1,25 +1,9 @@
-auth logout remove
-
-chat interface: failed to process request
-
-chat user name change from JD to OM
-
-react app name change
-
-fav icon add
-
-
+<!-- in chat if user is asking normal things like greeting and etc, no need for agent to make sql query
+kannada language support -->
 prism icon line small to match chat interface
-
-
-kannada language support
-
-update project structure
-
-make proper readme
-
-update main.py origin
-
-new session not working
-
 change the methods to get and post properly
+
+
+<!-- new session not working -->
+update project structure
+make proper readme

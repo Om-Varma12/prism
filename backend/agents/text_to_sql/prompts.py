@@ -20,20 +20,20 @@ ZCQL HARD RULES — violating any of these will break the pipeline:
 
 1. SELECT only — never INSERT, UPDATE, DELETE, DROP.
 2. Always start the FROM clause from CaseMaster.
-3. Max 4 JOINs per query (only 1 JOIN condition per join clause).
+3. Max 4 JOINs per query. You can ONLY write ONE JOIN condition for each join clause (do NOT use AND/OR in the ON clause). Always qualify joined columns with their table names (e.g. Table.column).
 4. Max 20 columns in SELECT.
 5. Max 300 rows per query — ALWAYS include LIMIT clause (except GROUP BY/aggregation queries).
    - Syntax: LIMIT [{OFFSET}],{VALUE} (e.g., LIMIT 50 or LIMIT 0,50)
    - Default to LIMIT 50 for non-aggregation queries.
 6. Max 5 WHERE conditions per query (use AND/OR to link).
-7. NO subqueries (except simple singular subqueries in WHERE clause - ZCQL V2).
+7. NO subqueries (except simple singular subqueries in WHERE clause - ZCQL V2). No subqueries in FROM or JOIN.
 8. NO CASE WHEN expressions.
 9. NO date functions (NOW(), DATE_TRUNC, YEAR(), MONTH(), etc.). Use string literals for dates: '2026-01-01'.
-10. NO table aliases in FROM or JOIN clauses. Aliases (AS) only in SELECT column expressions (ZCQL V2).
-11. String values MUST be in single quotes: 'value'. Unquoted values treated as column names.
-    ✅ CORRECT: SELECT Name FROM Employee_DB WHERE name = 'Amelia'
-    ❌ WRONG:   SELECT Name FROM Employee_DB WHERE name = Amelia
-12. LIKE wildcards: `*` (zero or more chars), `?` (exactly one char) — NOT `%`.
+10. Table aliases (AS) are supported in FROM, JOIN, and SELECT column expressions (ZCQL V2).
+11. String values MUST be in single quotes: 'value'. Unquoted values are treated as column names.
+    ✅ CORRECT: SELECT Name FROM Employee WHERE Name = 'Amelia'
+    ❌ WRONG:   SELECT Name FROM Employee WHERE Name = Amelia
+12. LIKE wildcards: ONLY `*` (zero or more chars) and `?` (exactly one char) are allowed. Never use `%` or `_`.
     ✅ CORRECT: WHERE Accused.AccusedName LIKE '*Rauf*'
     ❌ WRONG:   WHERE Accused.AccusedName LIKE '%Rauf%'
 13. For primary key joins, use ROWID: e.g. Unit.ROWID = CaseMaster.PoliceStationID
@@ -43,10 +43,10 @@ ZCQL HARD RULES — violating any of these will break the pipeline:
 17. Check NULL values using IS/IS NOT operators (only for NULL values).
     ✅ CORRECT: WHERE column IS NULL or WHERE column IS NOT NULL
     ❌ WRONG:   WHERE column = NULL
-18. BETWEEN only works for Int or Double data types (not strings/dates).
-19. Column-to-column comparison allowed (same/different tables) but data types must match.
+18. BETWEEN only works for Int or Double data types (never for strings/dates).
+19. Column-to-column comparison is allowed but data types must match exactly (no cross-type comparisons).
 20. Boolean data type rules:
-    - Only accepts: FALSE, TRUE, NULL (no string values)
+    - Only accepts unquoted: FALSE, TRUE, NULL (never quote them like 'TRUE' or 'FALSE').
     - Cannot use: <, >, <=, >=, LIKE, NOT LIKE, BETWEEN, NOT BETWEEN, IN, NOT IN
     - Only accepts: =, !=, IS, IS NOT operators
 21. Encrypted data type rules:
@@ -58,19 +58,17 @@ ZCQL HARD RULES — violating any of these will break the pipeline:
     - BIGINT: -9223372036854775808 to 9223372036854775807
     - VarChar: Cannot exceed MaxLength setting
 23. GROUP BY rules:
-    - BINARYOF() only in GROUP BY statements (VarChar/Text columns only)
+    - BINARYOF() only in GROUP BY statements (VarChar/Text columns only) for case-insensitive grouping
     - Results are case-sensitive when using BINARYOF()
 24. ORDER BY rules:
-    - Supports ZCQL functions
-    - ASC/DESC can be applied to individual columns
+    - Supports ZCQL functions and ASC/DESC applied to individual columns
     - Used after WHERE/GROUP BY, before LIMIT
 25. HAVING clause (ZCQL V2):
     - Only with SELECT queries and GROUP BY
-    - Supports same operators as WHERE clause
-    - Supports ZCQL functions (SUM, COUNT, AVG, etc.)
+    - Supports same operators as WHERE clause and ZCQL functions (SUM, COUNT, AVG, etc.)
 26. ZCQL functions: MIN(), MAX(), COUNT(), SUM(), AVG(), DISTINCT
     - Multiple functions can be used on same column
-    - AVG() works on Date, DateTime, Boolean types (ZCQL V2)
+    - AVG() works on Date, DateTime, Boolean, and numeric types (ZCQL V2)
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 COLUMN HALLUCINATION IS THE #1 ERROR.
