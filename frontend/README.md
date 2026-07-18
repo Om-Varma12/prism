@@ -1,46 +1,82 @@
-# Getting Started with Create React App
+# PRISM Frontend Client
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+The frontend of PRISM is a Single Page Application (SPA) built using React, TypeScript, and Tailwind CSS. It communicates with the FastAPI backend deployed on Catalyst AppSail and provides an interactive command center for crime intelligence mapping, predictive analytics, network graph navigation, and natural language database querying.
 
-## Available Scripts
+---
 
-In the project directory, you can run:
+## 🛠️ Key Components & Technologies
 
-### `yarn start`
+*   **UI Framework**: React with TypeScript.
+*   **Styling**: Tailwind CSS for styling layout, tokens, animations, and custom panels.
+*   **Data Fetching & Caching**: `@tanstack/react-query` (React Query) for state sync, history polling, and automatic invalidation.
+*   **Geospatial Maps**: Leaflet (`react-leaflet`) for rendering coordinates, markers, heatmaps, and region boundaries.
+*   **Data Visualizations**: Recharts for crime timelines, temporal forecasting boundaries, and KPI indicators.
+*   **Interactive Visualizations**: D3.js for force-directed criminal associate network graphs.
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
+---
 
-The page will reload if you make edits.\
-You will also see any lint errors in the console.
+## 🧭 Page States & Address Bar Routing Sync
 
-### `yarn test`
+PRISM implements a custom page navigation and state synchronization mechanism in `App.tsx` and `hooks/useChat.ts` that links page state and chat sessions directly to the browser URL:
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+```
+Address Bar URL: /app?page=chat&session_id=9ed95fe3-9451-4f4c-b5de-6061d200be4b
+                               │
+            ┌──────────────────┴──────────────────┐
+            ▼                                     ▼
+[App.tsx] Syncs Page State             [useChat.ts] Syncs Chat Session
+- page=dashboard                       - restructures history on load
+- page=chat                            - popstate handles back/forward buttons
+- page=analytics                       - invalidates query caches dynamically
+- page=network
+```
 
-### `yarn build`
+### Back/Forward Browser Buttons
+The app registers global `popstate` event listeners. When an analyst clicks the browser's Back/Forward buttons, the app automatically reflects page adjustments and restores previously opened chat session states without reloading the application.
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+---
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+## 📁 Key Screens
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+The main screen views are flat components stored under `src/components/`:
 
-### `yarn eject`
+*   **`CommandDashboardScreen.tsx`**: Features the main KPI metrics, real-time alert feed (with acknowledgment actions), overall crime category trends, and an interactive SVG district map of Karnataka.
+*   **`ChatScreen.tsx`**: Features the multi-agent conversational interface. It includes an input box with voice capability (Web Speech API), a message thread (handling markdown, markdown alerts, and suggested actions), an **SQL transparency drawer** showing generated ZCQL, and a **dynamic results table** that builds table columns on the fly from whatever data keys are returned.
+*   **`AnalyticsScreen.tsx`**: Features tab routers for:
+    *   *Geospatial Hotspots*: Leaflet map detailing DBSCAN density crime clusters.
+    *   *Trend Analysis*: Historical charts overlaid with temporal forecasting data (Prophet).
+    *   *Offender Risk Board*: Rank listings of high-risk recidivists.
+*   **`NetworkExplorerScreen.tsx`**: Features the force-directed D3 network graph rendering linkages between cases, accomplices, and gangs. Clicking a node opens a slide-in profiling drawer detailing key metrics (centrality and crime involvement).
+*   **`LoginScreen.tsx`**: High-fidelity authorization page displaying an atmospheric, themed landing layout.
 
-**Note: this is a one-way operation. Once you `eject`, you can’t go back!**
+---
 
-If you aren’t satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+## ⚙️ Local Installation & Development
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you’re on your own.
+### 1. Requirements
+Ensure you have Node.js v18+ and npm installed.
 
-You don’t have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn’t feel obligated to use this feature. However we understand that this tool wouldn’t be useful if you couldn’t customize it when you are ready for it.
+### 2. Dependency Setup
+Navigate to the `frontend` folder and install packages:
+```bash
+npm install
+```
 
-## Learn More
+### 3. API Configuration
+Verify that `src/constants/api.ts` (or the corresponding config file) references the correct API URL for the backend:
+*   Local Backend Dev Server: `http://localhost:3001` (FastAPI)
+*   Deployed Catalyst Gateway: The deployment gateway domain provided by Zoho.
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+### 4. Running the Dev Client
+Start the local server:
+```bash
+npm start
+```
+Open `http://localhost:3000` to view the application in development mode.
 
-To learn React, check out the [React documentation](https://reactjs.org/).
+### 5. Production Build
+To build the application for deployment or web-client hosting:
+```bash
+npm run build
+```
+The output files will be compiled and optimized in the `build/` directory, ready to be hosted via Catalyst Web Client Hosting.

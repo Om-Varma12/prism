@@ -36,12 +36,14 @@ router = APIRouter(prefix="/api/chat", tags=["chat"])
 def invalidate_session_cache(cache: CacheService, session_id: str):
     """
     Invalidate cache for a specific session.
+    Uses the same hashed key as the messages endpoint so the cache is actually cleared.
     
     Args:
         cache: CacheService instance
         session_id: Session ID to invalidate
     """
-    cache.delete(f"chat:messages:{session_id}")
+    cache_key = generate_cache_key("chat:messages", session_id)
+    cache.delete(cache_key)
     print(f"[Cache] Invalidated session messages cache: {session_id}")
 
 
@@ -286,6 +288,10 @@ async def chat_query(
             
             # Invalidate session messages cache when new message added
             invalidate_session_cache(cache, request.session_id)
+            # Invalidate history cache so sidebar refreshes
+            history_cache_key = generate_cache_key("chat:history", "all")
+            cache.delete(history_cache_key)
+            print(f"[Cache] Invalidated conversation history cache after general query")
         except Exception as e:
             print(f"[Warning] Failed to save to conversations table: {e}")
             
@@ -413,6 +419,10 @@ async def chat_query(
             
             # Invalidate session messages cache when new message added
             invalidate_session_cache(cache, request.session_id)
+            # Invalidate history cache so sidebar refreshes
+            history_cache_key = generate_cache_key("chat:history", "all")
+            cache.delete(history_cache_key)
+            print(f"[Cache] Invalidated conversation history cache after general query")
         except Exception as e:
             print(f"[Warning] Failed to save to conversations table: {e}")
     
@@ -452,6 +462,7 @@ async def chat_history(
         FROM conversations
         WHERE user_id = 'dev_user' AND role = 'user'
         ORDER BY created_at ASC
+        LIMIT 300
         """
         result = zcql.execute_query(query)
         rows = result if isinstance(result, list) else []
@@ -538,6 +549,7 @@ async def get_session_messages(
         FROM conversations
         WHERE session_id = '{escaped_sid}' AND user_id = 'dev_user'
         ORDER BY created_at ASC
+        LIMIT 300
         """
         result = zcql.execute_query(query)
         rows = result if isinstance(result, list) else []
@@ -579,8 +591,9 @@ async def new_conversation(cache_segment = Depends(get_cache_segment)):
     """
     cache = CacheService(cache_segment)
     
-    # Invalidate conversation history cache
-    cache.delete("chat:history:all")
+    # Invalidate conversation history cache using the correct hashed key
+    history_cache_key = generate_cache_key("chat:history", "all")
+    cache.delete(history_cache_key)
     print(f"[Cache] Invalidated conversation history cache")
     
     return NewConversationResponse(session_id=str(uuid.uuid4()))

@@ -164,10 +164,11 @@ export const useChat = () => {
   const startNewConversation = async () => {
     try {
       const { session_id } = await newConversationMutation.mutateAsync();
-      setActiveSessionId(session_id);
+      // Reset state before changing session to avoid flicker
       setMessages([]);
       setLatestResponse(null);
       isNewSession.current = true;
+      setActiveSessionId(session_id);
     } catch (error) {
       console.error('Failed to create new session:', error);
     }
@@ -189,9 +190,19 @@ export const useChat = () => {
   };
 
   // Update messages when sessionData changes (from react-query)
+  // Only restore messages for EXISTING sessions (not new ones where we use optimistic updates)
   useEffect(() => {
-    if (sessionData && sessionData.session_id === activeSessionId && sessionData.messages && activeSessionId) {
+    if (
+      sessionData &&
+      sessionData.session_id === activeSessionId &&
+      sessionData.messages &&
+      activeSessionId &&
+      !isNewSession.current  // Don't restore for new sessions — optimistic updates already displayed
+    ) {
       const rows = sessionData.messages;
+      
+      // If no messages in DB yet, don't wipe optimistic messages
+      if (rows.length === 0) return;
       
       const restored: ChatMessage[] = rows.map((row: any, idx: number) => {
         const message: ChatMessage = {

@@ -21,7 +21,7 @@ export const useChatHistory = () => {
   return useQuery({
     queryKey: chatQueryKeys.history(),
     queryFn: () => chatService.getHistory(),
-    staleTime: 2 * 60 * 1000, // 2 minutes
+    staleTime: 0, // Always refetch on invalidation
   });
 };
 
@@ -33,7 +33,7 @@ export const useSessionMessages = (sessionId: string) => {
     queryKey: chatQueryKeys.sessionMessages(sessionId),
     queryFn: () => chatService.getSessionMessages(sessionId),
     enabled: !!sessionId,
-    staleTime: 5 * 60 * 1000, // 5 minutes
+    staleTime: 0, // Always refetch on invalidation
   });
 };
 

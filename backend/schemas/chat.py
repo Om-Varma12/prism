@@ -3,7 +3,7 @@ Pydantic schemas for chat API request and response models.
 """
 from pydantic import BaseModel
 from datetime import datetime
-from typing import List, Optional
+from typing import List, Optional, Dict, Any
 
 
 class ChatQueryRequest(BaseModel):
@@ -12,12 +12,9 @@ class ChatQueryRequest(BaseModel):
     session_id: str
 
 
-class ChatTableRow(BaseModel):
-    """Table row data for chat response."""
-    firNo: str
-    crimeType: str
-    district: str
-    status: str
+# ChatTableRow is a dynamic dict — columns vary depending on the SQL query
+ChatTableRow = Dict[str, str]
+
 
 
 class ChatEntity(BaseModel):
@@ -31,7 +28,7 @@ class ChatQueryResponse(BaseModel):
     """Response model for chat query endpoint."""
     message_id: str
     response_text: str
-    table_data: List[ChatTableRow]
+    table_data: List[Dict[str, str]]
     sql_query: str
     scanned_records: int
     sources: List[str]

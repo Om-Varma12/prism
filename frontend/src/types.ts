@@ -61,12 +61,8 @@ export interface ClusterItem {
 
 // ─── Chat ─────────────────────────────────────────────────────────────────────
 
-export interface ChatTableRow {
-  firNo: string;
-  crimeType: string;
-  district: string;
-  status: string;
-}
+export type ChatTableRow = Record<string, string>;
+
 
 export interface ChatMessage {
   id: string;

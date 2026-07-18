@@ -56,8 +56,10 @@ def validate_query(sql: str) -> Tuple[bool, str]:
     if not sql_upper.strip().startswith('SELECT'):
         return False, "Query must start with SELECT"
     
-    # Must have LIMIT clause
-    if 'LIMIT' not in sql_upper:
+    # Must have LIMIT clause (except for GROUP BY / aggregation queries)
+    is_aggregation = bool(re.search(r'\b(COUNT|SUM|AVG|MIN|MAX)\s*\(', sql_upper))
+    has_group_by = bool(re.search(r'\bGROUP\s+BY\b', sql_upper))
+    if 'LIMIT' not in sql_upper and not (is_aggregation or has_group_by):
         return False, "Query must include LIMIT clause"
     
     # Check for valid table names
@@ -88,7 +90,8 @@ def validate_query(sql: str) -> Tuple[bool, str]:
 
 def sanitize_query(sql: str) -> str:
     """
-    Sanitize a SQL query by removing trailing semicolons and normalizing whitespace.
+    Sanitize a SQL query by removing trailing semicolons, normalizing whitespace,
+    and auto-appending LIMIT 50 for non-aggregation, non-GROUP BY queries if missing.
     
     Args:
         sql: The SQL query string to sanitize
@@ -96,6 +99,8 @@ def sanitize_query(sql: str) -> str:
     Returns:
         Sanitized SQL query
     """
+    if not sql:
+        return ""
     # Remove trailing semicolon
     sql = sql.rstrip(';')
     
@@ -105,6 +110,13 @@ def sanitize_query(sql: str) -> str:
     # Trim leading/trailing whitespace
     sql = sql.strip()
     
+    sql_upper = sql.upper()
+    if sql_upper.startswith('SELECT') and 'LIMIT' not in sql_upper:
+        is_aggregation = bool(re.search(r'\b(COUNT|SUM|AVG|MIN|MAX)\s*\(', sql_upper))
+        has_group_by = bool(re.search(r'\bGROUP\s+BY\b', sql_upper))
+        if not (is_aggregation or has_group_by):
+            sql = f"{sql} LIMIT 50"
+            
     return sql
 
 

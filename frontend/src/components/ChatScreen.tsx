@@ -183,12 +183,29 @@ function HistoryItem({
 function ResultTable({ message }: { message: ChatMessage }) {
   if (!message.tableData || message.tableData.length === 0) return null;
 
+  // Derive columns dynamically from the first row's keys
+  const columns = Object.keys(message.tableData[0]);
+
+  // Detect status-like columns for colour coding
+  const isStatusCol = (col: string) =>
+    col.toLowerCase().includes('status') || col.toLowerCase().includes('state');
+
+  const getCellStyle = (col: string, val: string) => {
+    if (!isStatusCol(col)) return {};
+    const upper = val.toUpperCase();
+    if (upper.includes('ACTIVE') || upper.includes('PENDING'))
+      return { color: shell.red, borderColor: `${shell.redMuted}99`, backgroundColor: `${shell.redMuted}55` };
+    if (upper.includes('INVEST'))
+      return { color: shell.gold, borderColor: `${shell.goldMuted}99`, backgroundColor: `${shell.goldMuted}55` };
+    return { color: shell.green, borderColor: `${shell.greenMuted}99`, backgroundColor: `${shell.greenMuted}55` };
+  };
+
   return (
     <div className="overflow-hidden rounded-xl border shadow-[0_0_0_1px_rgba(255,255,255,0.04),0_4px_24px_rgba(0,0,0,0.4)]" style={{ backgroundColor: shell.panelRaised, borderColor: shell.line }}>
       <div className="flex items-center justify-between border-b px-3.5 py-2" style={{ borderColor: shell.line, backgroundColor: 'rgba(28,33,43,0.4)' }}>
         <div className="flex items-center gap-2">
           <Glyph name="table" className="text-[15px]" style={{ color: shell.blue } as any} />
-          <span className="text-[11px] font-semibold text-slate-200">FIR Result Summary</span>
+          <span className="text-[11px] font-semibold text-slate-200">Query Results</span>
         </div>
         <span className="font-mono text-[10px]" style={{ color: shell.ghost }}>{message.tableData.length} rows</span>
       </div>
@@ -196,31 +213,36 @@ function ResultTable({ message }: { message: ChatMessage }) {
         <table className="w-full text-[11px]">
           <thead>
             <tr className="border-b" style={{ borderColor: shell.line, backgroundColor: 'rgba(28,33,43,0.3)' }}>
-              {['FIR No.', 'Crime Type', 'District', 'Status'].map((head, idx) => (
-                <th key={head} className={`whitespace-nowrap px-3.5 py-2 font-semibold uppercase tracking-wider ${idx === 3 ? 'text-right' : 'text-left'}`} style={{ color: shell.ghost }}>
-                  {head}
+              {columns.map((col) => (
+                <th key={col} className="whitespace-nowrap px-3.5 py-2 text-left font-semibold uppercase tracking-wider" style={{ color: shell.ghost }}>
+                  {/* Convert camelCase / PascalCase to spaced label */}
+                  {col.replace(/([A-Z])/g, ' $1').replace(/[_*()]/g, ' ').trim()}
                 </th>
               ))}
             </tr>
           </thead>
           <tbody>
             {message.tableData.map((row, idx) => (
-              <tr key={`${row.firNo}-${idx}`} className="border-b transition-colors hover:bg-teal-300/[0.04]" style={{ borderColor: 'rgba(27,30,38,0.6)' }}>
-                <td className="whitespace-nowrap px-3.5 py-2.5 font-medium" style={{ color: shell.teal }}>{row.firNo}</td>
-                <td className="whitespace-nowrap px-3.5 py-2.5 text-slate-300">{row.crimeType}</td>
-                <td className="whitespace-nowrap px-3.5 py-2.5 text-slate-300">{row.district}</td>
-                <td className="whitespace-nowrap px-3.5 py-2.5 text-right">
-                  <span
-                    className="inline-flex items-center gap-1 rounded border px-1.5 py-0.5 text-[10px] font-semibold"
-                    style={{
-                      color: row.status === 'ACTIVE' ? shell.red : row.status === 'INVESTIGATION' ? shell.gold : shell.green,
-                      borderColor: row.status === 'ACTIVE' ? `${shell.redMuted}99` : row.status === 'INVESTIGATION' ? `${shell.goldMuted}99` : `${shell.greenMuted}99`,
-                      backgroundColor: row.status === 'ACTIVE' ? `${shell.redMuted}55` : row.status === 'INVESTIGATION' ? `${shell.goldMuted}55` : `${shell.greenMuted}55`,
-                    }}
-                  >
-                    {row.status}
-                  </span>
-                </td>
+              <tr key={idx} className="border-b transition-colors hover:bg-teal-300/[0.04]" style={{ borderColor: 'rgba(27,30,38,0.6)' }}>
+                {columns.map((col, ci) => {
+                  const rawVal = row[col];
+                  const val = String(rawVal !== null && rawVal !== undefined ? rawVal : 'N/A');
+                  const sStyle = getCellStyle(col, val);
+                  const isStatus = Object.keys(sStyle).length > 0;
+                  return (
+                    <td key={col} className="whitespace-nowrap px-3.5 py-2.5">
+                      {isStatus ? (
+                        <span className="inline-flex items-center gap-1 rounded border px-1.5 py-0.5 text-[10px] font-semibold" style={sStyle}>
+                          {val}
+                        </span>
+                      ) : (
+                        <span style={{ color: ci === 0 ? shell.teal : '#cbd5e1' }} className={ci === 0 ? 'font-medium' : ''}>
+                          {val}
+                        </span>
+                      )}
+                    </td>
+                  );
+                })}
               </tr>
             ))}
           </tbody>
@@ -229,6 +251,7 @@ function ResultTable({ message }: { message: ChatMessage }) {
     </div>
   );
 }
+
 
 function MessageMetadata({
   message,

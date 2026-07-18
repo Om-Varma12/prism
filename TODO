@@ -1,9 +1,6 @@
-<!-- in chat if user is asking normal things like greeting and etc, no need for agent to make sql query
-kannada language support -->
 prism icon line small to match chat interface
-change the methods to get and post properly
 
+chat table row working in localhost and not on deployment
 
-<!-- new session not working -->
 update project structure
 make proper readme
