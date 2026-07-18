@@ -3,269 +3,198 @@ prism/
 │
 ├── README.md
 ├── .gitignore
-├── .env.example
-├── docker-compose.yml                 # local dev: backend + postgres together
+├── .catalystrc                            # Catalyst CLI project config
+├── catalyst.json                          # Catalyst project metadata
+├── TODO                                   # open tasks / roadmap notes
+├── project-structure.md                   # this file
+├── services-used.md                       # list of Catalyst services consumed
 │
-├── frontend/                          # Vite + React + TypeScript
-│   ├── index.html
-│   ├── vite.config.ts
-│   ├── tsconfig.json
-│   ├── tsconfig.node.json
-│   ├── tailwind.config.ts
-│   ├── postcss.config.js
+├── resources/                             # Catalyst API reference docs (offline)
+│   ├── cache/                             # Cache service reference
+│   ├── quickml/                           # Quick ML / LLM reference
+│   ├── stratus/                           # Stratus object-storage reference
+│   └── zcql/                              # ZCQL query language reference
+│
+├── implementations/                       # Feature-level design docs & specs
+│   ├── analytics/
+│   │   └── ANALYTICS_PAGE_SPEC.md
+│   ├── chat-interface/
+│   │   ├── PLAN.md
+│   │   └── STEPS.md
+│   ├── dashboard/
+│   │   ├── DASHBOARD_SPEC.md
+│   │   ├── PLAN.md
+│   │   └── STEPS.md
+│   └── network-explorer/
+│       ├── NETWORK_EXPLORER_SPEC.md
+│       ├── NETWORK_EXPLORER_SUMMARY.txt
+│       └── STEPS.md
+│
+├── frontend/                              # Create React App + TypeScript
 │   ├── package.json
-│   ├── .env.local
+│   ├── tsconfig.json
+│   ├── public/
+│   │   ├── index.html
+│   │   ├── favicon.ico
+│   │   └── logo192.png
+│   ├── DESIGN.md                          # frontend design guidelines & tokens
 │   │
 │   └── src/
-│       ├── main.tsx                   # app entry point
-│       ├── App.tsx                    # router setup
-│       ├── vite-env.d.ts
+│       ├── index.tsx                      # app entry point (ReactDOM.render)
+│       ├── index.css                      # global styles & CSS variables
+│       ├── App.tsx                        # top-level routing, page switching
+│       ├── App.css                        # app-level styles
+│       ├── App.test.tsx
+│       ├── react-app-env.d.ts
+│       ├── reportWebVitals.ts
+│       ├── setupTests.ts
+│       ├── logo.svg
 │       │
-│       ├── assets/                    # static assets
-│       │   ├── karnataka-map.svg      # the district map SVG
-│       │   └── logo.svg
+│       ├── types.ts                       # shared TypeScript types (chat, sessions, etc.)
 │       │
-│       ├── styles/
-│       │   ├── globals.css            # css variables, base reset
-│       │   └── tokens.css             # design tokens (colors, spacing, type)
-│       │
-│       ├── types/                     # all TypeScript interfaces/types
-│       │   ├── auth.ts
-│       │   ├── case.ts                # CaseMaster, Accused, Victim etc
-│       │   ├── analytics.ts           # hotspot, trend, forecast types
-│       │   ├── network.ts             # graph nodes, edges, clusters
-│       │   ├── chat.ts                # message, conversation, query result
-│       │   └── index.ts               # barrel export
+│       ├── types/                         # domain-specific TypeScript interfaces
+│       │   ├── analytics.ts               # HotspotPoint, TrendData, RiskScore types
+│       │   └── network.ts                 # GraphNode, GraphEdge, NetworkGraph types
 │       │
 │       ├── constants/
-│       │   ├── roles.ts               # role definitions and permissions
-│       │   ├── routes.ts              # all route path constants
-│       │   └── api.ts                 # API base URL, endpoint paths
+│       │   └── districtCoordinates.ts     # lat/lng for each Karnataka district
 │       │
-│       ├── lib/                       # pure utility functions, no React
-│       │   ├── api-client.ts          # axios instance + interceptors
-│       │   ├── auth.ts                # token read/write/decode helpers
-│       │   ├── formatters.ts          # date, number, case-number formatters
-│       │   ├── risk-color.ts          # risk score → color mapping
-│       │   └── voice.ts              # Web Speech API wrapper
+│       ├── data/
+│       │   └── mockData.ts                # static mock data for dev/testing
 │       │
-│       ├── hooks/                     # custom React hooks
-│       │   ├── useAuth.ts
-│       │   ├── useChat.ts
-│       │   ├── useDashboardStats.ts
-│       │   ├── useNetworkGraph.ts
-│       │   ├── useHotspots.ts
-│       │   ├── useOffenderProfile.ts
-│       │   └── useVoiceInput.ts
+│       ├── lib/
+│       │   └── api-client.ts              # axios instance with base URL + headers
 │       │
-│       ├── store/                     # Zustand global state
-│       │   ├── auth.store.ts          # user, role, token
-│       │   ├── chat.store.ts          # active conversation, messages
-│       │   ├── network.store.ts       # selected node, active filters
-│       │   └── alerts.store.ts        # active alert feed
+│       ├── hooks/                         # custom React hooks
+│       │   ├── useChat.ts                 # session management, message send/receive, URL sync
+│       │   ├── useChatQuery.ts            # React Query hooks for chat history & session messages
+│       │   ├── useDashboardStats.ts       # dashboard KPI + trend data fetching
+│       │   └── useNetworkGraph.ts         # criminal network graph data fetching
 │       │
-│       ├── services/                  # API call functions (not hooks)
-│       │   ├── auth.service.ts
-│       │   ├── chat.service.ts
-│       │   ├── cases.service.ts
-│       │   ├── network.service.ts
-│       │   ├── analytics.service.ts
-│       │   └── offenders.service.ts
+│       ├── services/                      # API call functions (not hooks)
+│       │   ├── analytics.service.ts       # hotspots, trends, risk-board API calls
+│       │   ├── chat.service.ts            # chat query & history API calls
+│       │   ├── dashboard.service.ts       # dashboard stats & district crimes API calls
+│       │   └── network.service.ts         # network graph API calls
 │       │
-│       ├── components/                # shared, reusable UI components
-│       │   ├── ui/                    # atomic primitives
-│       │   │   ├── Button.tsx
-│       │   │   ├── Input.tsx
-│       │   │   ├── Badge.tsx          # status/severity tags
-│       │   │   ├── Card.tsx
-│       │   │   ├── Spinner.tsx
-│       │   │   ├── Tooltip.tsx
-│       │   │   ├── Divider.tsx
-│       │   │   ├── Modal.tsx
-│       │   │   └── index.ts
+│       ├── components/                    # screen-level & shared UI components
+│       │   ├── LoginScreen.tsx            # login / auth landing page
+│       │   ├── CommandDashboardScreen.tsx # main dashboard (KPIs, trends, map)
+│       │   ├── ChatScreen.tsx             # intelligence chat (messages, table, SQL drawer)
+│       │   ├── AnalyticsScreen.tsx        # analytics hub (hotspot, trend, risk-board tabs)
+│       │   ├── NetworkExplorerScreen.tsx  # criminal network graph explorer
+│       │   ├── Sidebar.tsx                # persistent left navigation bar
 │       │   │
-│       │   ├── layout/
-│       │   │   ├── Sidebar.tsx        # persistent left nav
-│       │   │   ├── SidebarItem.tsx
-│       │   │   ├── PageShell.tsx      # wraps every page: sidebar + content area
-│       │   │   └── StatusBar.tsx      # bottom bar: role, district, time
+│       │   ├── analytics/
+│       │   │   └── HotspotDetailsPanel.tsx  # slide-in panel for hotspot drill-down
 │       │   │
-│       │   ├── data-display/
-│       │   │   ├── KpiCard.tsx        # the big number + label cards
-│       │   │   ├── AlertItem.tsx      # single alert in the feed
-│       │   │   ├── AlertFeed.tsx
-│       │   │   ├── Sparkline.tsx      # single recharts sparkline
-│       │   │   ├── DataTable.tsx      # reusable sortable table
-│       │   │   ├── RiskBar.tsx        # horizontal risk score bar
-│       │   │   ├── Timeline.tsx       # case investigation timeline
-│       │   │   └── EntityCard.tsx     # accused/victim/location mini card
+│       │   ├── common/
+│       │   │   ├── DateRangeSlider.tsx    # shared date-range slider control
+│       │   │   └── DistrictFilter.tsx     # shared district dropdown filter
 │       │   │
-│       │   ├── maps/
-│       │   │   ├── KarnatakaMap.tsx   # SVG district map (dashboard)
-│       │   │   ├── HotspotMap.tsx     # Mapbox heatmap (analytics)
-│       │   │   └── MapLegend.tsx
-│       │   │
-│       │   ├── charts/
-│       │   │   ├── CrimeTrendChart.tsx
-│       │   │   ├── DemographicChart.tsx
-│       │   │   ├── ForecastChart.tsx
-│       │   │   └── HourlyDistribution.tsx
-│       │   │
-│       │   ├── network/
-│       │   │   ├── NetworkGraph.tsx   # D3 force-directed graph
-│       │   │   ├── NodeDetailPanel.tsx
-│       │   │   ├── FilterPanel.tsx
-│       │   │   └── ClusterLabel.tsx
-│       │   │
-│       │   └── chat/
-│       │       ├── ChatMessage.tsx    # single message bubble/block
-│       │       ├── ChatThread.tsx     # full message list
-│       │       ├── ChatInput.tsx      # input bar + mic button
-│       │       ├── SqlDrawer.tsx      # collapsible SQL transparency panel
-│       │       ├── SourcesDrawer.tsx  # collapsible data sources panel
-│       │       ├── ConversationList.tsx
-│       │       └── SuggestedQueries.tsx
+│       │   └── network/
+│       │       └── NetworkGraph.tsx       # D3 force-directed criminal network graph
 │       │
-│       └── pages/                     # one folder per route
-│           ├── Login/
-│           │   ├── index.tsx
-│           │   └── LoginMap.tsx       # the atmospheric left-side map
-│           │
-│           ├── Dashboard/
-│           │   └── index.tsx
-│           │
-│           ├── Chat/
-│           │   └── index.tsx
-│           │
-│           ├── NetworkExplorer/
-│           │   └── index.tsx
-│           │
-│           ├── Analytics/
-│           │   ├── index.tsx
-│           │   ├── HotspotTab.tsx
-│           │   ├── TrendTab.tsx
-│           │   └── RiskBoardTab.tsx
-│           │
-│           └── NotFound/
-│               └── index.tsx
+│       └── pages/                         # sub-page components (route fragments)
+│           └── Analytics/
+│               ├── index.tsx              # analytics page container / tab router
+│               ├── HotspotMap.tsx         # Leaflet heatmap tab
+│               ├── TrendAnalysis.tsx      # recharts trend analysis tab
+│               └── OffenderRiskBoard.tsx  # offender risk scoring board tab
 │
 │
-└── backend/                           # Python — FastAPI
+└── backend/                              # Python — FastAPI + Zoho Catalyst
     │
-    ├── Dockerfile                     # for Catalyst AppSail deployment
-    ├── requirements.txt
-    ├── .env.example
-    ├── main.py                        # FastAPI app entry point
+    ├── Dockerfile                         # for Catalyst AppSail deployment
+    ├── app-config.json                    # AppSail start command config
+    ├── requirements.txt                   # pip dependencies (legacy)
+    ├── pyproject.toml                     # uv project config & dependencies
+    ├── uv.lock                            # locked dependency graph (uv)
+    ├── .env                               # local secrets (gitignored)
+    ├── .env.example                       # env variable template
+    ├── .catalystignore                    # files excluded from Catalyst deploy
+    ├── .python-version                    # pinned Python version (for uv/pyenv)
+    ├── docker-compose.yml                 # local dev stack
+    ├── main.py                            # FastAPI app entry point, middleware, startup
+    ├── BACKEND_DOCUMENTATION.md           # full backend API & architecture docs
     │
-    ├── core/                          # app-wide configuration
-    │   ├── config.py                  # pydantic settings, env vars
-    │   ├── database.py                # DB connection, session factory
-    │   ├── security.py                # JWT decode, role extraction
-    │   ├── logger.py                  # structured logging setup
-    │   └── exceptions.py             # custom HTTP exception classes
+    ├── db/
+    │   └── schema.md                      # ZCQL database schema reference (all tables & columns)
     │
-    ├── middleware/
-    │   ├── audit_log.py               # logs every request to audit_logs table
-    │   ├── role_guard.py              # role-based access enforcement
-    │   └── cors.py
+    ├── core/                              # app-wide singletons & config
+    │   ├── database.py                    # ZCQL client factory (get_zcql dependency)
+    │   └── security.py                    # Catalyst auth token validation helpers
     │
-    ├── models/                        # SQLAlchemy ORM models (mirror given schema)
-    │   ├── case.py                    # CaseMaster
-    │   ├── accused.py                 # Accused
-    │   ├── victim.py                  # Victim
-    │   ├── complainant.py             # ComplainantDetails
-    │   ├── arrest.py                  # ArrestSurrender
-    │   ├── chargesheet.py             # ChargesheetDetails
-    │   ├── act.py                     # Act, Section, ActSectionAssociation
-    │   ├── lookup.py                  # CrimeHead, CrimeSubHead, GravityOffence etc
-    │   ├── geography.py               # State, District, Unit, UnitType
-    │   ├── employee.py                # Employee, Rank, Designation
-    │   ├── derived.py                 # our added tables: risk_scores,
-    │   │                              #   crime_alerts, dashboard_stats,
-    │   │                              #   audit_logs, conversations
-    │   └── __init__.py
+    ├── schemas/                           # Pydantic request / response schemas
+    │   ├── chat.py                        # ChatQueryRequest, ChatQueryResponse, SessionMessage, etc.
+    │   ├── analytics.py                   # HotspotResponse, TrendResponse, RiskBoardResponse
+    │   ├── dashboard.py                   # DashboardStats, DistrictCrimeResponse
+    │   └── network.py                     # NetworkGraphResponse, NodeSchema, EdgeSchema
     │
-    ├── schemas/                       # Pydantic request/response schemas
-    │   ├── chat.py                    # ChatRequest, ChatResponse, MessageSchema
-    │   ├── network.py                 # GraphResponse, NodeSchema, EdgeSchema
-    │   ├── analytics.py               # HotspotResponse, TrendResponse
-    │   ├── offender.py                # OffenderProfile, RiskScore
-    │   ├── dashboard.py               # DashboardStats, AlertSchema
-    │   └── auth.py                    # TokenPayload, UserContext
+    ├── routers/                           # FastAPI routers, one per domain
+    │   ├── chat.py                        # POST /api/chat/query
+    │   │                                  # GET  /api/chat/history
+    │   │                                  # GET  /api/chat/messages?session_id=...
+    │   │                                  # POST /api/chat/new-session
+    │   │                                  # DELETE /api/chat/session/{id}
+    │   ├── analytics.py                   # GET /api/analytics/hotspots
+    │   │                                  # GET /api/analytics/trends
+    │   │                                  # GET /api/analytics/risk-board
+    │   ├── dashboard.py                   # GET /api/dashboard/stats
+    │   │                                  # GET /api/dashboard/trends
+    │   │                                  # GET /api/dashboard/district-crimes
+    │   └── network.py                     # GET /api/network/graph
+    │                                      # GET /api/network/node/{id}
     │
-    ├── routers/                       # FastAPI routers, one per domain
-    │   ├── auth.py                    # POST /auth/verify (Catalyst Auth callback)
-    │   ├── chat.py                    # POST /chat/query, GET /chat/history
-    │   ├── network.py                 # GET /network/graph, GET /network/profile/{id}
-    │   ├── analytics.py               # GET /analytics/hotspots, /trends, /risk-board
-    │   ├── dashboard.py               # GET /dashboard/stats, /alerts
-    │   ├── cases.py                   # GET /cases/{id}, /cases/similar
-    │   └── offenders.py               # GET /offenders/{id}, /offenders/search
-    │
-    ├── agents/                        # the multi-agent intelligence system
-    │   ├── orchestrator.py            # routes queries to correct agent
-    │   ├── base_agent.py              # abstract base class for all agents
+    ├── agents/                            # multi-agent intelligence pipeline
+    │   ├── __init__.py
     │   │
-    │   ├── text_to_sql/
-    │   │   ├── agent.py               # Text-to-SQL agent (Groq LLM)
-    │   │   ├── schema_context.py      # schema string injected into prompt
-    │   │   ├── validator.py           # validates generated SQL before execution
-    │   │   └── prompts.py             # system + user prompt templates
+    │   ├── router/                        # query classification & routing
+    │   │   ├── agent.py                   # QueryRouterAgent — routes to sql/general/kannada
+    │   │   └── prompts.py                 # router system + user prompt templates
     │   │
-    │   ├── rag/
-    │   │   ├── agent.py               # RAG agent for investigative queries
-    │   │   ├── embedder.py            # sentence-transformers embedding logic
-    │   │   ├── vector_store.py        # ChromaDB client wrapper
-    │   │   ├── retriever.py           # query → retrieve → rerank
-    │   │   └── prompts.py
+    │   ├── text_to_sql/                   # natural language → ZCQL
+    │   │   ├── agent.py                   # TextToSQLAgent — LLM call + retry logic
+    │   │   ├── schema_context.py          # full DB schema injected into LLM prompt
+    │   │   ├── validator.py               # ZCQL query validation & auto-sanitisation
+    │   │   └── prompts.py                 # system + user + retry prompt templates
     │   │
-    │   ├── network_agent/
-    │   │   ├── agent.py               # graph query + analysis agent
-    │   │   ├── graph_builder.py       # NetworkX graph construction from DB
-    │   │   ├── community_detection.py # Louvain clustering
-    │   │   ├── centrality.py          # betweenness, degree centrality
-    │   │   └── entity_resolver.py     # fuzzy name matching (rapidfuzz)
+    │   ├── response_structurer/           # formats raw DB results into user response
+    │   │   ├── agent.py                   # ResponseStructurer — LLM formats text + table
+    │   │   └── prompts.py                 # structurer system + user prompt templates
     │   │
-    │   └── summarizer/
-    │       ├── agent.py               # case summary + lead recommendation agent
-    │       └── prompts.py
+    │   ├── general_chat/                  # handles non-database conversational queries
+    │   │   ├── agent.py                   # GeneralChatAgent — answers app/general questions
+    │   │   └── prompts.py                 # general chat system + user prompt templates
+    │   │
+    │   ├── title_generator/               # generates session titles from first query
+    │   │   ├── agent.py                   # TitleGeneratorAgent
+    │   │   └── prompts.py                 # title generation prompt templates
+    │   │
+    │   └── network_agent/                 # criminal network graph analysis
+    │       ├── graph_builder.py           # builds NetworkX graph from ZCQL data
+    │       ├── community_detection.py     # Louvain community clustering
+    │       └── centrality.py              # betweenness / degree centrality scores
     │
-    ├── analytics/                     # standalone analytics modules (not agents)
-    │   ├── hotspot.py                 # DBSCAN geospatial clustering
-    │   ├── trends.py                  # temporal aggregation queries
-    │   ├── forecasting.py             # Prophet time-series forecasting
-    │   ├── risk_scoring.py            # weighted offender risk formula
-    │   ├── mo_extractor.py            # LLM-based MO extraction from BriefFacts
-    │   ├── sociological.py            # demographic correlation queries
-    │   └── alert_engine.py            # spike detection + alert generation
+    ├── analytics/                         # standalone analytics computation modules
+    │   ├── hotspot.py                     # DBSCAN geospatial crime hotspot clustering
+    │   ├── trends.py                      # temporal aggregation + trend detection
+    │   └── forecasting.py                 # Prophet time-series crime forecasting
     │
-    ├── services/                      # infrastructure/external service wrappers
-    │   ├── groq_client.py             # Groq API wrapper
-    │   ├── cache.py                   # Catalyst Cache client wrapper
-    │   ├── storage.py                 # Catalyst Stratus (object storage) wrapper
-    │   └── translation.py             # IndicTrans2 wrapper (Kannada ↔ English)
+    ├── services/                          # external service wrappers
+    │   ├── llm_client.py                  # Catalyst Quick ML LLM API wrapper
+    │   ├── token_manager.py               # OAuth2 token refresh & authenticated requests
+    │   ├── cache_service.py               # Catalyst Cache client (get/put/delete + keying)
+    │   ├── translation.py                 # Kannada ↔ English translation via LLM
+    │   └── example_usage.py              # cache service usage examples (dev reference)
     │
-    ├── jobs/                          # scheduled jobs (run by Catalyst Cron)
-    │   ├── nightly_aggregation.py     # precompute dashboard stats
-    │   ├── risk_score_refresh.py      # recompute all risk scores
-    │   ├── forecast_refresh.py        # refresh Prophet forecasts
-    │   └── alert_detection.py         # run alert_engine, fire Catalyst Signals
+    ├── jobs/                              # scheduled background jobs
+    │   └── forecast_cron.py               # APScheduler job: refreshes Prophet forecasts
     │
-    └── data/                          # synthetic data generation (not deployed)
-        ├── generator/
-        │   ├── main.py                # entry point — generates everything
-        │   ├── config.py              # scale config (n_firs, n_districts etc)
-        │   ├── geography.py           # Karnataka districts, police stations
-        │   ├── criminal_ecosystem.py  # gang definitions, MO patterns
-        │   ├── fir_generator.py       # generates CaseMaster rows
-        │   ├── accused_generator.py   # generates Accused rows with planted clusters
-        │   ├── victim_generator.py
-        │   ├── briefacts_generator.py # LLM-generated realistic FIR text
-        │   └── seed_lookups.py        # populates all lookup tables
-        │
-        └── output/                    # generated SQL/CSV files (gitignored)
-            ├── lookups.sql
-            ├── cases.sql
-            ├── accused.sql
-            └── ...
+    ├── data/                              # static reference data
+    │   └── district_socioeconomic.json    # socioeconomic indicators per Karnataka district
+    │
+    └── tests/                             # test suites
+        ├── db/                            # ZCQL database connection & query tests
+        └── llm_serving/                   # LLM API integration tests
 ```
