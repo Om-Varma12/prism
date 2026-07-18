@@ -9,6 +9,7 @@ import tempfile
 
 from services.llm_client import CatalystLLMClient
 from agents.router.agent import QueryRouterAgent
+from services.translation import TranslationService
 from agents.general_chat.agent import GeneralChatAgent
 from agents.text_to_sql.agent import TextToSQLAgent
 from agents.response_structurer.agent import ResponseStructurer
@@ -221,25 +222,37 @@ async def chat_query(
     
     route = router_result.get("route", "database")
     refined_query = router_result.get("refined_query", request.query)
+    is_kannada = router_result.get("is_kannada", False)
+    translated_query = router_result.get("translated_english_query", request.query)
     
-    print(f"[Router] Routing to: {route}. Refined query: {refined_query}")
+    print(f"[Router] Routing to: {route}. Refined query: {refined_query}. Kannada: {is_kannada}")
     
     if route == "general":
         # Handle general conversation query
+        query_to_use = translated_query if is_kannada else request.query
+        
         general_result = general_chat_agent.generate_response(
-            user_query=request.query,
+            user_query=query_to_use,
             conversation_history=history_rows
         )
         
+        response_text = general_result["response_text"]
+        follow_ups = general_result["follow_ups"]
+        
+        if is_kannada:
+            translation_service = TranslationService(llm_client)
+            response_text = translation_service.translate_to_kannada(response_text)
+            follow_ups = [translation_service.translate_to_kannada(f) for f in follow_ups]
+        
         response = ChatQueryResponse(
             message_id=str(uuid.uuid4()),
-            response_text=general_result["response_text"],
+            response_text=response_text,
             table_data=[],
             sql_query="",
             scanned_records=0,
             sources=[],
             entities=[],
-            follow_ups=general_result["follow_ups"],
+            follow_ups=follow_ups,
             timestamp=datetime.utcnow().isoformat()
         )
         
@@ -340,22 +353,32 @@ async def chat_query(
         }
         
         # Structure response
+        query_to_use = translated_query if is_kannada else request.query
+        
         structured_response = response_structurer.structure_response(
-            query=request.query,
+            query=query_to_use,
             raw_results=flat_results,
             metadata=metadata
         )
         
+        response_text = structured_response["response_text"]
+        follow_ups = structured_response["follow_ups"]
+        
+        if is_kannada:
+            translation_service = TranslationService(llm_client)
+            response_text = translation_service.translate_to_kannada(response_text)
+            follow_ups = [translation_service.translate_to_kannada(f) for f in follow_ups]
+        
         # Build final response
         response = ChatQueryResponse(
             message_id=str(uuid.uuid4()),
-            response_text=structured_response["response_text"],
+            response_text=response_text,
             table_data=structured_response["table_data"],
             sql_query=zcql_query,
             scanned_records=len(flat_results),
             sources=tables_accessed,
             entities=structured_response["entities"],
-            follow_ups=structured_response["follow_ups"],
+            follow_ups=follow_ups,
             timestamp=datetime.utcnow().isoformat()
         )
         

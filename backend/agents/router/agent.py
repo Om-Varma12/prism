@@ -54,6 +54,8 @@ class QueryRouterAgent:
             )
             
             # Ensure keys exist
+            is_kannada = response.get("is_kannada", False)
+            translated_query = response.get("translated_english_query", user_query).strip()
             route = response.get("route", "database").strip().lower()
             if route not in ["general", "database"]:
                 route = "database"
@@ -62,6 +64,8 @@ class QueryRouterAgent:
             explanation = response.get("explanation", "")
             
             return {
+                "is_kannada": is_kannada,
+                "translated_english_query": translated_query,
                 "route": route,
                 "refined_query": refined_query,
                 "explanation": explanation
@@ -69,6 +73,8 @@ class QueryRouterAgent:
         except Exception as e:
             print(f"[Warning] Routing agent failed: {e}. Defaulting to database route.")
             return {
+                "is_kannada": False,
+                "translated_english_query": user_query,
                 "route": "database",
                 "refined_query": user_query,
                 "explanation": f"Routing failed due to error: {str(e)}"
