@@ -27,6 +27,23 @@ from core.database import get_datastore, get_zcql
 
 app = FastAPI()
 
+ENABLE_FASTAPI_CORS = os.getenv("ENABLE_FASTAPI_CORS", "true").lower() == "true"
+
+if ENABLE_FASTAPI_CORS:
+    app.add_middleware(
+        CORSMiddleware,
+        allow_origins=[
+            "https://prism.onslate.in",
+            "https://prism-snhszbyd.onslate.in",
+        ],
+        allow_credentials=True,
+        allow_methods=["*"],
+        allow_headers=["*"],
+    )
+    print("[CORS] FastAPI CORSMiddleware enabled")
+else:
+    print("[CORS] FastAPI CORSMiddleware disabled (ENABLE_FASTAPI_CORS=false)")
+
 # Initialize APScheduler
 scheduler = AsyncIOScheduler()
 
@@ -86,6 +103,7 @@ async def cors_debug_middleware(request: Request, call_next):
 
 
 
+
 app.include_router(router=insertion_router)
 app.include_router(router=truncate_router)
 app.include_router(router=schema_router)
@@ -102,25 +120,6 @@ app.include_router(router=auto_sync_router)
 app.include_router(router=chat_router)
 app.include_router(router=populate_network_router)
 
-
-
-# Conditional CORS middleware registration
-ENABLE_FASTAPI_CORS = os.getenv("ENABLE_FASTAPI_CORS", "true").lower() == "true"
-
-if ENABLE_FASTAPI_CORS:
-    app.add_middleware(
-        CORSMiddleware,
-        allow_origins=[
-            "https://prism.onslate.in",
-            "https://prism-snhszbyd.onslate.in",
-        ],
-        allow_credentials=True,
-        allow_methods=["*"],
-        allow_headers=["*"],
-    )
-    print("[CORS] FastAPI CORSMiddleware enabled")
-else:
-    print("[CORS] FastAPI CORSMiddleware disabled (ENABLE_FASTAPI_CORS=false)")
 
 @app.get("/debug/headers")
 def debug_headers(request: Request):

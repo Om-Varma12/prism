@@ -8,6 +8,8 @@ from typing import Optional
 import tempfile
 
 from services.llm_client import CatalystLLMClient
+from agents.router.agent import QueryRouterAgent
+from agents.general_chat.agent import GeneralChatAgent
 from agents.text_to_sql.agent import TextToSQLAgent
 from agents.response_structurer.agent import ResponseStructurer
 from agents.title_generator.agent import TitleGenerator
@@ -186,6 +188,8 @@ async def chat_query(
     
     # Initialize agents
     llm_client = CatalystLLMClient()
+    query_router_agent = QueryRouterAgent(llm_client)
+    general_chat_agent = GeneralChatAgent(llm_client)
     text_to_sql_agent = TextToSQLAgent(llm_client)
     response_structurer = ResponseStructurer(llm_client)
     
@@ -209,121 +213,185 @@ async def chat_query(
     except Exception as e:
         print(f"[Warning] Failed to fetch conversation context: {e}")
     
-    # Generate SQL query
-    sql_result = text_to_sql_agent.generate_query(
+    # Route query
+    router_result = query_router_agent.route_query(
         user_query=request.query,
         conversation_history=history_rows
     )
     
-    if not sql_result["is_valid"] or not sql_result["zcql_query"]:
-        # Return error response if SQL generation failed
-        return ChatQueryResponse(
+    route = router_result.get("route", "database")
+    refined_query = router_result.get("refined_query", request.query)
+    
+    print(f"[Router] Routing to: {route}. Refined query: {refined_query}")
+    
+    if route == "general":
+        # Handle general conversation query
+        general_result = general_chat_agent.generate_response(
+            user_query=request.query,
+            conversation_history=history_rows
+        )
+        
+        response = ChatQueryResponse(
             message_id=str(uuid.uuid4()),
-            response_text=f"Unable to generate query: {sql_result.get('error', 'Unknown error')}",
+            response_text=general_result["response_text"],
             table_data=[],
-            sql_query=sql_result.get("zcql_query", ""),
+            sql_query="",
             scanned_records=0,
             sources=[],
             entities=[],
-            follow_ups=["Try rephrasing your question", "Ask about a different topic"],
+            follow_ups=general_result["follow_ups"],
             timestamp=datetime.utcnow().isoformat()
         )
-    
-    zcql_query = sql_result["zcql_query"]
-    
-    # Execute ZCQL query
-    try:
-        query_result = zcql.execute_query(zcql_query)
-        raw_results = query_result if isinstance(query_result, list) else []
-    except Exception as e:
-        # Handle ZCQL execution error
-        return ChatQueryResponse(
+        
+        # Save to conversations table via ZCQL INSERT (avoids Table API permission issues)
+        try:
+            ts = datetime.utcnow().strftime("%Y-%m-%d %H:%M:%S")
+            user_conv_id = random.randint(1, 2147483647)
+            asst_conv_id = random.randint(1, 2147483647)
+
+            # Escape single quotes in content and JSON strings
+            user_content = request.query.replace("'", "''")
+            asst_content = general_result["response_text"].replace("'", "''")
+            
+            # Convert response metadata to JSON strings and escape
+            import json
+            table_data_json = json.dumps([]).replace("'", "''")
+            entities_json = json.dumps([]).replace("'", "''")
+            follow_ups_json = json.dumps(general_result["follow_ups"]).replace("'", "''")
+            sources_json = json.dumps([]).replace("'", "''")
+            scanned_records = 0
+
+            zcql.execute_query(f"""
+                INSERT INTO conversations (conversation_id, user_id, session_id, role, content, sql_generated, created_at, table_data_json, entities_json, follow_ups_json, sources_json, scanned_records)
+                VALUES ({user_conv_id}, 'dev_user', '{request.session_id}', 'user', '{user_content}', '', '{ts}', NULL, NULL, NULL, NULL, NULL)
+            """)
+
+            zcql.execute_query(f"""
+                INSERT INTO conversations (conversation_id, user_id, session_id, role, content, sql_generated, created_at, table_data_json, entities_json, follow_ups_json, sources_json, scanned_records)
+                VALUES ({asst_conv_id}, 'dev_user', '{request.session_id}', 'assistant', '{asst_content}', '', '{ts}', '{table_data_json}', '{entities_json}', '{follow_ups_json}', '{sources_json}', {scanned_records})
+            """)
+            
+            # Invalidate session messages cache when new message added
+            invalidate_session_cache(cache, request.session_id)
+        except Exception as e:
+            print(f"[Warning] Failed to save to conversations table: {e}")
+            
+    else:
+        # Generate SQL query using refined query
+        sql_result = text_to_sql_agent.generate_query(
+            user_query=refined_query,
+            conversation_history=history_rows
+        )
+        
+        if not sql_result["is_valid"] or not sql_result["zcql_query"]:
+            # Return error response if SQL generation failed
+            return ChatQueryResponse(
+                message_id=str(uuid.uuid4()),
+                response_text=f"Unable to generate query: {sql_result.get('error', 'Unknown error')}",
+                table_data=[],
+                sql_query=sql_result.get("zcql_query", ""),
+                scanned_records=0,
+                sources=[],
+                entities=[],
+                follow_ups=["Try rephrasing your question", "Ask about a different topic"],
+                timestamp=datetime.utcnow().isoformat()
+            )
+        
+        zcql_query = sql_result["zcql_query"]
+        
+        # Execute ZCQL query
+        try:
+            query_result = zcql.execute_query(zcql_query)
+            raw_results = query_result if isinstance(query_result, list) else []
+        except Exception as e:
+            # Handle ZCQL execution error
+            return ChatQueryResponse(
+                message_id=str(uuid.uuid4()),
+                response_text=f"Query execution failed: {str(e)}",
+                table_data=[],
+                sql_query=zcql_query,
+                scanned_records=0,
+                sources=[],
+                entities=[],
+                follow_ups=["Try rephrasing your question", "Ask about a different topic"],
+                timestamp=datetime.utcnow().isoformat()
+            )
+        
+        # Flatten results
+        flat_results = flatten_zcql_results(raw_results)
+        
+        # Extract tables accessed from ZCQL query
+        tables_accessed = []
+        if zcql_query:
+            # Match table names after FROM or JOIN
+            tables = re.findall(r'FROM\s+(\w+)|JOIN\s+(\w+)', zcql_query, re.IGNORECASE)
+            for table_tuple in tables:
+                t = table_tuple[0] or table_tuple[1]
+                if t and t not in tables_accessed:
+                    tables_accessed.append(t)
+        if not tables_accessed:
+            tables_accessed = ["CaseMaster"]
+        
+        # Extract metadata
+        metadata = {
+            "record_count": len(flat_results),
+            "tables_accessed": tables_accessed,
+            "sql_query": zcql_query
+        }
+        
+        # Structure response
+        structured_response = response_structurer.structure_response(
+            query=request.query,
+            raw_results=flat_results,
+            metadata=metadata
+        )
+        
+        # Build final response
+        response = ChatQueryResponse(
             message_id=str(uuid.uuid4()),
-            response_text=f"Query execution failed: {str(e)}",
-            table_data=[],
+            response_text=structured_response["response_text"],
+            table_data=structured_response["table_data"],
             sql_query=zcql_query,
-            scanned_records=0,
-            sources=[],
-            entities=[],
-            follow_ups=["Try rephrasing your question", "Ask about a different topic"],
+            scanned_records=len(flat_results),
+            sources=tables_accessed,
+            entities=structured_response["entities"],
+            follow_ups=structured_response["follow_ups"],
             timestamp=datetime.utcnow().isoformat()
         )
-    
-    # Flatten results
-    flat_results = flatten_zcql_results(raw_results)
-    
-    # Extract tables accessed from ZCQL query
-    tables_accessed = []
-    if zcql_query:
-        # Match table names after FROM or JOIN
-        tables = re.findall(r'FROM\s+(\w+)|JOIN\s+(\w+)', zcql_query, re.IGNORECASE)
-        for table_tuple in tables:
-            t = table_tuple[0] or table_tuple[1]
-            if t and t not in tables_accessed:
-                tables_accessed.append(t)
-    if not tables_accessed:
-        tables_accessed = ["CaseMaster"]
-    
-    # Extract metadata
-    metadata = {
-        "record_count": len(flat_results),
-        "tables_accessed": tables_accessed,
-        "sql_query": zcql_query
-    }
-    
-    # Structure response
-    structured_response = response_structurer.structure_response(
-        query=request.query,
-        raw_results=flat_results,
-        metadata=metadata
-    )
-    
-    # Build final response
-    response = ChatQueryResponse(
-        message_id=str(uuid.uuid4()),
-        response_text=structured_response["response_text"],
-        table_data=structured_response["table_data"],
-        sql_query=zcql_query,
-        scanned_records=len(flat_results),
-        sources=tables_accessed,
-        entities=structured_response["entities"],
-        follow_ups=structured_response["follow_ups"],
-        timestamp=datetime.utcnow().isoformat()
-    )
-    
-    # Save to conversations table via ZCQL INSERT (avoids Table API permission issues)
-    try:
-        ts = datetime.utcnow().strftime("%Y-%m-%d %H:%M:%S")
-        user_conv_id = random.randint(1, 2147483647)
-        asst_conv_id = random.randint(1, 2147483647)
-
-        # Escape single quotes in content and JSON strings
-        user_content = request.query.replace("'", "''")
-        asst_content = structured_response["response_text"].replace("'", "''")
-        sql_escaped = zcql_query.replace("'", "''") if zcql_query else ""
         
-        # Convert response metadata to JSON strings and escape
-        import json
-        table_data_json = json.dumps(structured_response["table_data"]).replace("'", "''")
-        entities_json = json.dumps(structured_response["entities"]).replace("'", "''")
-        follow_ups_json = json.dumps(structured_response["follow_ups"]).replace("'", "''")
-        sources_json = json.dumps(tables_accessed).replace("'", "''")
-        scanned_records = len(flat_results)
+        # Save to conversations table via ZCQL INSERT (avoids Table API permission issues)
+        try:
+            ts = datetime.utcnow().strftime("%Y-%m-%d %H:%M:%S")
+            user_conv_id = random.randint(1, 2147483647)
+            asst_conv_id = random.randint(1, 2147483647)
 
-        zcql.execute_query(f"""
-            INSERT INTO conversations (conversation_id, user_id, session_id, role, content, sql_generated, created_at, table_data_json, entities_json, follow_ups_json, sources_json, scanned_records)
-            VALUES ({user_conv_id}, 'dev_user', '{request.session_id}', 'user', '{user_content}', '{sql_escaped}', '{ts}', NULL, NULL, NULL, NULL, NULL)
-        """)
+            # Escape single quotes in content and JSON strings
+            user_content = request.query.replace("'", "''")
+            asst_content = structured_response["response_text"].replace("'", "''")
+            sql_escaped = zcql_query.replace("'", "''") if zcql_query else ""
+            
+            # Convert response metadata to JSON strings and escape
+            import json
+            table_data_json = json.dumps(structured_response["table_data"]).replace("'", "''")
+            entities_json = json.dumps(structured_response["entities"]).replace("'", "''")
+            follow_ups_json = json.dumps(structured_response["follow_ups"]).replace("'", "''")
+            sources_json = json.dumps(tables_accessed).replace("'", "''")
+            scanned_records = len(flat_results)
 
-        zcql.execute_query(f"""
-            INSERT INTO conversations (conversation_id, user_id, session_id, role, content, sql_generated, created_at, table_data_json, entities_json, follow_ups_json, sources_json, scanned_records)
-            VALUES ({asst_conv_id}, 'dev_user', '{request.session_id}', 'assistant', '{asst_content}', '{sql_escaped}', '{ts}', '{table_data_json}', '{entities_json}', '{follow_ups_json}', '{sources_json}', {scanned_records})
-        """)
-        
-        # Invalidate session messages cache when new message added
-        invalidate_session_cache(cache, request.session_id)
-    except Exception as e:
-        print(f"[Warning] Failed to save to conversations table: {e}")
+            zcql.execute_query(f"""
+                INSERT INTO conversations (conversation_id, user_id, session_id, role, content, sql_generated, created_at, table_data_json, entities_json, follow_ups_json, sources_json, scanned_records)
+                VALUES ({user_conv_id}, 'dev_user', '{request.session_id}', 'user', '{user_content}', '{sql_escaped}', '{ts}', NULL, NULL, NULL, NULL, NULL)
+            """)
+
+            zcql.execute_query(f"""
+                INSERT INTO conversations (conversation_id, user_id, session_id, role, content, sql_generated, created_at, table_data_json, entities_json, follow_ups_json, sources_json, scanned_records)
+                VALUES ({asst_conv_id}, 'dev_user', '{request.session_id}', 'assistant', '{asst_content}', '{sql_escaped}', '{ts}', '{table_data_json}', '{entities_json}', '{follow_ups_json}', '{sources_json}', {scanned_records})
+            """)
+            
+            # Invalidate session messages cache when new message added
+            invalidate_session_cache(cache, request.session_id)
+        except Exception as e:
+            print(f"[Warning] Failed to save to conversations table: {e}")
     
     # Cache the response
     response_dict = response.dict()
