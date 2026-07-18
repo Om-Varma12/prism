@@ -336,8 +336,8 @@ export function NetworkGraph({ nodes, edges, selectedNodeId, onNodeClick }: Netw
             <span>FIRs</span>
             <span style={{ color: '#E8EAF0' }}>{hoveredNode.nodeData.fir_count}</span>
             <span>Risk Score</span>
-            <span style={{ color: hoveredNode.nodeData.risk_score > 0.7 ? '#FF6B6B' : '#4ECDC4' }}>
-              {(hoveredNode.nodeData.risk_score * 100).toFixed(0)}
+            <span style={{ color: hoveredNode.nodeData.risk_score > 70 ? '#FF6B6B' : '#4ECDC4' }}>
+              {Math.round(hoveredNode.nodeData.risk_score)}
             </span>
             {hoveredNode.nodeData.gang_cluster != null && (
               <>

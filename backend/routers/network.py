@@ -263,7 +263,7 @@ async def get_accused_profile(
         
         # Calculate risk score (fallback: based on FIR count and absconding status)
         fir_count = len(firs)
-        risk_score = min(100, fir_count * 15 + (50 if is_absconding else 0))
+        risk_score = min(100, fir_count * 15 + (35 if is_absconding else 0))
         
         return AccusedProfileResponse(
             accused_id=resolved_accused_id,
@@ -459,17 +459,43 @@ async def search_accused(
         # Sort by fir_count descending, take top `limit`
         sorted_results = sorted(seen_ids.items(), key=lambda kv: kv[1]["fir_count"], reverse=True)[:limit]
 
-        results = [
-            {
-                "accused_id": info["accused_id"],
+        # Check absconding status for the search results to compute risk score consistently
+        accused_ids_to_check = [info["accused_id"] for _key, info in sorted_results if info["accused_id"]]
+        absconding_map = {}
+        if accused_ids_to_check:
+            try:
+                ids_str = ",".join(map(str, accused_ids_to_check))
+                arrest_query = f"""
+                    SELECT ArrestSurrenderID, AccusedMasterID
+                    FROM ArrestSurrender
+                    WHERE ArrestSurrender.AccusedMasterID IN ({ids_str})
+                """
+                arrest_result = zcql.execute_query(arrest_query)
+                arrest_rows = arrest_result if isinstance(arrest_result, list) else []
+                arrested_ids = {
+                    _to_int(_value(r, "ArrestSurrender", "AccusedMasterID", "AccusedMasterID"))
+                    for r in arrest_rows
+                }
+                for acc_id in accused_ids_to_check:
+                    absconding_map[acc_id] = acc_id not in arrested_ids
+            except Exception:
+                # Default all to absconding (flight risk) if query fails
+                for acc_id in accused_ids_to_check:
+                    absconding_map[acc_id] = True
+        
+        results = []
+        for _key, info in sorted_results:
+            acc_id = info["accused_id"]
+            is_absconding = absconding_map.get(acc_id, True) if acc_id else True
+            risk_score = min(100, info["fir_count"] * 15 + (35 if is_absconding else 0))
+            results.append({
+                "accused_id": acc_id,
                 "row_id": info["row_id"],
                 "name": info["name"],
                 "fir_count": info["fir_count"],
-                "risk_score": min(100, info["fir_count"] * 15),
+                "risk_score": risk_score,
                 "last_fir_date": info["last_fir_date"],
-            }
-            for _key, info in sorted_results
-        ]
+            })
 
         # Cache the response for 1 hour
         cache.put(cache_key, {"results": results}, expiry_in_hours=1)
