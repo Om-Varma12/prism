@@ -577,6 +577,7 @@ async def get_trends(
             forecast_rows = []
         
         # Convert forecast data to response format
+        forecast_groups = {}
         for row in forecast_rows:
             # Handle both flat and nested ZCQL response structures
             crime_category = row.get("crime_category")
@@ -604,26 +605,40 @@ async def get_trends(
                     
                     predicted_value = row.get("predicted_value")
                     if predicted_value is None:
-                        predicted_value = row.get("crime_forecasts", {}).get("predicted_value", 0)
+                        predicted_value = row.get("crime_forecasts", {}).get("predicted_value", 0.0)
                     
                     lower_bound = row.get("lower_bound")
                     if lower_bound is None:
-                        lower_bound = row.get("crime_forecasts", {}).get("lower_bound")
+                        lower_bound = row.get("crime_forecasts", {}).get("lower_bound", 0.0)
                     
                     upper_bound = row.get("upper_bound")
                     if upper_bound is None:
-                        upper_bound = row.get("crime_forecasts", {}).get("upper_bound")
+                        upper_bound = row.get("crime_forecasts", {}).get("upper_bound", 0.0)
                     
-                    trend_points.append(TrendPoint(
-                        date=period_key,
-                        count=predicted_value or 0,
-                        is_forecast=True,
-                        lower_bound=lower_bound,
-                        upper_bound=upper_bound,
-                    ))
+                    if period_key not in forecast_groups:
+                        forecast_groups[period_key] = {
+                            "count": 0.0,
+                            "lower_bound": 0.0,
+                            "upper_bound": 0.0
+                        }
+                    
+                    forecast_groups[period_key]["count"] += float(predicted_value or 0.0)
+                    if lower_bound is not None:
+                        forecast_groups[period_key]["lower_bound"] += float(lower_bound)
+                    if upper_bound is not None:
+                        forecast_groups[period_key]["upper_bound"] += float(upper_bound)
                 except ValueError as e:
                     print(f"[DEBUG] Failed to parse forecast date '{forecast_date}': {e}")
                     continue
+        
+        for period_key, vals in forecast_groups.items():
+            trend_points.append(TrendPoint(
+                date=period_key,
+                count=int(round(vals["count"])),
+                is_forecast=True,
+                lower_bound=int(round(vals["lower_bound"])) if vals["lower_bound"] else None,
+                upper_bound=int(round(vals["upper_bound"])) if vals["upper_bound"] else None,
+            ))
         
         # Sort all points by date
         trend_points.sort(key=lambda x: x.date)

@@ -26,6 +26,57 @@ export default function TrendAnalysis() {
     queryFn: () => analyticsService.getTrends(filters),
   });
 
+  // Combine historical and forecast data points with the same date
+  const chartData = React.useMemo(() => {
+    if (!trendsData?.data) return [];
+    
+    const merged: Record<string, {
+      date: string;
+      historical: number | null;
+      forecast: number | null;
+      lower_bound: number | null;
+      upper_bound: number | null;
+    }> = {};
+
+    trendsData.data.forEach((point: TrendPoint) => {
+      const key = point.date;
+      if (!merged[key]) {
+        merged[key] = {
+          date: key,
+          historical: null,
+          forecast: null,
+          lower_bound: null,
+          upper_bound: null,
+        };
+      }
+      
+      if (point.is_forecast) {
+        merged[key].forecast = (merged[key].forecast ?? 0) + point.count;
+        if (point.lower_bound !== null && point.lower_bound !== undefined) {
+          merged[key].lower_bound = (merged[key].lower_bound ?? 0) + point.lower_bound;
+        }
+        if (point.upper_bound !== null && point.upper_bound !== undefined) {
+          merged[key].upper_bound = (merged[key].upper_bound ?? 0) + point.upper_bound;
+        }
+      } else {
+        merged[key].historical = (merged[key].historical ?? 0) + point.count;
+      }
+    });
+
+    const result = Object.values(merged).sort((a, b) => a.date.localeCompare(b.date));
+
+    // Connect the historical line and forecast line smoothly at the transition point
+    const lastHistoricalIdx = result.map(d => d.historical !== null).lastIndexOf(true);
+    const firstForecastIdx = result.findIndex(d => d.forecast !== null);
+    
+    if (lastHistoricalIdx !== -1 && firstForecastIdx !== -1 && firstForecastIdx >= lastHistoricalIdx) {
+      const transitionPoint = result[lastHistoricalIdx];
+      transitionPoint.forecast = transitionPoint.historical;
+    }
+
+    return result;
+  }, [trendsData]);
+
   // Fetch festival calendar with filters
   const { data: festivalData } = useQuery({
     queryKey: ['festival-calendar', filters],
@@ -124,34 +175,34 @@ export default function TrendAnalysis() {
         ) : (
           <div className="h-80">
             <ResponsiveContainer width="100%" height="100%">
-              <LineChart data={trendsData?.data || []}>
-                <CartesianGrid strokeDasharray="3 3" stroke="#333" vertical={false} />
+              <LineChart data={chartData}>
+                <CartesianGrid strokeDasharray="3 3" stroke="#252830" vertical={false} />
                 <XAxis 
                   dataKey="date" 
-                  stroke="#888"
-                  tick={{ fill: '#888', fontSize: 11 }}
-                  axisLine={{ stroke: '#333' }}
+                  stroke="#8b92a5"
+                  tick={{ fill: '#8b92a5', fontSize: 11, fontFamily: 'monospace' }}
+                  axisLine={{ stroke: '#252830' }}
                 />
                 <YAxis 
-                  stroke="#888"
-                  tick={{ fill: '#888', fontSize: 11 }}
-                  axisLine={{ stroke: '#333' }}
+                  stroke="#8b92a5"
+                  tick={{ fill: '#8b92a5', fontSize: 11, fontFamily: 'monospace' }}
+                  axisLine={{ stroke: '#252830' }}
                 />
                 <Tooltip 
                   contentStyle={{ 
-                    backgroundColor: '#1a1a1a', 
-                    border: '1px solid #333',
-                    borderRadius: '4px',
+                    backgroundColor: '#111318', 
+                    border: '1px solid #252830',
+                    borderRadius: '8px',
                     padding: '12px'
                   }}
                   itemStyle={{ color: '#fff', fontSize: '12px' }}
-                  labelStyle={{ color: '#888', fontSize: '11px' }}
+                  labelStyle={{ color: '#8b92a5', fontSize: '11px', fontFamily: 'monospace' }}
                   formatter={(value: any, name: any) => {
-                    if (name === 'Crime Count') {
+                    if (name === 'Historical Crimes') {
                       return [value, 'Historical'];
                     }
-                    if (name === 'Forecast') {
-                      return [value, 'Forecast'];
+                    if (name === 'Forecasted Crimes') {
+                      return [value, 'Predicted (Prophet)'];
                     }
                     return [value, name];
                   }}
@@ -162,25 +213,24 @@ export default function TrendAnalysis() {
                 />
                 <Line 
                   type="monotone" 
-                  dataKey="count" 
+                  dataKey="historical" 
                   stroke="#00F0FF" 
                   strokeWidth={3}
                   dot={false}
-                  name="Crime Count"
-                  activeDot={{ r: 5, stroke: '#00F0FF', strokeWidth: 2, fill: '#1a1a1a' }}
+                  name="Historical Crimes"
+                  activeDot={{ r: 5, stroke: '#00F0FF', strokeWidth: 2, fill: '#111318' }}
                   connectNulls={true}
                 />
                 {showForecast && (
                   <Line 
                     type="monotone" 
-                    dataKey="count" 
+                    dataKey="forecast" 
                     stroke="#ff4d4d" 
                     strokeWidth={2}
                     strokeDasharray="6 4"
                     dot={false}
-                    name="Forecast"
-                    data={trendsData?.data?.filter((d: TrendPoint) => d.is_forecast) || []}
-                    activeDot={{ r: 5, stroke: '#ff4d4d', strokeWidth: 2, fill: '#1a1a1a' }}
+                    name="Forecasted Crimes"
+                    activeDot={{ r: 5, stroke: '#ff4d4d', strokeWidth: 2, fill: '#111318' }}
                     connectNulls={true}
                   />
                 )}
