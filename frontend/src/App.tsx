@@ -51,8 +51,20 @@ function isCatalystSessionActive(): boolean {
 }
 
 function App() {
+  const getInitialScreen = (): Screen => {
+    const params = new URLSearchParams(window.location.search);
+    const page = params.get('page');
+    switch (page) {
+      case 'dashboard': return Screen.DASHBOARD;
+      case 'chat': return Screen.CHAT;
+      case 'network': return Screen.NETWORK;
+      case 'analytics': return Screen.ANALYTICS;
+      default: return Screen.DASHBOARD;
+    }
+  };
+
   const [isLoggedIn, setIsLoggedIn] = useState<boolean>(false);
-  const [currentScreen, setCurrentScreen] = useState<Screen>(Screen.DASHBOARD);
+  const [currentScreen, setCurrentScreen] = useState<Screen>(getInitialScreen);
   const [checking, setChecking] = useState<boolean>(true);
 
   // On mount, check for an existing Catalyst session
@@ -62,15 +74,43 @@ function App() {
     setIsLoggedIn(true);
     setChecking(false);
     
-    // Original authentication logic (commented out)
-    // if (isLocalDevelopment()) {
-    //   setIsLoggedIn(true);
-    //   setChecking(false);
-    // } else {
-    //   const sessionActive = isCatalystSessionActive();
-    //   setIsLoggedIn(sessionActive);
-    //   setChecking(false);
-    // }
+    const params = new URLSearchParams(window.location.search);
+    if (!params.has('page')) {
+      const url = new URL(window.location.href);
+      url.searchParams.set('page', 'dashboard');
+      window.history.replaceState({}, '', url.pathname + url.search);
+    }
+  }, []);
+
+  // Handle back/forward navigation
+  useEffect(() => {
+    const handlePopState = () => {
+      const params = new URLSearchParams(window.location.search);
+      const page = params.get('page');
+      if (page) {
+        switch (page) {
+          case 'dashboard':
+            setCurrentScreen(Screen.DASHBOARD);
+            break;
+          case 'chat':
+            setCurrentScreen(Screen.CHAT);
+            break;
+          case 'network':
+            setCurrentScreen(Screen.NETWORK);
+            break;
+          case 'analytics':
+            setCurrentScreen(Screen.ANALYTICS);
+            break;
+          default:
+            setCurrentScreen(Screen.DASHBOARD);
+        }
+      } else {
+        setCurrentScreen(Screen.DASHBOARD);
+      }
+    };
+
+    window.addEventListener('popstate', handlePopState);
+    return () => window.removeEventListener('popstate', handlePopState);
   }, []);
 
   const handleLogout = () => {
@@ -81,6 +121,20 @@ function App() {
 
   const handleNavigate = (screen: Screen) => {
     setCurrentScreen(screen);
+    
+    const url = new URL(window.location.href);
+    let screenName = 'dashboard';
+    switch (screen) {
+      case Screen.DASHBOARD: screenName = 'dashboard'; break;
+      case Screen.CHAT: screenName = 'chat'; break;
+      case Screen.NETWORK: screenName = 'network'; break;
+      case Screen.ANALYTICS: screenName = 'analytics'; break;
+    }
+    url.searchParams.set('page', screenName);
+    if (screenName !== 'chat') {
+      url.searchParams.delete('session_id');
+    }
+    window.history.pushState({}, '', url.pathname + url.search);
   };
 
   const renderScreen = () => {
