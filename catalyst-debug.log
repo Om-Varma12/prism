@@ -220,3 +220,74 @@ Search for the keywords to learn more about each warning.
 [info] [2026-07-19T07:02:14.223Z] : [1784444534223]  "GET"  "/app/favicon.ico"
 [info] [2026-07-19T07:02:16.182Z] : [1784444536182]  "GET"  "/app/map.svg"
 [info] [2026-07-19T07:02:16.507Z] : [1784444536506]  "GET"  "/app/favicon.ico"
+[info] [2026-07-19T07:03:16.490Z] : [1784444596489]  Appsail[backend]  "GET"  "/api/dashboard/alerts?limit=10"
+[info] [2026-07-19T07:03:28.049Z] : [1784444608048]  Appsail[backend]  "GET"  "/api/chat/history"
+[info] [2026-07-19T07:03:28.367Z] : [1784444608367]  Appsail[backend]  "POST"  "/api/chat/new"
+[info] [2026-07-19T07:03:28.368Z] : [1784444608368]  "GET"  "/app/favicon.ico"
+[info] [2026-07-19T07:03:28.787Z] : [1784444608786]  "GET"  "/app/favicon.ico"
+[info] [2026-07-19T07:03:29.095Z] : [1784444609095]  Appsail[backend]  "GET"  "/api/chat/history"
+[info] [2026-07-19T07:03:29.096Z] : [1784444609096]  Appsail[backend]  "GET"  "/api/chat/messages?session_id=4b19f2f2-7574-4ea8-9e9f-9a747ae2270f"
+[info] [2026-07-19T09:27:31.460Z] : [1784453251460]  Appsail[backend]  "GET"  "/api/network/graph?view=all"
+[debug] [2026-07-19T09:27:31.461Z] : > refreshing access token <
+[debug] [2026-07-19T09:27:31.464Z] : >>>> HTTP REQUEST : POST https://accounts.zoho.in/oauth/v2/token 
+<request body omitted>
+
+[info] [2026-07-19T09:27:31.470Z] : [1784453251470]  Appsail[backend]  "GET"  "/api/network/graph?date_from=2026-06-19&date_to=2026-07-19&view=all"
+[debug] [2026-07-19T09:27:31.470Z] : > refreshing access token <
+[debug] [2026-07-19T09:27:31.471Z] : >>>> HTTP REQUEST : POST https://accounts.zoho.in/oauth/v2/token 
+<request body omitted>
+
+[info] [2026-07-19T09:27:31.471Z] : [1784453251471]  "GET"  "/app/favicon.ico"
+[debug] [2026-07-19T09:27:31.472Z] : > refreshing access token <
+[debug] [2026-07-19T09:27:31.473Z] : >>>> HTTP REQUEST : POST https://accounts.zoho.in/oauth/v2/token 
+<request body omitted>
+
+[debug] [2026-07-19T09:27:31.739Z] : <<<< HTTP RESPONSE : 200
+Response Headers: {"server":"ZGS","date":"Sun, 19 Jul 2026 09:27:32 GMT","content-type":"application/json;charset=UTF-8","content-length":"2523","connection":"keep-alive","cache-control":"no-store","x-content-type-options":"nosniff","pragma":"no-cache","x-frame-options":"SAMEORIGIN","vary":"accept-encoding","content-language":"en-US","strict-transport-security":"max-age=64072000; includeSubDomains; preload"}
+
+[debug] [2026-07-19T09:27:31.746Z] : <<<< HTTP RESPONSE : 200
+Response Headers: {"server":"ZGS","date":"Sun, 19 Jul 2026 09:27:32 GMT","content-type":"application/json;charset=UTF-8","content-length":"2523","connection":"keep-alive","cache-control":"no-store","x-content-type-options":"nosniff","pragma":"no-cache","x-frame-options":"SAMEORIGIN","vary":"accept-encoding","content-language":"en-US","strict-transport-security":"max-age=64072000; includeSubDomains; preload"}
+
+[debug] [2026-07-19T09:27:31.769Z] : <<<< HTTP RESPONSE : 200
+Response Headers: {"server":"ZGS","date":"Sun, 19 Jul 2026 09:27:33 GMT","content-type":"application/json;charset=UTF-8","content-length":"2523","connection":"keep-alive","cache-control":"no-store","x-content-type-options":"nosniff","pragma":"no-cache","x-frame-options":"SAMEORIGIN","vary":"accept-encoding","content-language":"en-US","strict-transport-security":"max-age=64072000; includeSubDomains; preload"}
+
+[info] [2026-07-19T09:33:44.491Z] : [react-plugin]: Compiling...
+[info] [2026-07-19T09:33:45.520Z] : [react-plugin]: Compiled with warnings.
+
+[info] [2026-07-19T09:33:45.520Z] : [react-plugin]: [eslint] 
+src\components\ChatScreen.tsx
+  Line 35:7:  'quickActions' is assigned a value but never used  @typescript-eslint/no-unused-vars
+[info] [2026-07-19T09:33:45.520Z] : [react-plugin]: 
+Search for the keywords to learn more about each warning.
+[info] [2026-07-19T09:33:45.521Z] : [react-plugin]: To ignore, add // eslint-disable-next-line to the line before.
+
+[info] [2026-07-19T09:33:45.825Z] : [1784453625825]  "GET"  "/app/main.65ecab50c9311738871b.hot-update.json"
+[info] [2026-07-19T09:33:46.091Z] : [1784453626091]  "GET"  "/app/main.65ecab50c9311738871b.hot-update.js"
+[info] [2026-07-19T09:34:34.347Z] : [1784453674347]  Appsail[backend]  "GET"  "/api/network/profile/0?row_id=46143000000062140"
+[info] [2026-07-19T09:37:04.828Z] : [react-plugin]: Compiling...
+[info] [2026-07-19T09:37:05.877Z] : [react-plugin]: Compiled with warnings.
+
+[info] [2026-07-19T09:37:05.878Z] : [react-plugin]: [eslint] 
+src\components\ChatScreen.tsx
+  Line 35:7:  'quickActions' is assigned a value but never used  @typescript-eslint/no-unused-vars
+
+src\components\network\NetworkGraph.tsx
+  Line 52:10:  'drawCrispLabel' is defined but never used  @typescript-eslint/no-unused-vars
+[info] [2026-07-19T09:37:05.878Z] : [react-plugin]: 
+Search for the keywords to learn more about each warning.
+[info] [2026-07-19T09:37:05.878Z] : [react-plugin]: To ignore, add // eslint-disable-next-line to the line before.
+
+[info] [2026-07-19T09:37:06.187Z] : [1784453826187]  "GET"  "/app/main.5967cd74b2ec475c75a3.hot-update.json"
+[info] [2026-07-19T09:37:06.455Z] : [1784453826455]  "GET"  "/app/main.5967cd74b2ec475c75a3.hot-update.js"
+[info] [2026-07-19T09:37:28.200Z] : [react-plugin]: Compiling...
+[info] [2026-07-19T09:37:29.108Z] : [react-plugin]: Compiled with warnings.
+
+[info] [2026-07-19T09:37:29.108Z] : [react-plugin]: [eslint] 
+src\components\ChatScreen.tsx
+  Line 35:7:  'quickActions' is assigned a value but never used  @typescript-eslint/no-unused-vars
+[info] [2026-07-19T09:37:29.109Z] : [react-plugin]: 
+Search for the keywords to learn more about each warning.
+[info] [2026-07-19T09:37:29.109Z] : [react-plugin]: To ignore, add // eslint-disable-next-line to the line before.
+
+[info] [2026-07-19T09:37:29.138Z] : [1784453849138]  "GET"  "/app/main.30d03fe747e7c11167b1.hot-update.json"
+[info] [2026-07-19T09:37:29.455Z] : [1784453849455]  "GET"  "/app/main.30d03fe747e7c11167b1.hot-update.js"

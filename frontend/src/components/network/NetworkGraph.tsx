@@ -49,6 +49,50 @@ const getClusterColor = (cluster: number | null | undefined): string =>
   cluster != null ? (CLUSTER_COLORS[cluster % 8] ?? '#7B61FF') : '#5A6478';
 
 // ─── Canvas node painter (Obsidian glow style) ────────────────────────────────
+function drawCrispLabel(
+  node: FGNode,
+  ctx: CanvasRenderingContext2D,
+  globalScale: number,
+  radius: number,
+  isSelected: boolean,
+  dimmed: boolean,
+) {
+  const { x = 0, y = 0 } = node;
+  const transform = ctx.getTransform();
+  const screenX = transform.a * x + transform.c * y + transform.e;
+  const screenY = transform.b * x + transform.d * y + transform.f;
+  const labelX = Math.round(screenX);
+  const labelY = Math.round(screenY + radius * globalScale + 9);
+  const fontSize = isSelected ? 12 : 11;
+  const fontWeight = isSelected ? 700 : 600;
+  const maxWidth = isSelected ? 180 : 140;
+
+  ctx.save();
+  ctx.setTransform(1, 0, 0, 1, 0, 0);
+  ctx.font = `${fontWeight} ${fontSize}px Inter, system-ui, sans-serif`;
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'top';
+
+  const measuredWidth = ctx.measureText(node.label).width;
+  const labelWidth = Math.min(measuredWidth + 14, maxWidth + 14);
+  const labelHeight = fontSize + 7;
+
+  ctx.globalAlpha = dimmed ? 0.35 : 1;
+  ctx.fillStyle = 'rgba(5, 6, 8, 0.76)';
+  ctx.strokeStyle = 'rgba(255, 255, 255, 0.08)';
+  ctx.lineWidth = 1;
+  ctx.beginPath();
+  ctx.roundRect(labelX - labelWidth / 2, labelY - 3, labelWidth, labelHeight, 5);
+  ctx.fill();
+  ctx.stroke();
+
+  ctx.fillStyle = dimmed ? 'rgba(232, 234, 240, 0.42)' : '#F4F7FB';
+  ctx.shadowColor = 'rgba(0, 0, 0, 0.72)';
+  ctx.shadowBlur = 3;
+  ctx.fillText(node.label, labelX, labelY, maxWidth);
+  ctx.restore();
+}
+
 function paintNode(
   node: FGNode,
   ctx: CanvasRenderingContext2D,
@@ -95,14 +139,8 @@ function paintNode(
   }
 
   // ── Label — always visible, font shrinks as user zooms in ──────────
-  const fontSize = Math.max(4, 10 / globalScale);
-  ctx.font = `${isSelected ? '600' : '400'} ${fontSize}px Inter, sans-serif`;
-  ctx.fillStyle = dimmed ? 'rgba(255,255,255,0.2)' : '#E8EAF0';
-  ctx.textAlign = 'center';
-  ctx.textBaseline = 'top';
-  ctx.fillText(node.label, x, y + baseRadius + 3 / globalScale);
-
   ctx.restore();
+  drawCrispLabel(node, ctx, globalScale, baseRadius, isSelected, dimmed);
 }
 
 // ─── Component ────────────────────────────────────────────────────────────────

@@ -70,13 +70,17 @@ function MaterialIcon({
     <span
       aria-hidden="true"
       className={cn(
-        'material-symbols-outlined flex size-8 shrink-0 items-center justify-center rounded-md border border-border bg-muted text-[19px] text-muted-foreground transition-colors',
+        'flex size-8 shrink-0 items-center justify-center rounded-md border border-border bg-muted text-muted-foreground transition-colors',
         active && 'border-primary/40 bg-primary/15 text-primary'
       )}
       data-icon="inline-start"
-      style={{ fontVariationSettings: active ? '"FILL" 1' : undefined }}
     >
-      {children}
+      <span
+        className="material-symbols-outlined block text-[19px] leading-none"
+        style={{ fontVariationSettings: active ? '"FILL" 1' : undefined }}
+      >
+        {children}
+      </span>
     </span>
   );
 }
@@ -92,7 +96,7 @@ export default function Sidebar({ currentScreen, onNavigate, onLogout }: Sidebar
                 <div className="flex size-11 items-center justify-center rounded-lg border border-primary/30 bg-primary/10 text-primary">
                   <span
                     aria-hidden="true"
-                    className="material-symbols-outlined text-[24px]"
+                    className="material-symbols-outlined block text-[24px] leading-none"
                     style={{ fontVariationSettings: '"FILL" 1' }}
                   >
                     security
@@ -174,7 +178,7 @@ export default function Sidebar({ currentScreen, onNavigate, onLogout }: Sidebar
           <Card className="border-border bg-card/80 shadow-none">
             <CardContent className="flex items-center gap-3 p-3">
               <div className="flex size-9 items-center justify-center rounded-md border border-border bg-muted">
-                <span aria-hidden="true" className="material-symbols-outlined text-[20px] text-muted-foreground">
+                <span aria-hidden="true" className="material-symbols-outlined block text-[20px] leading-none text-muted-foreground">
                   account_circle
                 </span>
               </div>
