@@ -6,6 +6,29 @@
 @tailwind components;
 @tailwind utilities;
 
+:root {
+  --radius: 0.5rem;
+  --background: 220 28% 5%;
+  --foreground: 216 30% 94%;
+  --card: 220 25% 8%;
+  --card-foreground: 216 30% 94%;
+  --popover: 220 25% 8%;
+  --popover-foreground: 216 30% 94%;
+  --primary: 219 78% 64%;
+  --primary-foreground: 220 45% 8%;
+  --secondary: 220 18% 14%;
+  --secondary-foreground: 216 30% 92%;
+  --muted: 220 18% 13%;
+  --muted-foreground: 219 15% 64%;
+  --accent: 219 34% 18%;
+  --accent-foreground: 216 30% 94%;
+  --destructive: 4 90% 68%;
+  --destructive-foreground: 216 30% 96%;
+  --border: 220 15% 17%;
+  --input: 220 15% 18%;
+  --ring: 219 78% 64%;
+}
+
 /* ─── Base resets ───────────────────────────────────────────────────────────── */
 *, *::before, *::after { box-sizing: border-box; }
 

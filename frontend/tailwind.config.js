@@ -4,8 +4,26 @@ module.exports = {
   theme: {
     extend: {
       colors: {
+        // shadcn semantic tokens
+        'foreground':            'hsl(var(--foreground) / <alpha-value>)',
+        'card':                  'hsl(var(--card) / <alpha-value>)',
+        'card-foreground':       'hsl(var(--card-foreground) / <alpha-value>)',
+        'popover':               'hsl(var(--popover) / <alpha-value>)',
+        'popover-foreground':    'hsl(var(--popover-foreground) / <alpha-value>)',
+        'primary-foreground':    'hsl(var(--primary-foreground) / <alpha-value>)',
+        'secondary-foreground':  'hsl(var(--secondary-foreground) / <alpha-value>)',
+        'muted':                 'hsl(var(--muted) / <alpha-value>)',
+        'muted-foreground':      'hsl(var(--muted-foreground) / <alpha-value>)',
+        'accent':                'hsl(var(--accent) / <alpha-value>)',
+        'accent-foreground':     'hsl(var(--accent-foreground) / <alpha-value>)',
+        'destructive':           'hsl(var(--destructive) / <alpha-value>)',
+        'destructive-foreground':'hsl(var(--destructive-foreground) / <alpha-value>)',
+        'border':                'hsl(var(--border) / <alpha-value>)',
+        'input':                 'hsl(var(--input) / <alpha-value>)',
+        'ring':                  'hsl(var(--ring) / <alpha-value>)',
+
         // Core surface tokens (dark tactical palette)
-        'background':            '#0A0C10',
+        'background':            'hsl(var(--background) / <alpha-value>)',
         'surface':               '#111318',
         'surface-variant':       '#1A1D24',
         'surface-container':     '#1A1D24',
@@ -15,7 +33,7 @@ module.exports = {
         'panel':                 '#111318',
 
         // Primary (blue)
-        'primary':               '#3B6FE8',
+        'primary':               'hsl(var(--primary) / <alpha-value>)',
         'primary-container':     '#3B6FE8',
         'primary-fixed':         '#A8C4FF',
         'inverse-primary':       '#2b5bc2',
@@ -23,7 +41,7 @@ module.exports = {
         'on-primary-container':  '#FFFFFF',
 
         // Secondary
-        'secondary':             '#6B8EFF',
+        'secondary':             'hsl(var(--secondary) / <alpha-value>)',
         'secondary-container':   '#2A3A6E',
         'on-secondary':          '#FFFFFF',
 
@@ -68,9 +86,13 @@ module.exports = {
         'margin-desktop':  '24px',
       },
       borderRadius: {
-        'DEFAULT': '6px',
-        'btn':     '6px',
-        'card':    '8px',
+        'DEFAULT': 'var(--radius)',
+        'sm': 'calc(var(--radius) - 4px)',
+        'md': 'calc(var(--radius) - 2px)',
+        'lg': 'var(--radius)',
+        'xl': 'calc(var(--radius) + 4px)',
+        'btn':     'var(--radius)',
+        'card':    'calc(var(--radius) + 2px)',
       },
     },
   },

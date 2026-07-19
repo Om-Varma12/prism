@@ -1,3 +1,6 @@
 implementations
 resources/
 TODO
+.agents
+.claude
+skills-lock.json
