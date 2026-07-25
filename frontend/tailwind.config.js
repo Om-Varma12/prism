@@ -1,3 +1,5 @@
+const { COLORS } = require('./src/constants/colors.js');
+
 /** @type {import('tailwindcss').Config} */
 module.exports = {
   content: ['./src/**/*.{js,jsx,ts,tsx}'],
@@ -24,53 +26,53 @@ module.exports = {
 
         // Core surface tokens (dark tactical palette)
         'background':            'hsl(var(--background) / <alpha-value>)',
-        'surface':               '#111318',
-        'surface-variant':       '#1A1D24',
-        'surface-container':     '#1A1D24',
-        'surface-container-low': '#141720',
-        'surface-container-high':'#252830',
-        'surface-container-highest': '#2E3138',
-        'panel':                 '#111318',
+        'surface':               COLORS.surface.panel,
+        'surface-variant':       COLORS.surface.container,
+        'surface-container':     COLORS.surface.container,
+        'surface-container-low': COLORS.surface.containerLow,
+        'surface-container-high':COLORS.surface.containerHigh,
+        'surface-container-highest': COLORS.surface.containerHighest,
+        'panel':                 COLORS.surface.panel,
 
         // Primary (blue)
         'primary':               'hsl(var(--primary) / <alpha-value>)',
-        'primary-container':     '#3B6FE8',
-        'primary-fixed':         '#A8C4FF',
-        'inverse-primary':       '#2b5bc2',
-        'on-primary':            '#FFFFFF',
-        'on-primary-container':  '#FFFFFF',
+        'primary-container':     COLORS.primary.main,
+        'primary-fixed':         COLORS.primary.fixed,
+        'inverse-primary':       COLORS.primary.hover,
+        'on-primary':            COLORS.text.white,
+        'on-primary-container':  COLORS.text.white,
 
         // Secondary
         'secondary':             'hsl(var(--secondary) / <alpha-value>)',
-        'secondary-container':   '#2A3A6E',
-        'on-secondary':          '#FFFFFF',
+        'secondary-container':   COLORS.primary.container,
+        'on-secondary':          COLORS.text.white,
 
         // Tertiary (orange/amber warnings)
-        'tertiary':              '#E8A030',
+        'tertiary':              COLORS.status.warning,
         'tertiary-container':    '#7A5200',
-        'on-tertiary':           '#FFFFFF',
+        'on-tertiary':           COLORS.text.white,
         'on-tertiary-container': '#FFE0B2',
 
         // Error (red)
-        'error':                 '#FF4D4D',
-        'error-container':       '#93000A',
-        'on-error':              '#FFFFFF',
+        'error':                 COLORS.status.error,
+        'error-container':       COLORS.status.errorContainer,
+        'on-error':              COLORS.text.white,
         'on-error-container':    '#FFB4AB',
 
         // On-surface hierarchy
-        'on-surface':            '#E2E2E5',
-        'on-surface-variant':    '#8B92A5',
-        'on-primary-fixed':      '#A8C4FF',
+        'on-surface':            COLORS.text.primary,
+        'on-surface-variant':    COLORS.text.secondary,
+        'on-primary-fixed':      COLORS.primary.fixed,
 
         // Borders
-        'outline':               '#4A5060',
-        'outline-variant':       '#252830',
-        'tactical':              '#252830',
+        'outline':               COLORS.border.default,
+        'outline-variant':       COLORS.border.variant,
+        'tactical':              COLORS.border.tactical,
 
         // Layout aliases
-        'layout-bg':             '#0A0C10',
-        'layout-surface':        '#111318',
-        'layout-border':         '#252830',
+        'layout-bg':             COLORS.background.dark,
+        'layout-surface':        COLORS.surface.panel,
+        'layout-border':         COLORS.border.tactical,
       },
       fontFamily: {
         sans:  ['Inter', 'system-ui', 'sans-serif'],

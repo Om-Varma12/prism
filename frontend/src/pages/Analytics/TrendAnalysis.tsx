@@ -5,8 +5,9 @@
 
 import React, { useState, useCallback } from 'react';
 import { useQuery } from '@tanstack/react-query';
+import { COLORS } from '../../constants/colors';
 import { analyticsService } from '../../services/analytics.service';
-import { TrendDataResponse, TrendFilters, TrendGranularity, FestivalCalendarResponse, TrendPoint, SeasonalComparison } from '../../types/analytics';
+import { TrendDataResponse, TrendFilters, TrendGranularity, TrendPoint, SeasonalComparison } from '../../types/analytics';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 
 export default function TrendAnalysis() {
@@ -176,27 +177,27 @@ export default function TrendAnalysis() {
           <div className="h-80">
             <ResponsiveContainer width="100%" height="100%">
               <LineChart data={chartData}>
-                <CartesianGrid strokeDasharray="3 3" stroke="#252830" vertical={false} />
+                <CartesianGrid strokeDasharray="3 3" stroke={COLORS.border.variant} vertical={false} />
                 <XAxis 
                   dataKey="date" 
-                  stroke="#8b92a5"
-                  tick={{ fill: '#8b92a5', fontSize: 11, fontFamily: 'monospace' }}
-                  axisLine={{ stroke: '#252830' }}
+                  stroke={COLORS.text.secondary}
+                  tick={{ fill: COLORS.text.secondary, fontSize: 11, fontFamily: 'monospace' }}
+                  axisLine={{ stroke: COLORS.border.variant }}
                 />
                 <YAxis 
-                  stroke="#8b92a5"
-                  tick={{ fill: '#8b92a5', fontSize: 11, fontFamily: 'monospace' }}
-                  axisLine={{ stroke: '#252830' }}
+                  stroke={COLORS.text.secondary}
+                  tick={{ fill: COLORS.text.secondary, fontSize: 11, fontFamily: 'monospace' }}
+                  axisLine={{ stroke: COLORS.border.variant }}
                 />
                 <Tooltip 
                   contentStyle={{ 
-                    backgroundColor: '#111318', 
-                    border: '1px solid #252830',
+                    backgroundColor: COLORS.surface.panel, 
+                    border: `1px solid ${COLORS.border.variant}`,
                     borderRadius: '8px',
                     padding: '12px'
                   }}
-                  itemStyle={{ color: '#fff', fontSize: '12px' }}
-                  labelStyle={{ color: '#8b92a5', fontSize: '11px', fontFamily: 'monospace' }}
+                  itemStyle={{ color: COLORS.text.white, fontSize: '12px' }}
+                  labelStyle={{ color: COLORS.text.secondary, fontSize: '11px', fontFamily: 'monospace' }}
                   formatter={(value: any, name: any) => {
                     if (name === 'Historical Crimes') {
                       return [value, 'Historical'];
@@ -214,23 +215,23 @@ export default function TrendAnalysis() {
                 <Line 
                   type="monotone" 
                   dataKey="historical" 
-                  stroke="#00F0FF" 
+                  stroke={COLORS.accent.cyan} 
                   strokeWidth={3}
                   dot={false}
                   name="Historical Crimes"
-                  activeDot={{ r: 5, stroke: '#00F0FF', strokeWidth: 2, fill: '#111318' }}
+                  activeDot={{ r: 5, stroke: COLORS.accent.cyan, strokeWidth: 2, fill: COLORS.surface.panel }}
                   connectNulls={true}
                 />
                 {showForecast && (
                   <Line 
                     type="monotone" 
                     dataKey="forecast" 
-                    stroke="#ff4d4d" 
+                    stroke={COLORS.status.error} 
                     strokeWidth={2}
                     strokeDasharray="6 4"
                     dot={false}
                     name="Forecasted Crimes"
-                    activeDot={{ r: 5, stroke: '#ff4d4d', strokeWidth: 2, fill: '#111318' }}
+                    activeDot={{ r: 5, stroke: COLORS.status.error, strokeWidth: 2, fill: COLORS.surface.panel }}
                     connectNulls={true}
                   />
                 )}

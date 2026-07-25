@@ -5,6 +5,7 @@
 
 import React, { useState, useCallback } from 'react';
 import { useQuery } from '@tanstack/react-query';
+import { COLORS } from '../../constants/colors';
 import { analyticsService } from '../../services/analytics.service';
 import { OffenderRiskResponse, OffenderRiskFilters, OffenderRisk } from '../../types/analytics';
 
@@ -95,16 +96,16 @@ export default function OffenderRiskBoard() {
 
   // Get risk score color
   const getRiskScoreColor = (score: number) => {
-    if (score >= 70) return 'text-error';
-    if (score >= 40) return 'text-[#ff9f0a]';
-    return 'text-primary';
+    if (score >= 70) return COLORS.status.error;
+    if (score >= 40) return COLORS.status.amber;
+    return COLORS.primary.main;
   };
 
-  // Get risk badge color
-  const getRiskBadgeColor = (score: number) => {
-    if (score >= 70) return 'border-[#ff4d4d] text-[#ff4d4d]';
-    if (score >= 40) return 'border-[#ff9f0a] text-[#ff9f0a]';
-    return 'border-primary text-primary';
+  // Get risk badge style
+  const getRiskBadgeStyle = (score: number) => {
+    if (score >= 70) return { borderColor: COLORS.status.error, color: COLORS.status.error };
+    if (score >= 40) return { borderColor: COLORS.status.amber, color: COLORS.status.amber };
+    return { borderColor: COLORS.primary.main, color: COLORS.primary.main };
   };
 
   // Get risk label
@@ -169,7 +170,7 @@ export default function OffenderRiskBoard() {
       </div>
 
       {/* Search Bar */}
-      <div className="max-w-md relative border border-outline-variant bg-[#0A0C10] flex items-center px-3 py-2 rounded-none">
+      <div className="max-w-md relative border border-outline-variant flex items-center px-3 py-2 rounded-none" style={{ backgroundColor: COLORS.background.dark }}>
         <span className="material-symbols-outlined text-outline text-[18px] mr-2">filter_alt</span>
         <input
           type="text"
@@ -194,7 +195,8 @@ export default function OffenderRiskBoard() {
           {sortedOffenders.map((offender) => (
             <div
               key={offender.accused_id}
-              className="bg-[#111318] border border-outline-variant p-4 rounded-none flex flex-col justify-between group hover:border-[#00F0FF]/50 transition-all"
+              className="border border-outline-variant p-4 rounded-none flex flex-col justify-between group transition-all"
+              style={{ backgroundColor: COLORS.surface.panel }}
             >
               <div>
                 <div className="flex justify-between items-start mb-2">
@@ -205,7 +207,8 @@ export default function OffenderRiskBoard() {
                     </span>
                   </div>
                   <span
-                    className={`text-[8px] font-mono font-black border px-1.5 py-0.5 rounded-none uppercase tracking-wider ${getRiskBadgeColor(offender.risk_score)}`}
+                    className="text-[8px] font-mono font-black border px-1.5 py-0.5 rounded-none uppercase tracking-wider"
+                    style={getRiskBadgeStyle(offender.risk_score)}
                   >
                     {getRiskLabel(offender.risk_score)}
                   </span>

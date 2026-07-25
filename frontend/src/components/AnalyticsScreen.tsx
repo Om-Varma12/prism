@@ -5,6 +5,7 @@
 
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
+import { COLORS } from '../constants/colors';
 import { EMERGING_CLUSTERS, MOCK_SUSPECTS } from '../data/mockData';
 import { ClusterItem } from '../types';
 
@@ -119,7 +120,7 @@ export default function AnalyticsScreen() {
               <div className="flex-1 xl:w-[70%] flex flex-col gap-sm">
                 <div className="flex-1 bg-surface border border-outline-variant relative overflow-hidden flex flex-col min-h-[400px]">
                   {/* Map Container */}
-                  <div className="flex-1 relative bg-[#0A0C10]">
+                  <div className="flex-1 relative check-bg" style={{ backgroundColor: COLORS.background.dark }}>
                     <div
                       className="absolute inset-0 bg-cover bg-center opacity-40 mix-blend-luminosity grayscale pointer-events-none"
                       style={{
@@ -308,66 +309,65 @@ export default function AnalyticsScreen() {
               exit={{ opacity: 0, y: -10 }}
               className="space-y-6"
             >
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div className="bg-surface border border-outline-variant p-5 rounded-none">
-                  <h3 className="text-[10px] font-mono font-black text-white/40 uppercase mb-4 tracking-[0.15em]">
-                    Monthly Crime Clearance Rates (%)
-                  </h3>
-                  <div className="h-44 flex items-end justify-between gap-2 border-b border-white/10 pb-2 font-mono text-[9px] font-bold">
-                    {[
-                      { m: 'Jan', rate: 42, height: 63 },
-                      { m: 'Feb', rate: 45, height: 67 },
-                      { m: 'Mar', rate: 48, height: 72 },
-                      { m: 'Apr', rate: 52, height: 78 },
-                      { m: 'May', rate: 50, height: 75 },
-                      { m: 'Jun', rate: 58, height: 87 },
-                      { m: 'Jul', rate: 64, height: 96 },
-                      { m: 'Aug', rate: 62, height: 93 },
-                      { m: 'Sep', rate: 68, height: 102 },
-                      { m: 'Oct', rate: 75, height: 112 }
-                    ].map((item, idx) => (
-                      <div key={idx} className="w-full flex flex-col items-center">
-                        <span className="text-[#00F0FF] font-black mb-1">{item.rate}%</span>
-                        <div
-                          className="w-8 bg-[#00F0FF] rounded-none transition-all duration-500"
-                          style={{ height: `${item.height}px` }}
-                        ></div>
-                        <span className="text-white/40 mt-1.5 uppercase font-black tracking-wider text-[8px]">
-                          {item.m}
-                        </span>
-                      </div>
-                    ))}
-                  </div>
+              <div className="bg-surface border border-outline-variant p-5 rounded-none">
+                <h3 className="text-[10px] font-mono font-black text-white/40 uppercase mb-4 tracking-[0.15em]">
+                  Monthly Resolution Rate Trajectory (2024)
+                </h3>
+                <div className="h-44 flex items-end justify-between gap-2 border-b border-white/10 pb-2 font-mono text-[9px] font-bold">
+                  {[
+                    { m: 'Jan', rate: 35, height: 52 },
+                    { m: 'Feb', rate: 42, height: 63 },
+                    { m: 'Mar', rate: 48, height: 72 },
+                    { m: 'Apr', rate: 52, height: 78 },
+                    { m: 'May', rate: 50, height: 75 },
+                    { m: 'Jun', rate: 58, height: 87 },
+                    { m: 'Jul', rate: 64, height: 96 },
+                    { m: 'Aug', rate: 62, height: 93 },
+                    { m: 'Sep', rate: 68, height: 102 },
+                    { m: 'Oct', rate: 75, height: 112 }
+                  ].map((item, idx) => (
+                    <div key={idx} className="w-full flex flex-col items-center">
+                      <span className="font-black mb-1" style={{ color: COLORS.accent.cyan }}>{item.rate}%</span>
+                      <div
+                        className="w-8 rounded-none transition-all duration-500"
+                        style={{ height: `${item.height}px`, backgroundColor: COLORS.accent.cyan }}
+                      ></div>
+                      <span className="text-white/40 mt-1.5 uppercase font-black tracking-wider text-[8px]">
+                        {item.m}
+                      </span>
+                    </div>
+                  ))}
                 </div>
+              </div>
 
-                <div className="bg-surface border border-outline-variant p-5 rounded-none">
-                  <h3 className="text-[10px] font-mono font-black text-white/40 uppercase mb-4 tracking-[0.15em]">
-                    Weekly crime Occurrence Peak Times (Days)
-                  </h3>
-                  <div className="h-44 flex items-end justify-between gap-3 border-b border-white/10 pb-2 font-mono text-[9px] font-bold">
-                    {[
-                      { d: 'MON', crime: 30, height: 39 },
-                      { d: 'TUE', crime: 28, height: 36 },
-                      { d: 'WED', crime: 35, height: 45 },
-                      { d: 'THU', crime: 45, height: 58 },
-                      { d: 'FRI', crime: 72, height: 93 },
-                      { d: 'SAT', crime: 88, height: 114 },
-                      { d: 'SUN', crime: 64, height: 83 }
-                    ].map((item, idx) => (
-                      <div key={idx} className="w-full flex flex-col items-center">
-                        <span className="text-[#ff4d4d] font-black mb-1">{item.crime}</span>
-                        <div
-                          className={`w-10 rounded-none transition-all duration-500 ${
-                            item.crime > 60 ? 'bg-[#ff4d4d]' : 'bg-[#ff4d4d]/30'
-                          }`}
-                          style={{ height: `${item.height}px` }}
-                        ></div>
-                        <span className="text-white/40 mt-1.5 uppercase font-black tracking-wider text-[8px]">
-                          {item.d}
-                        </span>
-                      </div>
-                    ))}
-                  </div>
+              <div className="bg-surface border border-outline-variant p-5 rounded-none">
+                <h3 className="text-[10px] font-mono font-black text-white/40 uppercase mb-4 tracking-[0.15em]">
+                  Weekly crime Occurrence Peak Times (Days)
+                </h3>
+                <div className="h-44 flex items-end justify-between gap-3 border-b border-white/10 pb-2 font-mono text-[9px] font-bold">
+                  {[
+                    { d: 'MON', crime: 30, height: 39 },
+                    { d: 'TUE', crime: 28, height: 36 },
+                    { d: 'WED', crime: 35, height: 45 },
+                    { d: 'THU', crime: 45, height: 58 },
+                    { d: 'FRI', crime: 72, height: 93 },
+                    { d: 'SAT', crime: 88, height: 114 },
+                    { d: 'SUN', crime: 64, height: 83 }
+                  ].map((item, idx) => (
+                    <div key={idx} className="w-full flex flex-col items-center">
+                      <span className="font-black mb-1" style={{ color: COLORS.status.error }}>{item.crime}</span>
+                      <div
+                        className="w-10 rounded-none transition-all duration-500"
+                        style={{
+                          height: `${item.height}px`,
+                          backgroundColor: item.crime > 60 ? COLORS.status.error : `${COLORS.status.error}4D`
+                        }}
+                      ></div>
+                      <span className="text-white/40 mt-1.5 uppercase font-black tracking-wider text-[8px]">
+                        {item.d}
+                      </span>
+                    </div>
+                  ))}
                 </div>
               </div>
             </motion.div>
@@ -383,7 +383,7 @@ export default function AnalyticsScreen() {
               className="space-y-4"
             >
               {/* Search bar offenders filter */}
-              <div className="max-w-md relative border border-outline-variant bg-[#0A0C10] flex items-center px-3 py-2 rounded-none">
+              <div className="max-w-md relative border border-outline-variant flex items-center px-3 py-2 rounded-none" style={{ backgroundColor: COLORS.background.dark }}>
                 <span className="material-symbols-outlined text-outline text-[18px] mr-2">filter_alt</span>
                 <input
                   type="text"
@@ -399,7 +399,8 @@ export default function AnalyticsScreen() {
                 {MOCK_SUSPECTS.filter((s) => s.name.toLowerCase().includes(offenderSearch.toLowerCase())).map((sus) => (
                   <div
                     key={sus.id}
-                    className="bg-[#111318] border border-outline-variant p-4 rounded-none flex flex-col justify-between group hover:border-[#00F0FF]/50 transition-all"
+                    className="bg-surface border border-outline-variant p-4 rounded-none flex flex-col justify-between group transition-all"
+                    style={{ backgroundColor: COLORS.surface.panel }}
                   >
                     <div>
                       <div className="flex justify-between items-start mb-2">
@@ -410,11 +411,11 @@ export default function AnalyticsScreen() {
                           </span>
                         </div>
                         <span
-                          className={`text-[8px] font-mono font-black border px-1.5 py-0.5 rounded-none uppercase tracking-wider ${
-                            sus.status === 'HIGH-RISK'
-                              ? 'border-[#ff4d4d] text-[#ff4d4d]'
-                              : 'border-[#ff9f0a] text-[#ff9f0a]'
-                          }`}
+                          className="text-[8px] font-mono font-black border px-1.5 py-0.5 rounded-none uppercase tracking-wider"
+                          style={{
+                            borderColor: sus.status === 'HIGH-RISK' ? COLORS.status.error : COLORS.status.amber,
+                            color: sus.status === 'HIGH-RISK' ? COLORS.status.error : COLORS.status.amber,
+                          }}
                         >
                           {sus.status}
                         </span>
@@ -472,7 +473,7 @@ export default function AnalyticsScreen() {
                   <div key={idx} className="p-3 border border-white/10 rounded-none bg-black/40 space-y-1.5">
                     <div className="flex justify-between text-[9px] text-white/40 font-black uppercase">
                       <span>{log.time}</span>
-                      <span className="text-[#00F0FF]">{log.loc}</span>
+                      <span style={{ color: COLORS.accent.cyan }}>{log.loc}</span>
                     </div>
                     <p className="text-white/80 text-xs leading-snug font-sans">{log.desc}</p>
                   </div>
@@ -482,7 +483,7 @@ export default function AnalyticsScreen() {
               <div className="p-4 border-t border-white/10 bg-black flex justify-end">
                 <button
                   onClick={() => setShowLogDialog(false)}
-                  className="px-4 py-2 bg-primary hover:bg-[#2b5bc2] text-white text-[10px] font-black rounded-none font-mono tracking-wider transition-colors cursor-pointer uppercase"
+                  className="px-4 py-2 bg-primary hover:bg-inverse-primary text-white text-[10px] font-black rounded-none font-mono tracking-wider transition-colors cursor-pointer uppercase"
                 >
                   CLOSE LOGS
                 </button>

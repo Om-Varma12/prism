@@ -4,6 +4,7 @@
  */
 
 import React, { useEffect, useRef } from 'react';
+import { COLORS } from '../constants/colors';
 import { ChatMessage, ConversationItem } from '../types';
 import { useChat } from '../hooks/useChat';
 
@@ -12,24 +13,24 @@ interface ChatScreenProps {
 }
 
 const shell = {
-  obsidian: '#0b0c0f',
-  panel: '#111318',
-  panelRaised: '#161921',
-  line: '#1b1e26',
-  surface: '#1c212b',
-  teal: '#5eead4',
-  tealMuted: '#2c6b63',
-  blue: '#60a5fa',
-  blueMuted: '#1e3a5f',
-  gold: '#fbbf24',
-  goldMuted: '#5c4a1f',
-  red: '#f87171',
-  redMuted: '#5c2a2a',
-  green: '#4ade80',
-  greenMuted: '#1e4a2e',
-  slate: '#94a3b8',
-  ghost: '#334155',
-  dim: '#475569',
+  obsidian: COLORS.background.obsidian,
+  panel: COLORS.surface.panel,
+  panelRaised: COLORS.surface.panelRaised,
+  line: COLORS.border.line,
+  surface: COLORS.surface.container,
+  teal: COLORS.accent.teal,
+  tealMuted: COLORS.accent.tealMuted,
+  blue: COLORS.primary.blue,
+  blueMuted: COLORS.primary.blueMuted,
+  gold: COLORS.status.gold,
+  goldMuted: COLORS.status.goldMuted,
+  red: COLORS.status.errorLight,
+  redMuted: COLORS.status.errorMuted,
+  green: COLORS.status.success,
+  greenMuted: COLORS.status.greenMuted,
+  slate: COLORS.text.slate,
+  ghost: COLORS.text.ghost,
+  dim: COLORS.text.dim,
 };
 
 const quickActions = [
@@ -99,11 +100,11 @@ function ScanStyles() {
         .sentinel-dot { animation: sentinelDot 1.2s infinite ease-in-out; }
         .sentinel-dot:nth-child(2) { animation-delay: 0.15s; }
         .sentinel-dot:nth-child(3) { animation-delay: 0.3s; }
-        .sentinel-scroll { scrollbar-width: thin; scrollbar-color: #242a36 transparent; }
+        .sentinel-scroll { scrollbar-width: thin; scrollbar-color: ${COLORS.border.scrollbarThumb} transparent; }
         .sentinel-scroll::-webkit-scrollbar { width: 5px; height: 5px; }
         .sentinel-scroll::-webkit-scrollbar-track { background: transparent; }
-        .sentinel-scroll::-webkit-scrollbar-thumb { background: #242a36; border-radius: 3px; }
-        .sentinel-scroll::-webkit-scrollbar-thumb:hover { background: #334155; }
+        .sentinel-scroll::-webkit-scrollbar-thumb { background: ${COLORS.border.scrollbarThumb}; border-radius: 3px; }
+        .sentinel-scroll::-webkit-scrollbar-thumb:hover { background: ${COLORS.text.ghost}; }
         .sentinel-sidebar-item { position: relative; transition: all 0.15s ease; }
         .sentinel-sidebar-item::before {
           content: '';
@@ -236,7 +237,7 @@ function ResultTable({ message }: { message: ChatMessage }) {
                           {val}
                         </span>
                       ) : (
-                        <span style={{ color: ci === 0 ? shell.teal : '#cbd5e1' }} className={ci === 0 ? 'font-medium' : ''}>
+                        <span style={{ color: ci === 0 ? shell.teal : COLORS.text.primary }} className={ci === 0 ? 'font-medium' : ''}>
                           {val}
                         </span>
                       )}

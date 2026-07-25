@@ -11,6 +11,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { COLORS } from './constants/colors';
 import { Screen } from './types';
 import LoginScreen from './components/LoginScreen';
 import Sidebar from './components/Sidebar';
@@ -155,7 +156,7 @@ function App() {
   // Splash while checking session
   if (checking) {
     return (
-      <div className="flex h-screen items-center justify-center bg-[#0A0C10]">
+      <div className="flex h-screen items-center justify-center bg-layout-bg" style={{ backgroundColor: COLORS.background.dark }}>
         <span className="w-3 h-3 rounded-full bg-primary animate-ping" />
       </div>
     );
@@ -166,7 +167,7 @@ function App() {
   // which is the real Catalyst SSO redirect. We do NOT intercept it here.
   if (!isLoggedIn) {
     return (
-      <div className="flex h-screen bg-[#0A0C10] overflow-hidden">
+      <div className="flex h-screen bg-layout-bg overflow-hidden" style={{ backgroundColor: COLORS.background.dark }}>
         <LoginScreen />
       </div>
     );
@@ -175,7 +176,7 @@ function App() {
   // Authenticated — show the full app shell
   return (
     <QueryClientProvider client={queryClient}>
-      <div className="flex h-screen bg-[#0A0C10] overflow-hidden">
+      <div className="flex h-screen bg-layout-bg overflow-hidden" style={{ backgroundColor: COLORS.background.dark }}>
         <Sidebar
           currentScreen={currentScreen}
           onNavigate={handleNavigate}

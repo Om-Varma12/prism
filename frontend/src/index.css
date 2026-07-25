@@ -8,25 +8,47 @@
 
 :root {
   --radius: 0.5rem;
-  --background: 220 28% 5%;
-  --foreground: 216 30% 94%;
-  --card: 220 25% 8%;
-  --card-foreground: 216 30% 94%;
-  --popover: 220 25% 8%;
-  --popover-foreground: 216 30% 94%;
-  --primary: 219 78% 64%;
-  --primary-foreground: 220 45% 8%;
-  --secondary: 220 18% 14%;
-  --secondary-foreground: 216 30% 92%;
-  --muted: 220 18% 13%;
-  --muted-foreground: 219 15% 64%;
-  --accent: 219 34% 18%;
-  --accent-foreground: 216 30% 94%;
-  --destructive: 4 90% 68%;
-  --destructive-foreground: 216 30% 96%;
-  --border: 220 15% 17%;
-  --input: 220 15% 18%;
-  --ring: 219 78% 64%;
+  --background: 0 10% 4%;         /* #0B0909 */
+  --foreground: 210 20% 96%;      /* #F2F5F8 */
+  --card: 0 4% 26%;                /* #454040 */
+  --card-foreground: 191 58% 81%; /* #B4E1EB */
+  --popover: 0 4% 26%;             /* #454040 */
+  --popover-foreground: 191 58% 81%;
+  --primary: 191 58% 81%;         /* #B4E1EB */
+  --primary-foreground: 0 10% 4%; /* #0B0909 */
+  --secondary: 0 4% 26%;           /* #454040 */
+  --secondary-foreground: 191 58% 81%;
+  --muted: 0 4% 26%;               /* #454040 */
+  --muted-foreground: 191 58% 81%;/* #B4E1EB */
+  --accent: 191 58% 81%;          /* #B4E1EB */
+  --accent-foreground: 0 10% 4%;  /* #0B0909 */
+  --destructive: 0 100% 71%;      /* #FF6B6B */
+  --destructive-foreground: 210 20% 96%;
+  --border: 0 4% 26%;              /* #454040 */
+  --input: 0 4% 26%;
+  --ring: 191 58% 81%;            /* #B4E1EB */
+
+  /* Centralized theme variables */
+  --prism-bg-dark: #0B0909;
+  --prism-text-primary: #F2F5F8;
+  --prism-primary-main: #B4E1EB;
+  --prism-primary-hover: #c8ecf5;
+  --prism-border-variant: #454040;
+  --prism-node-accused-bg: #FF6B6B;
+  --prism-node-accused-border: #93000A;
+  --prism-node-crime-bg: #454040;
+  --prism-node-crime-border: #0B0909;
+  --prism-node-location-bg: #B4E1EB;
+  --prism-node-location-border: #454040;
+}
+
+/* ─── Grid / Check pattern background ────────────────────────────────────────── */
+body, .check-bg {
+  background-color: #0B0909;
+  background-image: 
+    linear-gradient(rgba(180, 225, 235, 0.08) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(180, 225, 235, 0.08) 1px, transparent 1px);
+  background-size: 32px 32px;
 }
 
 /* ─── Base resets ───────────────────────────────────────────────────────────── */
@@ -36,8 +58,8 @@ html, body, #root {
   height: 100%;
   margin: 0;
   padding: 0;
-  background-color: #0A0C10;
-  color: #E2E2E5;
+  background-color: var(--prism-bg-dark);
+  color: var(--prism-text-primary);
   font-family: 'Inter', system-ui, sans-serif;
   -webkit-font-smoothing: antialiased;
   overflow: hidden;
@@ -61,11 +83,11 @@ html, body, #root {
 
 /* ─── Buttons ───────────────────────────────────────────────────────────────── */
 .btn-primary {
-  background-color: #3B6FE8;
+  background-color: var(--prism-primary-main);
   color: #ffffff;
 }
 .btn-primary:hover {
-  background-color: #2b5bc2;
+  background-color: var(--prism-primary-hover);
 }
 
 /* ─── Scrollbar ──────────────────────────────────────────────────────────────── */
@@ -80,8 +102,8 @@ html, body, #root {
   width: 14px;
   height: 14px;
   border-radius: 50%;
-  background-color: #ffb4ab;
-  border: 1.5px solid #93000a;
+  background-color: var(--prism-node-accused-bg);
+  border: 1.5px solid var(--prism-node-accused-border);
 }
 .node-accused.node-high-centrality {
   width: 20px;
@@ -92,43 +114,43 @@ html, body, #root {
   position: absolute;
   width: 12px;
   height: 12px;
-  background-color: #44474f;
-  border: 1px solid #191c22;
+  background-color: var(--prism-node-crime-bg);
+  border: 1px solid var(--prism-node-crime-border);
 }
 .node-location {
   position: absolute;
   width: 12px;
   height: 12px;
-  background-color: #b3c5ff;
-  border: 1px solid #003fa4;
+  background-color: var(--prism-node-location-bg);
+  border: 1px solid var(--prism-node-location-border);
   transform: rotate(45deg) translate(-50%, -50%) !important;
 }
 .line-thick {
-  stroke: #3B6FE8;
+  stroke: var(--prism-primary-main);
   stroke-width: 1.5;
   stroke-opacity: 0.5;
 }
 .line-thin {
-  stroke: #44474f;
+  stroke: var(--prism-node-crime-bg);
   stroke-width: 1;
   stroke-opacity: 0.4;
 }
 .cluster-boundary {
   position: absolute;
-  border: 1px dashed #3B6FE8;
+  border: 1px dashed var(--prism-primary-main);
   border-radius: 50%;
   opacity: 0.4;
   pointer-events: none;
 }
 
 /* ─── Panel / Input borders ──────────────────────────────────────────────────── */
-.panel-border  { border: 1px solid #252830; }
-.input-border  { border: 1px solid #252830; }
-.input-border:focus-within { border-color: #3B6FE8; }
+.panel-border  { border: 1px solid var(--prism-border-variant); }
+.input-border  { border: 1px solid var(--prism-border-variant); }
+.input-border:focus-within { border-color: var(--prism-primary-main); }
 
 /* ─── Analytics map overlay ──────────────────────────────────────────────────── */
 .map-overlay {
-  background: radial-gradient(ellipse at center, transparent 40%, #0A0C10 100%);
+  background: radial-gradient(ellipse at center, transparent 40%, var(--prism-bg-dark) 100%);
 }
 
 /* ─── Material Symbols icon font base ───────────────────────────────────────── */

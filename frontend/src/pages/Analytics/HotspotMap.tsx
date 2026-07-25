@@ -5,6 +5,7 @@
 
 import React, { useState, useCallback, useEffect, useRef } from 'react';
 import { useQuery } from '@tanstack/react-query';
+import { COLORS } from '../../constants/colors';
 import { analyticsService } from '../../services/analytics.service';
 import { HotspotCluster, HotspotClusterResponse, HotspotFilters, CrimeAlert } from '../../types/analytics';
 import L from 'leaflet';
@@ -86,12 +87,11 @@ export default function HotspotMap() {
     setSelectedCluster(cluster);
   }, []);
 
-
   // Get cluster color based on point count (severity)
   const getClusterColor = (pointCount: number) => {
-    if (pointCount >= 20) return '#ff4d4d'; // Red for high density
-    if (pointCount >= 10) return '#ff9f0a'; // Orange for medium density
-    return '#00F0FF'; // Cyan for low density
+    if (pointCount >= 20) return COLORS.status.error; // Red for high density
+    if (pointCount >= 10) return COLORS.status.amber; // Orange for medium density
+    return COLORS.accent.cyan; // Cyan for low density
   };
 
   // Get cluster radius based on point count (in meters for L.circle)
@@ -187,7 +187,7 @@ export default function HotspotMap() {
       <div className="flex-1 xl:w-[70%] flex flex-col gap-sm">
         <div className="flex-1 bg-surface border border-outline-variant relative overflow-hidden flex flex-col min-h-[400px]">
           {/* Map Container with Leaflet */}
-          <div className="flex-1 relative bg-[#0A0C10]">
+          <div className="flex-1 relative bg-layout-bg" style={{ backgroundColor: COLORS.background.dark }}>
             {hotspotsLoading && (
               <div className="absolute inset-0 flex items-center justify-center text-on-surface-variant z-10">
                 <span className="text-primary font-body-sm text-body-sm">Loading hotspots...</span>
