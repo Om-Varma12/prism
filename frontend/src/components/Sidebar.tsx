@@ -133,7 +133,7 @@ export default function Sidebar({
               <div className="flex items-center gap-3">
                 <div className="flex size-11 items-center justify-center rounded-lg ">
                   <img
-                    src="/logo.svg"
+                    src={process.env.PUBLIC_URL + '/logo.svg'}
                     alt="PRISM Logo"
                     className="h-7 w-7 object-contain"
                   />
