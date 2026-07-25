@@ -4,7 +4,7 @@
  */
 
 import { useState, useEffect, useRef } from 'react';
-import { ChatMessage, ChatQueryResponse, ConversationItem } from '../types';
+import { ChatMessage, ChatQueryResponse } from '../types';
 import { useChatHistory, useSessionMessages, useNewConversation, useSendQuery } from './useChatQuery';
 
 export const useChat = () => {
@@ -48,6 +48,7 @@ export const useChat = () => {
       }
     };
     initSession();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   // Synchronize URL with the active session ID when it changes

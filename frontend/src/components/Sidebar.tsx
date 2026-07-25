@@ -4,6 +4,16 @@
  */
 
 import React from "react";
+import {
+  LayoutDashboard,
+  MessageSquareText,
+  Network,
+  LineChart,
+  User,
+  Settings as SettingsIcon,
+  LogOut,
+  LucideIcon,
+} from "lucide-react";
 import { Badge } from "components/ui/badge";
 import { Button } from "components/ui/button";
 import {
@@ -28,7 +38,7 @@ type NavItem = {
   screen: Screen;
   label: string;
   description: string;
-  icon: string;
+  icon: LucideIcon;
   badge?: string;
 };
 
@@ -37,34 +47,34 @@ const menuItems: NavItem[] = [
     screen: Screen.DASHBOARD,
     label: "Dashboard",
     description: "Live command view",
-    icon: "dashboard",
+    icon: LayoutDashboard,
     badge: "Live",
   },
   {
     screen: Screen.CHAT,
     label: "Intelligence Chat",
     description: "Ask the FIR database",
-    icon: "forum",
+    icon: MessageSquareText,
   },
   {
     screen: Screen.NETWORK,
     label: "Network Explorer",
     description: "Co-accused links",
-    icon: "hub",
+    icon: Network,
   },
   {
     screen: Screen.ANALYTICS,
     label: "Analytics",
     description: "Patterns and risk",
-    icon: "analytics",
+    icon: LineChart,
   },
 ];
 
-function MaterialIcon({
-  children,
+function NavVectorIcon({
+  icon: Icon,
   active = false,
 }: {
-  children: string;
+  icon: LucideIcon;
   active?: boolean;
 }) {
   return (
@@ -88,12 +98,7 @@ function MaterialIcon({
       }
       data-icon="inline-start"
     >
-      <span
-        className="material-symbols-outlined block text-[19px] leading-none"
-        style={{ fontVariationSettings: active ? '"FILL" 1' : undefined }}
-      >
-        {children}
-      </span>
+      <Icon className="size-[18px] stroke-[2]" />
     </span>
   );
 }
@@ -116,17 +121,15 @@ export default function Sidebar({
         className="flex min-h-0 w-full flex-col"
       >
         <div className="p-4">
-          <Card className="border-border/80 bg-card/90 shadow-none">
+          <Card>
             <CardHeader className="gap-0 p-4">
               <div className="flex items-center gap-3">
-                <div className="flex size-11 items-center justify-center rounded-lg border border-primary/30 bg-primary/10 text-primary">
-                  <span
-                    aria-hidden="true"
-                    className="material-symbols-outlined block text-[24px] leading-none"
-                    style={{ fontVariationSettings: '"FILL" 1' }}
-                  >
-                    security
-                  </span>
+                <div className="flex size-11 items-center justify-center rounded-lg ">
+                  <img
+                    src="/logo.svg"
+                    alt="PRISM Logo"
+                    className="h-7 w-7 object-contain"
+                  />
                 </div>
                 <div className="min-w-0">
                   <CardTitle className="font-mono text-[22px] font-bold tracking-[0] text-foreground">
@@ -170,7 +173,7 @@ export default function Sidebar({
                   }
                   onClick={() => onNavigate(item.screen)}
                 >
-                  <MaterialIcon active={isActive}>{item.icon}</MaterialIcon>
+                  <NavVectorIcon icon={item.icon} active={isActive} />
                   <span className="flex min-w-0 flex-1 flex-col items-start gap-0.5">
                     <span className="flex w-full items-center justify-between gap-2">
                       <span
@@ -224,12 +227,7 @@ export default function Sidebar({
           <Card className="border-border bg-card/80 shadow-none">
             <CardContent className="flex items-center gap-3 p-3">
               <div className="flex size-9 items-center justify-center rounded-md border border-border bg-muted">
-                <span
-                  aria-hidden="true"
-                  className="material-symbols-outlined block text-[20px] leading-none text-muted-foreground"
-                >
-                  account_circle
-                </span>
+                <User className="size-4 text-muted-foreground" />
               </div>
               <div className="min-w-0 flex-1">
                 <div className="truncate text-sm font-semibold text-foreground">
@@ -243,29 +241,17 @@ export default function Sidebar({
           </Card>
 
           <div className="grid grid-cols-2 gap-2">
-            <Button type="button" variant="outline" className="justify-start">
-              <span
-                aria-hidden="true"
-                className="material-symbols-outlined"
-                data-icon="inline-start"
-              >
-                settings
-              </span>
+            <Button type="button" variant="outline" className="justify-start gap-2">
+              <SettingsIcon className="size-4" />
               Settings
             </Button>
             <Button
               type="button"
               variant="destructive"
-              className="justify-start"
+              className="justify-start gap-2"
               onClick={onLogout}
             >
-              <span
-                aria-hidden="true"
-                className="material-symbols-outlined"
-                data-icon="inline-start"
-              >
-                logout
-              </span>
+              <LogOut className="size-4" />
               Logout
             </Button>
           </div>

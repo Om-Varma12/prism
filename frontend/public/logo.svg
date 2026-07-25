@@ -1,0 +1,61 @@
+<svg
+    xmlns="http://www.w3.org/2000/svg"
+    viewBox="0 0 512 512"
+    width="512"
+    height="512"
+>
+    <!-- Background -->
+    <rect width="512" height="512" rx="96" fill="#0B0B0C"/>
+
+    <!-- Prism -->
+    <path
+        d="M256 70
+           L365 145
+           L330 370
+           L256 442
+           L182 370
+           L147 145
+           Z"
+        fill="none"
+        stroke="#FFFFFF"
+        stroke-width="18"
+        stroke-linejoin="round"
+    />
+
+    <!-- Internal Facets -->
+    <path
+        d="M256 70
+           L256 442"
+        stroke="#FFFFFF"
+        stroke-width="12"
+        stroke-linecap="round"
+    />
+
+    <path
+        d="M147 145
+           L256 215
+           L365 145"
+        stroke="#FFFFFF"
+        stroke-width="12"
+        stroke-linecap="round"
+        fill="none"
+    />
+
+    <path
+        d="M182 370
+           L256 290
+           L330 370"
+        stroke="#FFFFFF"
+        stroke-width="12"
+        stroke-linecap="round"
+        fill="none"
+    />
+
+    <!-- Center Core -->
+    <circle
+        cx="256"
+        cy="256"
+        r="18"
+        fill="#FFFFFF"
+    />
+</svg>

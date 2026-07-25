@@ -21,7 +21,7 @@ export default function NetworkExplorerScreen() {
   const [selectedDateRange, setSelectedDateRange] = useState('Last 30 Days');
   
   // Convert date range to actual dates
-  const getDateRange = () => {
+  const getDateRange = React.useCallback(() => {
     const now = new Date();
     const toDate = now.toISOString().split('T')[0];
     
@@ -39,7 +39,7 @@ export default function NetworkExplorerScreen() {
     }
     
     return { date_from: fromDate, date_to: toDate };
-  };
+  }, [selectedDateRange]);
 
   // Network graph filters
   const [filters, setFilters] = useState<NetworkGraphFilters>({
@@ -57,7 +57,7 @@ export default function NetworkExplorerScreen() {
       date_from,
       date_to,
     });
-  }, [selectedDistrict, selectedCrimeType, selectedDateRange, activeSegment]);
+  }, [selectedDistrict, selectedCrimeType, selectedDateRange, activeSegment, getDateRange]);
 
   // Debounce search query
   useEffect(() => {
@@ -117,9 +117,14 @@ export default function NetworkExplorerScreen() {
     <div className="flex-1 flex flex-col relative h-screen check-bg" style={{ backgroundColor: COLORS.background.dark }}>
       {/* Header */}
       <header className="h-16 border-b flex items-center justify-between px-lg shrink-0 z-40" style={{ borderColor: COLORS.border.default, backgroundColor: COLORS.surface.panel }}>
-        <h2 className="font-headline-sm text-headline-sm text-on-surface">
-          Network Explorer
-        </h2>
+        <div className="flex items-center gap-3">
+          <span className="rounded border px-2 py-0.5 font-mono text-[11px] font-semibold" style={{ borderColor: `${COLORS.primary.main}4D`, backgroundColor: `${COLORS.primary.main}1A`, color: COLORS.primary.lightText }}>
+            GRAPH INTELLIGENCE
+          </span>
+          <h2 className="font-headline-sm text-xl font-bold" style={{ color: COLORS.text.heading }}>
+            Network Explorer
+          </h2>
+        </div>
         {isLoading && (
           <span className="text-xs text-on-surface-variant">Loading graph data...</span>
         )}

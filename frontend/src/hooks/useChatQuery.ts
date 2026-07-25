@@ -5,7 +5,6 @@
 
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { chatService } from '../services/chat.service';
-import { ChatQueryResponse, ConversationItem, SessionMessagesResponse } from '../types';
 
 // Query keys for react-query cache
 export const chatQueryKeys = {

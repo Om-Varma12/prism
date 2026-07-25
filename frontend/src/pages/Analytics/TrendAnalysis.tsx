@@ -7,7 +7,7 @@ import React, { useState, useCallback } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { COLORS } from '../../constants/colors';
 import { analyticsService } from '../../services/analytics.service';
-import { TrendDataResponse, TrendFilters, TrendGranularity, TrendPoint, SeasonalComparison } from '../../types/analytics';
+import { TrendFilters, TrendGranularity, TrendPoint, SeasonalComparison } from '../../types/analytics';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 
 export default function TrendAnalysis() {

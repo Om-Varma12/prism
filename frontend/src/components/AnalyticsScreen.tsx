@@ -69,35 +69,46 @@ export default function AnalyticsScreen() {
   };
 
   return (
-    <div className="flex-1 flex flex-col h-full overflow-hidden bg-background">
+    <div className="flex-1 flex flex-col h-full overflow-hidden check-bg" style={{ backgroundColor: COLORS.background.dark }}>
       {/* Header */}
-      <header className="px-margin-desktop pt-margin-desktop pb-0 border-b border-outline-variant flex-shrink-0">
-        <h2 className="font-headline-md text-display-lg text-on-surface mb-lg">
+      <header className="px-6 pt-5 pb-0 border-b flex-shrink-0" style={{ backgroundColor: COLORS.surface.panel, borderColor: COLORS.border.default }}>
+        <div className="flex items-center gap-2 mb-2">
+          <span className="rounded border px-2 py-0.5 font-mono text-[11px] font-semibold" style={{ borderColor: `${COLORS.primary.main}4D`, backgroundColor: `${COLORS.primary.main}1A`, color: COLORS.primary.lightText }}>
+            ANALYTICS ENGINE
+          </span>
+        </div>
+        <h2 className="font-headline-md text-2xl font-bold mb-4" style={{ color: COLORS.text.heading }}>
           Analytics &amp; Patterns
         </h2>
         {/* Tabs */}
-        <div className="flex gap-lg font-body-sm text-body-sm font-semibold">
+        <div className="flex gap-6 font-body-sm text-sm font-semibold">
           <button
             onClick={() => setActiveTab('hotspot')}
-            className={`pb-sm border-b-2 transition-colors cursor-pointer ${
-              activeTab === 'hotspot' ? 'border-primary text-primary' : 'border-transparent text-on-surface-variant hover:text-on-surface'
-            }`}
+            className="pb-3 border-b-2 transition-colors cursor-pointer"
+            style={{
+              borderColor: activeTab === 'hotspot' ? COLORS.primary.main : 'transparent',
+              color: activeTab === 'hotspot' ? COLORS.primary.light : COLORS.text.muted,
+            }}
           >
             Hotspot Map
           </button>
           <button
             onClick={() => setActiveTab('trends')}
-            className={`pb-sm border-b-2 transition-colors cursor-pointer ${
-              activeTab === 'trends' ? 'border-primary text-primary' : 'border-transparent text-on-surface-variant hover:text-on-surface'
-            }`}
+            className="pb-3 border-b-2 transition-colors cursor-pointer"
+            style={{
+              borderColor: activeTab === 'trends' ? COLORS.primary.main : 'transparent',
+              color: activeTab === 'trends' ? COLORS.primary.light : COLORS.text.muted,
+            }}
           >
             Trend Analysis
           </button>
           <button
             onClick={() => setActiveTab('offenders')}
-            className={`pb-sm border-b-2 transition-colors cursor-pointer ${
-              activeTab === 'offenders' ? 'border-primary text-primary' : 'border-transparent text-on-surface-variant hover:text-on-surface'
-            }`}
+            className="pb-3 border-b-2 transition-colors cursor-pointer"
+            style={{
+              borderColor: activeTab === 'offenders' ? COLORS.primary.main : 'transparent',
+              color: activeTab === 'offenders' ? COLORS.primary.light : COLORS.text.muted,
+            }}
           >
             Offender Risk Board
           </button>
@@ -160,67 +171,68 @@ export default function AnalyticsScreen() {
                   </div>
 
                   {/* Timeline Slider */}
-                  <div className="p-md border-t border-outline-variant bg-surface">
-                    <div className="flex justify-between font-label-mono text-label-mono text-on-surface-variant mb-xs">
-                      <span>JAN 2023</span>
-                      <span className="text-primary font-bold">
+                  <div className="p-4 border-t" style={{ backgroundColor: COLORS.surface.panel, borderColor: COLORS.border.default }}>
+                    <div className="flex justify-between font-mono text-xs mb-2">
+                      <span style={{ color: COLORS.text.muted }}>JAN 2023</span>
+                      <span className="font-bold tracking-wide" style={{ color: COLORS.primary.main }}>
                         CURRENT WINDOW: {getSliderMonth(sliderVal)}
                       </span>
-                      <span>DEC 2025</span>
+                      <span style={{ color: COLORS.text.muted }}>DEC 2025</span>
                     </div>
-                    <div className="relative w-full h-4">
+                    <div className="relative w-full h-4 flex items-center">
                       <input
-                        className="w-full"
+                        className="w-full cursor-pointer"
                         max="36"
                         min="1"
                         type="range"
                         value={sliderVal}
                         onChange={(e) => setSliderVal(Number(e.target.value))}
+                        style={{ accentColor: COLORS.primary.main }}
                       />
                     </div>
                     <div className="flex justify-between w-full mt-1 px-1">
-                      <div className="w-px h-2 bg-outline-variant"></div>
-                      <div className="w-px h-2 bg-outline-variant"></div>
-                      <div className="w-px h-2 bg-outline-variant"></div>
-                      <div className="w-px h-2 bg-outline-variant"></div>
-                      <div className="w-px h-2 bg-outline-variant"></div>
-                      <div className="w-px h-2 bg-outline-variant"></div>
+                      <div className="w-px h-2" style={{ backgroundColor: COLORS.border.default }}></div>
+                      <div className="w-px h-2" style={{ backgroundColor: COLORS.border.default }}></div>
+                      <div className="w-px h-2" style={{ backgroundColor: COLORS.border.default }}></div>
+                      <div className="w-px h-2" style={{ backgroundColor: COLORS.border.default }}></div>
+                      <div className="w-px h-2" style={{ backgroundColor: COLORS.border.default }}></div>
+                      <div className="w-px h-2" style={{ backgroundColor: COLORS.border.default }}></div>
                     </div>
                   </div>
                 </div>
               </div>
 
               {/* RIGHT SIDE (30%) */}
-              <div className="w-full xl:w-[30%] flex flex-col gap-lg shrink-0">
+              <div className="w-full xl:w-[30%] flex flex-col gap-4 shrink-0">
                 {/* Panel 1: Emerging Clusters */}
-                <div className="bg-surface border border-outline-variant flex flex-col rounded-none overflow-hidden">
-                  <div className="p-sm border-b border-outline-variant bg-surface-container-high">
-                    <h3 className="font-label-mono text-label-mono text-on-surface-variant uppercase tracking-wider">
+                <div className="border flex flex-col rounded-lg overflow-hidden" style={{ backgroundColor: COLORS.surface.panel, borderColor: COLORS.border.default }}>
+                  <div className="p-3 border-b" style={{ borderColor: COLORS.border.default, backgroundColor: COLORS.background.dark }}>
+                    <h3 className="font-mono text-xs font-semibold uppercase tracking-wider" style={{ color: COLORS.text.heading }}>
                       Emerging Clusters
                     </h3>
                   </div>
-                  <div className="divide-y divide-outline-variant">
+                  <div className="divide-y" style={{ borderColor: COLORS.border.default }}>
                     {EMERGING_CLUSTERS.map((cl) => {
                       const isActive = selectedCluster.id === cl.id;
                       return (
                         <div
                           key={cl.id}
                           onClick={() => setSelectedCluster(cl)}
-                          className={`p-md border-l-2 transition-colors cursor-pointer flex flex-col gap-xs ${
-                            isActive
-                              ? 'bg-surface-variant border-l-primary'
-                              : 'border-l-transparent hover:bg-surface-variant'
-                          }`}
+                          className="p-3 border-l-2 transition-colors cursor-pointer flex flex-col gap-1"
+                          style={{
+                            borderLeftColor: isActive ? COLORS.primary.main : 'transparent',
+                            backgroundColor: isActive ? `${COLORS.primary.main}12` : 'transparent',
+                          }}
                         >
                           <div className="flex justify-between items-start">
-                            <span className="font-body-sm text-body-sm font-semibold text-on-surface">
+                            <span className="text-sm font-semibold" style={{ color: COLORS.text.heading }}>
                               {cl.name}
                             </span>
-                            <span className="font-data-mono-bold text-data-mono-bold text-error">
+                            <span className="font-mono text-xs font-bold" style={{ color: COLORS.status.errorSoft }}>
                               {cl.change}
                             </span>
                           </div>
-                          <span className="font-label-mono text-label-mono text-on-surface-variant uppercase">
+                          <span className="font-mono text-xs uppercase" style={{ color: COLORS.text.muted }}>
                             {cl.location}
                           </span>
                         </div>
@@ -230,58 +242,58 @@ export default function AnalyticsScreen() {
                 </div>
 
                 {/* Panel 2: Cluster Details */}
-                <div className="bg-surface border border-outline-variant flex flex-col flex-1 rounded-none overflow-hidden min-h-[300px]">
-                  <div className="p-sm border-b border-outline-variant bg-surface-container-high flex justify-between items-center">
-                    <h3 className="font-label-mono text-label-mono text-on-surface-variant uppercase tracking-wider">
+                <div className="border flex flex-col flex-1 rounded-lg overflow-hidden min-h-[300px]" style={{ backgroundColor: COLORS.surface.panel, borderColor: COLORS.border.default }}>
+                  <div className="p-3 border-b flex justify-between items-center" style={{ borderColor: COLORS.border.default, backgroundColor: COLORS.background.dark }}>
+                    <h3 className="font-mono text-xs font-semibold uppercase tracking-wider" style={{ color: COLORS.text.heading }}>
                       Cluster Details
                     </h3>
-                    <span className="font-label-mono text-[10px] text-primary border border-primary px-1 font-bold">
+                    <span className="font-mono text-[10px] border px-1.5 py-0.5 rounded font-bold" style={{ color: COLORS.primary.lightText, borderColor: `${COLORS.primary.main}66`, backgroundColor: `${COLORS.primary.main}22` }}>
                       {selectedCluster.location.replace(' ', '_')}_02
                     </span>
                   </div>
-                  <div className="p-md flex flex-col gap-md">
-                    <div className="grid grid-cols-2 gap-md border-b border-outline-variant pb-md font-mono text-xs">
+                  <div className="p-4 flex flex-col gap-4">
+                    <div className="grid grid-cols-2 gap-4 border-b pb-4 font-mono text-xs" style={{ borderColor: COLORS.border.default }}>
                       <div>
-                        <div className="font-label-mono text-[10px] text-on-surface-variant mb-1">
+                        <div className="font-mono text-[10px] mb-1" style={{ color: COLORS.text.muted }}>
                           INCIDENTS
                         </div>
-                        <div className="font-data-mono-bold text-headline-sm text-on-surface">
+                        <div className="font-mono text-xl font-bold" style={{ color: COLORS.text.heading }}>
                           {selectedCluster.incidents}
                         </div>
                       </div>
                       <div>
-                        <div className="font-label-mono text-[10px] text-on-surface-variant mb-1">
+                        <div className="font-mono text-[10px] mb-1" style={{ color: COLORS.text.muted }}>
                           RANGE
                         </div>
-                        <div className="font-data-mono-bold text-body-md text-on-surface mt-1">
+                        <div className="font-mono text-sm font-bold mt-1" style={{ color: COLORS.text.heading }}>
                           {selectedCluster.rangeDays} DAYS
                         </div>
                       </div>
                     </div>
-                    <div className="border-b border-outline-variant pb-md">
-                      <div className="font-label-mono text-[10px] text-on-surface-variant mb-1">
+                    <div className="border-b pb-4" style={{ borderColor: COLORS.border.default }}>
+                      <div className="font-mono text-[10px] mb-1" style={{ color: COLORS.text.muted }}>
                         PRIMARY TYPE
                       </div>
-                      <div className="font-body-sm text-body-sm font-semibold text-error flex items-center gap-2 uppercase tracking-wide">
+                      <div className="text-sm font-semibold flex items-center gap-2 uppercase tracking-wide" style={{ color: COLORS.status.errorSoft }}>
                         <span className="material-symbols-outlined text-[16px]">warning</span>
                         {selectedCluster.primaryType}
                       </div>
                     </div>
                     <div className="flex-1 flex flex-col">
-                      <div className="font-label-mono text-[10px] text-on-surface-variant mb-2">
+                      <div className="font-mono text-[10px] mb-2" style={{ color: COLORS.text.muted }}>
                         HOURLY DISTRIBUTION (24H)
                       </div>
-                      <div className="flex-1 flex items-end justify-between gap-1 h-24 pt-4 border-b border-outline-variant">
+                      <div className="flex-1 flex items-end justify-between gap-1 h-24 pt-4 border-b" style={{ borderColor: COLORS.border.default }}>
                         {selectedCluster.hourlyDistribution.map((hVal, idx) => (
                           <div
                             key={idx}
                             title={`Hour ${idx}: ${hVal} occurrences`}
-                            className={`w-full transition-colors rounded-t-sm ${hVal > 25 ? 'bg-primary' : 'bg-outline-variant'}`}
-                            style={{ height: `${hVal}%` }}
+                            className="w-full transition-colors rounded-t-sm"
+                            style={{ height: `${hVal}%`, backgroundColor: hVal > 25 ? COLORS.primary.main : COLORS.border.default }}
                           ></div>
                         ))}
                       </div>
-                      <div className="flex justify-between font-label-mono text-[10px] text-on-surface-variant mt-1">
+                      <div className="flex justify-between font-mono text-[10px] mt-1" style={{ color: COLORS.text.muted }}>
                         <span>00:00</span>
                         <span>12:00</span>
                         <span>23:59</span>
@@ -289,7 +301,8 @@ export default function AnalyticsScreen() {
                     </div>
                     <button
                       onClick={() => setShowLogDialog(true)}
-                      className="w-full bg-transparent border border-outline-variant text-on-surface font-body-sm font-bold py-2 hover:border-primary transition-colors flex items-center justify-center gap-2 mt-2 cursor-pointer rounded-none"
+                      className="w-full border font-mono text-xs font-bold py-2 transition-colors flex items-center justify-center gap-2 mt-2 cursor-pointer rounded"
+                      style={{ borderColor: COLORS.border.default, color: COLORS.text.heading, backgroundColor: `${COLORS.primary.main}12` }}
                     >
                       <span className="material-symbols-outlined text-[16px]">visibility</span>
                       VIEW DETAILED LOG

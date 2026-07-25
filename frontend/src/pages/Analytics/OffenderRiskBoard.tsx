@@ -7,7 +7,7 @@ import React, { useState, useCallback } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { COLORS } from '../../constants/colors';
 import { analyticsService } from '../../services/analytics.service';
-import { OffenderRiskResponse, OffenderRiskFilters, OffenderRisk } from '../../types/analytics';
+import { OffenderRiskFilters, OffenderRisk } from '../../types/analytics';
 
 export default function OffenderRiskBoard() {
   // Offender filters
@@ -203,7 +203,7 @@ export default function OffenderRiskBoard() {
                   <div>
                     <h4 className="font-black text-white uppercase tracking-tight text-sm">{offender.accused_name}</h4>
                     <span className="text-[9px] font-mono text-white/40 font-black tracking-wider uppercase">
-                      ID: {offender.accused_id} // FIRs: {offender.fir_count}
+                      ID: {offender.accused_id} {'//'} FIRs: {offender.fir_count}
                     </span>
                   </div>
                   <span

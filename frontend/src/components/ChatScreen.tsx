@@ -13,33 +13,27 @@ interface ChatScreenProps {
 }
 
 const shell = {
-  obsidian: COLORS.background.obsidian,
+  obsidian: COLORS.background.page,
   panel: COLORS.surface.panel,
   panelRaised: COLORS.surface.panelRaised,
   line: COLORS.border.line,
   surface: COLORS.surface.container,
-  teal: COLORS.accent.teal,
-  tealMuted: COLORS.accent.tealMuted,
-  blue: COLORS.primary.blue,
-  blueMuted: COLORS.primary.blueMuted,
-  gold: COLORS.status.gold,
-  goldMuted: COLORS.status.goldMuted,
+  // Primary accent: copper
+  teal: COLORS.primary.main,
+  tealMuted: COLORS.primary.container,
+  // Secondary accents
+  blue: COLORS.status.gold,
+  blueMuted: COLORS.status.goldMuted,
+  gold: COLORS.status.amber,
+  goldMuted: '#3B2E14',
   red: COLORS.status.errorLight,
   redMuted: COLORS.status.errorMuted,
   green: COLORS.status.success,
   greenMuted: COLORS.status.greenMuted,
   slate: COLORS.text.slate,
-  ghost: COLORS.text.ghost,
+  ghost: COLORS.text.muted,
   dim: COLORS.text.dim,
 };
-
-const quickActions = [
-  ['travel_explore', shell.teal, 'Area pattern scan', 'Robbery cases in Bengaluru North'],
-  ['shield_person', shell.blue, 'High-risk offenders', 'List high-risk offenders in Mysuru'],
-  ['hub', shell.gold, 'Network lead', 'Find connected accused in vehicle theft cases'],
-  ['warning', shell.red, 'Hotspot scan', 'Identify active crime hotspots in Bengaluru'],
-  ['article', shell.green, 'Executive brief', 'Draft an executive briefing on current FIR trends'],
-];
 
 function Glyph({
   name,
@@ -64,26 +58,28 @@ function ScanStyles() {
         .sentinel-grid {
           background-color: ${shell.obsidian};
           background-image:
-            linear-gradient(rgba(94, 234, 212, 0.015) 1px, transparent 1px),
-            linear-gradient(90deg, rgba(94, 234, 212, 0.015) 1px, transparent 1px);
-          background-size: 60px 60px;
+            linear-gradient(rgba(200, 116, 58, 0.04) 1px, transparent 1px),
+            linear-gradient(90deg, rgba(200, 116, 58, 0.04) 1px, transparent 1px),
+            radial-gradient(circle at 18% 8%, rgba(200,116,58,0.12) 0%, transparent 30%),
+            radial-gradient(circle at 82% 18%, rgba(216,179,106,0.07) 0%, transparent 25%);
+          background-size: 44px 44px, 44px 44px, 100% 100%, 100% 100%;
         }
         .sentinel-grid::before {
           content: '';
           position: absolute;
           inset: 0;
           pointer-events: none;
-          z-index: 30;
-          background: repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0,0,0,0.03) 2px, rgba(0,0,0,0.03) 4px);
+          z-index: 0;
+          background: repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0,0,0,0.06) 2px, rgba(0,0,0,0.06) 4px);
         }
         @keyframes sentinelMsgIn {
           from { opacity: 0; transform: translateY(10px) scale(0.98); }
           to { opacity: 1; transform: translateY(0) scale(1); }
         }
         @keyframes sentinelPulse {
-          0% { box-shadow: 0 0 0 0 rgba(74, 222, 128, 0.4); }
-          70% { box-shadow: 0 0 0 6px rgba(74, 222, 128, 0); }
-          100% { box-shadow: 0 0 0 0 rgba(74, 222, 128, 0); }
+          0% { box-shadow: 0 0 0 0 rgba(200, 116, 58, 0.4); }
+          70% { box-shadow: 0 0 0 6px rgba(200, 116, 58, 0); }
+          100% { box-shadow: 0 0 0 0 rgba(200, 116, 58, 0); }
         }
         @keyframes sentinelDot {
           0%, 60%, 100% { transform: translateY(0); }
@@ -104,7 +100,7 @@ function ScanStyles() {
         .sentinel-scroll::-webkit-scrollbar { width: 5px; height: 5px; }
         .sentinel-scroll::-webkit-scrollbar-track { background: transparent; }
         .sentinel-scroll::-webkit-scrollbar-thumb { background: ${COLORS.border.scrollbarThumb}; border-radius: 3px; }
-        .sentinel-scroll::-webkit-scrollbar-thumb:hover { background: ${COLORS.text.ghost}; }
+        .sentinel-scroll::-webkit-scrollbar-thumb:hover { background: ${COLORS.text.muted}; }
         .sentinel-sidebar-item { position: relative; transition: all 0.15s ease; }
         .sentinel-sidebar-item::before {
           content: '';
@@ -123,7 +119,7 @@ function ScanStyles() {
         .sentinel-quick { transition: all 0.2s ease; }
         .sentinel-quick:hover {
           transform: translateY(-1px);
-          box-shadow: 0 0 0 1px rgba(94, 234, 212, 0.2), 0 4px 16px rgba(0,0,0,0.3);
+          box-shadow: 0 0 0 1px rgba(200, 116, 58, 0.25), 0 4px 16px rgba(0,0,0,0.3);
         }
         .sentinel-scan { position: relative; overflow: hidden; }
         .sentinel-scan::after {
@@ -132,7 +128,7 @@ function ScanStyles() {
           top: 0;
           bottom: 0;
           width: 40px;
-          background: linear-gradient(90deg, transparent, rgba(94,234,212,0.08), transparent);
+          background: linear-gradient(90deg, transparent, rgba(200,116,58,0.1), transparent);
           animation: sentinelScan 3s linear infinite;
         }
       `}
@@ -224,7 +220,7 @@ function ResultTable({ message }: { message: ChatMessage }) {
           </thead>
           <tbody>
             {message.tableData.map((row, idx) => (
-              <tr key={idx} className="border-b transition-colors hover:bg-teal-300/[0.04]" style={{ borderColor: 'rgba(27,30,38,0.6)' }}>
+              <tr key={idx} className="border-b transition-colors hover:bg-white/[0.04]" style={{ borderColor: 'rgba(27,30,38,0.6)' }}>
                 {columns.map((col, ci) => {
                   const rawVal = row[col];
                   const val = String(rawVal !== null && rawVal !== undefined ? rawVal : 'N/A');
@@ -315,7 +311,7 @@ function MessageMetadata({
         <div className={`${sourcesOpen ? 'max-h-[600px] opacity-100' : 'max-h-0 opacity-0'} overflow-hidden transition-all duration-300`}>
           <div className="space-y-1.5 px-3.5 pb-3 pt-1">
             {sources.map((source, idx) => (
-              <div key={`${source}-${idx}`} className="flex items-center gap-2.5 rounded-lg border px-2.5 py-2 transition-colors hover:bg-teal-300/[0.08]" style={{ backgroundColor: 'rgba(28,33,43,0.3)', borderColor: 'rgba(27,30,38,0.6)' }}>
+              <div key={`${source}-${idx}`} className="flex items-center gap-2.5 rounded-lg border px-2.5 py-2 transition-colors hover:bg-white/[0.06]" style={{ backgroundColor: 'rgba(28,33,43,0.3)', borderColor: 'rgba(27,30,38,0.6)' }}>
                 <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded border" style={{ backgroundColor: `${shell.blueMuted}33`, borderColor: `${shell.blueMuted}66`, color: shell.blue }}>
                   <Glyph name="description" className="text-[13px]" />
                 </span>
@@ -353,7 +349,7 @@ function MessageBlock({
             <span className="text-[10px] font-medium" style={{ color: shell.ghost }}>You</span>
             <span className="text-[10px]" style={{ color: shell.ghost }}>{message.timestamp}</span>
           </div>
-          <div className="rounded-2xl rounded-tr-md border px-4 py-3 shadow-[0_0_12px_rgba(94,234,212,0.08)]" style={{ backgroundColor: 'rgba(94,234,212,0.08)', borderColor: 'rgba(94,234,212,0.15)' }}>
+          <div className="rounded-2xl rounded-tr-md border px-4 py-3" style={{ backgroundColor: 'rgba(200,116,58,0.08)', borderColor: 'rgba(200,116,58,0.18)', boxShadow: '0 0 12px rgba(200,116,58,0.06)' }}>
             <p className="text-sm leading-relaxed text-slate-200">{message.text}</p>
           </div>
         </div>
@@ -398,7 +394,7 @@ function Avatar({ kind, className = '' }: { kind: 'ai' | 'user'; className?: str
   }
 
   return (
-    <div className={`flex h-7 w-7 shrink-0 items-center justify-center rounded-lg border ${className}`} style={{ backgroundColor: `${shell.tealMuted}33`, borderColor: `${shell.tealMuted}66` }}>
+    <div className={`flex h-7 w-7 shrink-0 items-center justify-center rounded-lg border ${className}`} style={{ backgroundColor: `${COLORS.primary.container}88`, borderColor: `${COLORS.primary.main}55` }}>
       <Glyph name="auto_awesome" className="text-[15px]" style={{ color: shell.teal } as any} />
     </div>
   );
@@ -432,7 +428,7 @@ function EmptyTranscript({ onPrompt }: { onPrompt: (text: string) => void }) {
   return (
     <div className="flex h-full items-center justify-center px-5 py-8">
       <div className="max-w-xl text-center">
-        <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-xl border rotate-45" style={{ backgroundColor: 'rgba(94,234,212,0.10)', borderColor: 'rgba(94,234,212,0.20)' }}>
+        <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-xl border rotate-45" style={{ backgroundColor: 'rgba(200,116,58,0.10)', borderColor: 'rgba(200,116,58,0.22)' }}>
           <Glyph name="fingerprint" className="-rotate-45 text-[24px]" style={{ color: shell.teal } as any} />
         </div>
         <h2 className="text-xl font-semibold text-slate-100">Start an intelligence session</h2>
@@ -570,8 +566,8 @@ export default function ChatScreen({ onNavigate: _onNavigate }: ChatScreenProps)
             <button
               type="button"
               onClick={startNewConversation}
-              className="flex h-9 w-full items-center justify-center gap-2 rounded-lg border text-xs font-semibold transition-all hover:bg-teal-300/15"
-              style={{ backgroundColor: 'rgba(94,234,212,0.10)', borderColor: 'rgba(94,234,212,0.20)', color: shell.teal }}
+              className="flex h-9 w-full items-center justify-center gap-2 rounded-lg border text-xs font-semibold transition-all hover:brightness-110"
+              style={{ backgroundColor: 'rgba(200,116,58,0.12)', borderColor: 'rgba(200,116,58,0.25)', color: shell.teal }}
             >
               <Glyph name="add" className="text-[16px]" />
               New Session
@@ -582,7 +578,7 @@ export default function ChatScreen({ onNavigate: _onNavigate }: ChatScreenProps)
         <main className="flex min-w-0 flex-1 flex-col" style={{ backgroundColor: shell.obsidian }}>
           <div className="flex h-12 shrink-0 items-center justify-between border-b px-5" style={{ backgroundColor: 'rgba(17,19,24,0.30)', borderColor: shell.line }}>
             <div className="flex items-center gap-3">
-              <div className="flex h-7 w-7 items-center justify-center rounded-lg border" style={{ backgroundColor: `${shell.tealMuted}33`, borderColor: `${shell.tealMuted}66` }}>
+              <div className="flex h-7 w-7 items-center justify-center rounded-lg border" style={{ backgroundColor: `${COLORS.primary.container}`, borderColor: `${COLORS.primary.main}44` }}>
                 <Glyph name="bar_chart" className="text-[15px]" style={{ color: shell.teal } as any} />
               </div>
               <div>
@@ -694,8 +690,8 @@ export default function ChatScreen({ onNavigate: _onNavigate }: ChatScreenProps)
                 </div>
                 <button
                   type="submit"
-                  className="flex h-8 items-center gap-1.5 rounded-lg border px-4 text-xs font-semibold transition-all hover:bg-teal-300/15"
-                  style={{ backgroundColor: 'rgba(94,234,212,0.10)', borderColor: 'rgba(94,234,212,0.20)', color: shell.teal }}
+                  className="flex h-8 items-center gap-1.5 rounded-lg border px-4 text-xs font-semibold transition-all hover:brightness-110"
+                  style={{ backgroundColor: 'rgba(200,116,58,0.15)', borderColor: 'rgba(200,116,58,0.35)', color: shell.teal }}
                 >
                   <Glyph name="send" className="text-[15px]" />
                   Send

@@ -7,7 +7,7 @@ import React, { useState, useCallback, useEffect, useRef } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { COLORS } from '../../constants/colors';
 import { analyticsService } from '../../services/analytics.service';
-import { HotspotCluster, HotspotClusterResponse, HotspotFilters, CrimeAlert } from '../../types/analytics';
+import { HotspotCluster, HotspotFilters, CrimeAlert } from '../../types/analytics';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import DateRangeSlider from '../../components/common/DateRangeSlider';
