@@ -5,6 +5,7 @@
 
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
+import { COLORS } from '../constants/colors';
 import { EMERGING_CLUSTERS, MOCK_SUSPECTS } from '../data/mockData';
 import { ClusterItem } from '../types';
 
@@ -68,35 +69,46 @@ export default function AnalyticsScreen() {
   };
 
   return (
-    <div className="flex-1 flex flex-col h-full overflow-hidden bg-background">
+    <div className="flex-1 flex flex-col h-full overflow-hidden check-bg" style={{ backgroundColor: COLORS.background.dark }}>
       {/* Header */}
-      <header className="px-margin-desktop pt-margin-desktop pb-0 border-b border-outline-variant flex-shrink-0">
-        <h2 className="font-headline-md text-display-lg text-on-surface mb-lg">
+      <header className="px-6 pt-5 pb-0 border-b flex-shrink-0" style={{ backgroundColor: COLORS.surface.panel, borderColor: COLORS.border.default }}>
+        <div className="flex items-center gap-2 mb-2">
+          <span className="rounded border px-2 py-0.5 font-mono text-[11px] font-semibold" style={{ borderColor: `${COLORS.primary.main}4D`, backgroundColor: `${COLORS.primary.main}1A`, color: COLORS.primary.lightText }}>
+            ANALYTICS ENGINE
+          </span>
+        </div>
+        <h2 className="font-headline-md text-2xl font-bold mb-4" style={{ color: COLORS.text.heading }}>
           Analytics &amp; Patterns
         </h2>
         {/* Tabs */}
-        <div className="flex gap-lg font-body-sm text-body-sm font-semibold">
+        <div className="flex gap-6 font-body-sm text-sm font-semibold">
           <button
             onClick={() => setActiveTab('hotspot')}
-            className={`pb-sm border-b-2 transition-colors cursor-pointer ${
-              activeTab === 'hotspot' ? 'border-primary text-primary' : 'border-transparent text-on-surface-variant hover:text-on-surface'
-            }`}
+            className="pb-3 border-b-2 transition-colors cursor-pointer"
+            style={{
+              borderColor: activeTab === 'hotspot' ? COLORS.primary.main : 'transparent',
+              color: activeTab === 'hotspot' ? COLORS.primary.light : COLORS.text.muted,
+            }}
           >
             Hotspot Map
           </button>
           <button
             onClick={() => setActiveTab('trends')}
-            className={`pb-sm border-b-2 transition-colors cursor-pointer ${
-              activeTab === 'trends' ? 'border-primary text-primary' : 'border-transparent text-on-surface-variant hover:text-on-surface'
-            }`}
+            className="pb-3 border-b-2 transition-colors cursor-pointer"
+            style={{
+              borderColor: activeTab === 'trends' ? COLORS.primary.main : 'transparent',
+              color: activeTab === 'trends' ? COLORS.primary.light : COLORS.text.muted,
+            }}
           >
             Trend Analysis
           </button>
           <button
             onClick={() => setActiveTab('offenders')}
-            className={`pb-sm border-b-2 transition-colors cursor-pointer ${
-              activeTab === 'offenders' ? 'border-primary text-primary' : 'border-transparent text-on-surface-variant hover:text-on-surface'
-            }`}
+            className="pb-3 border-b-2 transition-colors cursor-pointer"
+            style={{
+              borderColor: activeTab === 'offenders' ? COLORS.primary.main : 'transparent',
+              color: activeTab === 'offenders' ? COLORS.primary.light : COLORS.text.muted,
+            }}
           >
             Offender Risk Board
           </button>
@@ -119,7 +131,7 @@ export default function AnalyticsScreen() {
               <div className="flex-1 xl:w-[70%] flex flex-col gap-sm">
                 <div className="flex-1 bg-surface border border-outline-variant relative overflow-hidden flex flex-col min-h-[400px]">
                   {/* Map Container */}
-                  <div className="flex-1 relative bg-[#0A0C10]">
+                  <div className="flex-1 relative check-bg" style={{ backgroundColor: COLORS.background.dark }}>
                     <div
                       className="absolute inset-0 bg-cover bg-center opacity-40 mix-blend-luminosity grayscale pointer-events-none"
                       style={{
@@ -159,67 +171,68 @@ export default function AnalyticsScreen() {
                   </div>
 
                   {/* Timeline Slider */}
-                  <div className="p-md border-t border-outline-variant bg-surface">
-                    <div className="flex justify-between font-label-mono text-label-mono text-on-surface-variant mb-xs">
-                      <span>JAN 2023</span>
-                      <span className="text-primary font-bold">
+                  <div className="p-4 border-t" style={{ backgroundColor: COLORS.surface.panel, borderColor: COLORS.border.default }}>
+                    <div className="flex justify-between font-mono text-xs mb-2">
+                      <span style={{ color: COLORS.text.muted }}>JAN 2023</span>
+                      <span className="font-bold tracking-wide" style={{ color: COLORS.primary.main }}>
                         CURRENT WINDOW: {getSliderMonth(sliderVal)}
                       </span>
-                      <span>DEC 2025</span>
+                      <span style={{ color: COLORS.text.muted }}>DEC 2025</span>
                     </div>
-                    <div className="relative w-full h-4">
+                    <div className="relative w-full h-4 flex items-center">
                       <input
-                        className="w-full"
+                        className="w-full cursor-pointer"
                         max="36"
                         min="1"
                         type="range"
                         value={sliderVal}
                         onChange={(e) => setSliderVal(Number(e.target.value))}
+                        style={{ accentColor: COLORS.primary.main }}
                       />
                     </div>
                     <div className="flex justify-between w-full mt-1 px-1">
-                      <div className="w-px h-2 bg-outline-variant"></div>
-                      <div className="w-px h-2 bg-outline-variant"></div>
-                      <div className="w-px h-2 bg-outline-variant"></div>
-                      <div className="w-px h-2 bg-outline-variant"></div>
-                      <div className="w-px h-2 bg-outline-variant"></div>
-                      <div className="w-px h-2 bg-outline-variant"></div>
+                      <div className="w-px h-2" style={{ backgroundColor: COLORS.border.default }}></div>
+                      <div className="w-px h-2" style={{ backgroundColor: COLORS.border.default }}></div>
+                      <div className="w-px h-2" style={{ backgroundColor: COLORS.border.default }}></div>
+                      <div className="w-px h-2" style={{ backgroundColor: COLORS.border.default }}></div>
+                      <div className="w-px h-2" style={{ backgroundColor: COLORS.border.default }}></div>
+                      <div className="w-px h-2" style={{ backgroundColor: COLORS.border.default }}></div>
                     </div>
                   </div>
                 </div>
               </div>
 
               {/* RIGHT SIDE (30%) */}
-              <div className="w-full xl:w-[30%] flex flex-col gap-lg shrink-0">
+              <div className="w-full xl:w-[30%] flex flex-col gap-4 shrink-0">
                 {/* Panel 1: Emerging Clusters */}
-                <div className="bg-surface border border-outline-variant flex flex-col rounded-none overflow-hidden">
-                  <div className="p-sm border-b border-outline-variant bg-surface-container-high">
-                    <h3 className="font-label-mono text-label-mono text-on-surface-variant uppercase tracking-wider">
+                <div className="border flex flex-col rounded-lg overflow-hidden" style={{ backgroundColor: COLORS.surface.panel, borderColor: COLORS.border.default }}>
+                  <div className="p-3 border-b" style={{ borderColor: COLORS.border.default, backgroundColor: COLORS.background.dark }}>
+                    <h3 className="font-mono text-xs font-semibold uppercase tracking-wider" style={{ color: COLORS.text.heading }}>
                       Emerging Clusters
                     </h3>
                   </div>
-                  <div className="divide-y divide-outline-variant">
+                  <div className="divide-y" style={{ borderColor: COLORS.border.default }}>
                     {EMERGING_CLUSTERS.map((cl) => {
                       const isActive = selectedCluster.id === cl.id;
                       return (
                         <div
                           key={cl.id}
                           onClick={() => setSelectedCluster(cl)}
-                          className={`p-md border-l-2 transition-colors cursor-pointer flex flex-col gap-xs ${
-                            isActive
-                              ? 'bg-surface-variant border-l-primary'
-                              : 'border-l-transparent hover:bg-surface-variant'
-                          }`}
+                          className="p-3 border-l-2 transition-colors cursor-pointer flex flex-col gap-1"
+                          style={{
+                            borderLeftColor: isActive ? COLORS.primary.main : 'transparent',
+                            backgroundColor: isActive ? `${COLORS.primary.main}12` : 'transparent',
+                          }}
                         >
                           <div className="flex justify-between items-start">
-                            <span className="font-body-sm text-body-sm font-semibold text-on-surface">
+                            <span className="text-sm font-semibold" style={{ color: COLORS.text.heading }}>
                               {cl.name}
                             </span>
-                            <span className="font-data-mono-bold text-data-mono-bold text-error">
+                            <span className="font-mono text-xs font-bold" style={{ color: COLORS.status.errorSoft }}>
                               {cl.change}
                             </span>
                           </div>
-                          <span className="font-label-mono text-label-mono text-on-surface-variant uppercase">
+                          <span className="font-mono text-xs uppercase" style={{ color: COLORS.text.muted }}>
                             {cl.location}
                           </span>
                         </div>
@@ -229,58 +242,58 @@ export default function AnalyticsScreen() {
                 </div>
 
                 {/* Panel 2: Cluster Details */}
-                <div className="bg-surface border border-outline-variant flex flex-col flex-1 rounded-none overflow-hidden min-h-[300px]">
-                  <div className="p-sm border-b border-outline-variant bg-surface-container-high flex justify-between items-center">
-                    <h3 className="font-label-mono text-label-mono text-on-surface-variant uppercase tracking-wider">
+                <div className="border flex flex-col flex-1 rounded-lg overflow-hidden min-h-[300px]" style={{ backgroundColor: COLORS.surface.panel, borderColor: COLORS.border.default }}>
+                  <div className="p-3 border-b flex justify-between items-center" style={{ borderColor: COLORS.border.default, backgroundColor: COLORS.background.dark }}>
+                    <h3 className="font-mono text-xs font-semibold uppercase tracking-wider" style={{ color: COLORS.text.heading }}>
                       Cluster Details
                     </h3>
-                    <span className="font-label-mono text-[10px] text-primary border border-primary px-1 font-bold">
+                    <span className="font-mono text-[10px] border px-1.5 py-0.5 rounded font-bold" style={{ color: COLORS.primary.lightText, borderColor: `${COLORS.primary.main}66`, backgroundColor: `${COLORS.primary.main}22` }}>
                       {selectedCluster.location.replace(' ', '_')}_02
                     </span>
                   </div>
-                  <div className="p-md flex flex-col gap-md">
-                    <div className="grid grid-cols-2 gap-md border-b border-outline-variant pb-md font-mono text-xs">
+                  <div className="p-4 flex flex-col gap-4">
+                    <div className="grid grid-cols-2 gap-4 border-b pb-4 font-mono text-xs" style={{ borderColor: COLORS.border.default }}>
                       <div>
-                        <div className="font-label-mono text-[10px] text-on-surface-variant mb-1">
+                        <div className="font-mono text-[10px] mb-1" style={{ color: COLORS.text.muted }}>
                           INCIDENTS
                         </div>
-                        <div className="font-data-mono-bold text-headline-sm text-on-surface">
+                        <div className="font-mono text-xl font-bold" style={{ color: COLORS.text.heading }}>
                           {selectedCluster.incidents}
                         </div>
                       </div>
                       <div>
-                        <div className="font-label-mono text-[10px] text-on-surface-variant mb-1">
+                        <div className="font-mono text-[10px] mb-1" style={{ color: COLORS.text.muted }}>
                           RANGE
                         </div>
-                        <div className="font-data-mono-bold text-body-md text-on-surface mt-1">
+                        <div className="font-mono text-sm font-bold mt-1" style={{ color: COLORS.text.heading }}>
                           {selectedCluster.rangeDays} DAYS
                         </div>
                       </div>
                     </div>
-                    <div className="border-b border-outline-variant pb-md">
-                      <div className="font-label-mono text-[10px] text-on-surface-variant mb-1">
+                    <div className="border-b pb-4" style={{ borderColor: COLORS.border.default }}>
+                      <div className="font-mono text-[10px] mb-1" style={{ color: COLORS.text.muted }}>
                         PRIMARY TYPE
                       </div>
-                      <div className="font-body-sm text-body-sm font-semibold text-error flex items-center gap-2 uppercase tracking-wide">
+                      <div className="text-sm font-semibold flex items-center gap-2 uppercase tracking-wide" style={{ color: COLORS.status.errorSoft }}>
                         <span className="material-symbols-outlined text-[16px]">warning</span>
                         {selectedCluster.primaryType}
                       </div>
                     </div>
                     <div className="flex-1 flex flex-col">
-                      <div className="font-label-mono text-[10px] text-on-surface-variant mb-2">
+                      <div className="font-mono text-[10px] mb-2" style={{ color: COLORS.text.muted }}>
                         HOURLY DISTRIBUTION (24H)
                       </div>
-                      <div className="flex-1 flex items-end justify-between gap-1 h-24 pt-4 border-b border-outline-variant">
+                      <div className="flex-1 flex items-end justify-between gap-1 h-24 pt-4 border-b" style={{ borderColor: COLORS.border.default }}>
                         {selectedCluster.hourlyDistribution.map((hVal, idx) => (
                           <div
                             key={idx}
                             title={`Hour ${idx}: ${hVal} occurrences`}
-                            className={`w-full transition-colors rounded-t-sm ${hVal > 25 ? 'bg-primary' : 'bg-outline-variant'}`}
-                            style={{ height: `${hVal}%` }}
+                            className="w-full transition-colors rounded-t-sm"
+                            style={{ height: `${hVal}%`, backgroundColor: hVal > 25 ? COLORS.primary.main : COLORS.border.default }}
                           ></div>
                         ))}
                       </div>
-                      <div className="flex justify-between font-label-mono text-[10px] text-on-surface-variant mt-1">
+                      <div className="flex justify-between font-mono text-[10px] mt-1" style={{ color: COLORS.text.muted }}>
                         <span>00:00</span>
                         <span>12:00</span>
                         <span>23:59</span>
@@ -288,7 +301,8 @@ export default function AnalyticsScreen() {
                     </div>
                     <button
                       onClick={() => setShowLogDialog(true)}
-                      className="w-full bg-transparent border border-outline-variant text-on-surface font-body-sm font-bold py-2 hover:border-primary transition-colors flex items-center justify-center gap-2 mt-2 cursor-pointer rounded-none"
+                      className="w-full border font-mono text-xs font-bold py-2 transition-colors flex items-center justify-center gap-2 mt-2 cursor-pointer rounded"
+                      style={{ borderColor: COLORS.border.default, color: COLORS.text.heading, backgroundColor: `${COLORS.primary.main}12` }}
                     >
                       <span className="material-symbols-outlined text-[16px]">visibility</span>
                       VIEW DETAILED LOG
@@ -308,66 +322,65 @@ export default function AnalyticsScreen() {
               exit={{ opacity: 0, y: -10 }}
               className="space-y-6"
             >
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div className="bg-surface border border-outline-variant p-5 rounded-none">
-                  <h3 className="text-[10px] font-mono font-black text-white/40 uppercase mb-4 tracking-[0.15em]">
-                    Monthly Crime Clearance Rates (%)
-                  </h3>
-                  <div className="h-44 flex items-end justify-between gap-2 border-b border-white/10 pb-2 font-mono text-[9px] font-bold">
-                    {[
-                      { m: 'Jan', rate: 42, height: 63 },
-                      { m: 'Feb', rate: 45, height: 67 },
-                      { m: 'Mar', rate: 48, height: 72 },
-                      { m: 'Apr', rate: 52, height: 78 },
-                      { m: 'May', rate: 50, height: 75 },
-                      { m: 'Jun', rate: 58, height: 87 },
-                      { m: 'Jul', rate: 64, height: 96 },
-                      { m: 'Aug', rate: 62, height: 93 },
-                      { m: 'Sep', rate: 68, height: 102 },
-                      { m: 'Oct', rate: 75, height: 112 }
-                    ].map((item, idx) => (
-                      <div key={idx} className="w-full flex flex-col items-center">
-                        <span className="text-[#00F0FF] font-black mb-1">{item.rate}%</span>
-                        <div
-                          className="w-8 bg-[#00F0FF] rounded-none transition-all duration-500"
-                          style={{ height: `${item.height}px` }}
-                        ></div>
-                        <span className="text-white/40 mt-1.5 uppercase font-black tracking-wider text-[8px]">
-                          {item.m}
-                        </span>
-                      </div>
-                    ))}
-                  </div>
+              <div className="bg-surface border border-outline-variant p-5 rounded-none">
+                <h3 className="text-[10px] font-mono font-black text-white/40 uppercase mb-4 tracking-[0.15em]">
+                  Monthly Resolution Rate Trajectory (2024)
+                </h3>
+                <div className="h-44 flex items-end justify-between gap-2 border-b border-white/10 pb-2 font-mono text-[9px] font-bold">
+                  {[
+                    { m: 'Jan', rate: 35, height: 52 },
+                    { m: 'Feb', rate: 42, height: 63 },
+                    { m: 'Mar', rate: 48, height: 72 },
+                    { m: 'Apr', rate: 52, height: 78 },
+                    { m: 'May', rate: 50, height: 75 },
+                    { m: 'Jun', rate: 58, height: 87 },
+                    { m: 'Jul', rate: 64, height: 96 },
+                    { m: 'Aug', rate: 62, height: 93 },
+                    { m: 'Sep', rate: 68, height: 102 },
+                    { m: 'Oct', rate: 75, height: 112 }
+                  ].map((item, idx) => (
+                    <div key={idx} className="w-full flex flex-col items-center">
+                      <span className="font-black mb-1" style={{ color: COLORS.accent.cyan }}>{item.rate}%</span>
+                      <div
+                        className="w-8 rounded-none transition-all duration-500"
+                        style={{ height: `${item.height}px`, backgroundColor: COLORS.accent.cyan }}
+                      ></div>
+                      <span className="text-white/40 mt-1.5 uppercase font-black tracking-wider text-[8px]">
+                        {item.m}
+                      </span>
+                    </div>
+                  ))}
                 </div>
+              </div>
 
-                <div className="bg-surface border border-outline-variant p-5 rounded-none">
-                  <h3 className="text-[10px] font-mono font-black text-white/40 uppercase mb-4 tracking-[0.15em]">
-                    Weekly crime Occurrence Peak Times (Days)
-                  </h3>
-                  <div className="h-44 flex items-end justify-between gap-3 border-b border-white/10 pb-2 font-mono text-[9px] font-bold">
-                    {[
-                      { d: 'MON', crime: 30, height: 39 },
-                      { d: 'TUE', crime: 28, height: 36 },
-                      { d: 'WED', crime: 35, height: 45 },
-                      { d: 'THU', crime: 45, height: 58 },
-                      { d: 'FRI', crime: 72, height: 93 },
-                      { d: 'SAT', crime: 88, height: 114 },
-                      { d: 'SUN', crime: 64, height: 83 }
-                    ].map((item, idx) => (
-                      <div key={idx} className="w-full flex flex-col items-center">
-                        <span className="text-[#ff4d4d] font-black mb-1">{item.crime}</span>
-                        <div
-                          className={`w-10 rounded-none transition-all duration-500 ${
-                            item.crime > 60 ? 'bg-[#ff4d4d]' : 'bg-[#ff4d4d]/30'
-                          }`}
-                          style={{ height: `${item.height}px` }}
-                        ></div>
-                        <span className="text-white/40 mt-1.5 uppercase font-black tracking-wider text-[8px]">
-                          {item.d}
-                        </span>
-                      </div>
-                    ))}
-                  </div>
+              <div className="bg-surface border border-outline-variant p-5 rounded-none">
+                <h3 className="text-[10px] font-mono font-black text-white/40 uppercase mb-4 tracking-[0.15em]">
+                  Weekly crime Occurrence Peak Times (Days)
+                </h3>
+                <div className="h-44 flex items-end justify-between gap-3 border-b border-white/10 pb-2 font-mono text-[9px] font-bold">
+                  {[
+                    { d: 'MON', crime: 30, height: 39 },
+                    { d: 'TUE', crime: 28, height: 36 },
+                    { d: 'WED', crime: 35, height: 45 },
+                    { d: 'THU', crime: 45, height: 58 },
+                    { d: 'FRI', crime: 72, height: 93 },
+                    { d: 'SAT', crime: 88, height: 114 },
+                    { d: 'SUN', crime: 64, height: 83 }
+                  ].map((item, idx) => (
+                    <div key={idx} className="w-full flex flex-col items-center">
+                      <span className="font-black mb-1" style={{ color: COLORS.status.error }}>{item.crime}</span>
+                      <div
+                        className="w-10 rounded-none transition-all duration-500"
+                        style={{
+                          height: `${item.height}px`,
+                          backgroundColor: item.crime > 60 ? COLORS.status.error : `${COLORS.status.error}4D`
+                        }}
+                      ></div>
+                      <span className="text-white/40 mt-1.5 uppercase font-black tracking-wider text-[8px]">
+                        {item.d}
+                      </span>
+                    </div>
+                  ))}
                 </div>
               </div>
             </motion.div>
@@ -383,7 +396,7 @@ export default function AnalyticsScreen() {
               className="space-y-4"
             >
               {/* Search bar offenders filter */}
-              <div className="max-w-md relative border border-outline-variant bg-[#0A0C10] flex items-center px-3 py-2 rounded-none">
+              <div className="max-w-md relative border border-outline-variant flex items-center px-3 py-2 rounded-none" style={{ backgroundColor: COLORS.background.dark }}>
                 <span className="material-symbols-outlined text-outline text-[18px] mr-2">filter_alt</span>
                 <input
                   type="text"
@@ -399,7 +412,8 @@ export default function AnalyticsScreen() {
                 {MOCK_SUSPECTS.filter((s) => s.name.toLowerCase().includes(offenderSearch.toLowerCase())).map((sus) => (
                   <div
                     key={sus.id}
-                    className="bg-[#111318] border border-outline-variant p-4 rounded-none flex flex-col justify-between group hover:border-[#00F0FF]/50 transition-all"
+                    className="bg-surface border border-outline-variant p-4 rounded-none flex flex-col justify-between group transition-all"
+                    style={{ backgroundColor: COLORS.surface.panel }}
                   >
                     <div>
                       <div className="flex justify-between items-start mb-2">
@@ -410,11 +424,11 @@ export default function AnalyticsScreen() {
                           </span>
                         </div>
                         <span
-                          className={`text-[8px] font-mono font-black border px-1.5 py-0.5 rounded-none uppercase tracking-wider ${
-                            sus.status === 'HIGH-RISK'
-                              ? 'border-[#ff4d4d] text-[#ff4d4d]'
-                              : 'border-[#ff9f0a] text-[#ff9f0a]'
-                          }`}
+                          className="text-[8px] font-mono font-black border px-1.5 py-0.5 rounded-none uppercase tracking-wider"
+                          style={{
+                            borderColor: sus.status === 'HIGH-RISK' ? COLORS.status.error : COLORS.status.amber,
+                            color: sus.status === 'HIGH-RISK' ? COLORS.status.error : COLORS.status.amber,
+                          }}
                         >
                           {sus.status}
                         </span>
@@ -472,7 +486,7 @@ export default function AnalyticsScreen() {
                   <div key={idx} className="p-3 border border-white/10 rounded-none bg-black/40 space-y-1.5">
                     <div className="flex justify-between text-[9px] text-white/40 font-black uppercase">
                       <span>{log.time}</span>
-                      <span className="text-[#00F0FF]">{log.loc}</span>
+                      <span style={{ color: COLORS.accent.cyan }}>{log.loc}</span>
                     </div>
                     <p className="text-white/80 text-xs leading-snug font-sans">{log.desc}</p>
                   </div>
@@ -482,7 +496,7 @@ export default function AnalyticsScreen() {
               <div className="p-4 border-t border-white/10 bg-black flex justify-end">
                 <button
                   onClick={() => setShowLogDialog(false)}
-                  className="px-4 py-2 bg-primary hover:bg-[#2b5bc2] text-white text-[10px] font-black rounded-none font-mono tracking-wider transition-colors cursor-pointer uppercase"
+                  className="px-4 py-2 bg-primary hover:bg-inverse-primary text-white text-[10px] font-black rounded-none font-mono tracking-wider transition-colors cursor-pointer uppercase"
                 >
                   CLOSE LOGS
                 </button>

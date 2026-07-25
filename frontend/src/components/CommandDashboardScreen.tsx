@@ -5,6 +5,7 @@
 
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
+import { COLORS } from '../constants/colors';
 import {
   AlertItem,
   dashboardService,
@@ -100,26 +101,26 @@ function getTrendTone(trend: TrendData) {
   if (trend.trend === 'up') {
     return {
       icon: 'trending_up',
-      text: 'text-[#ff6b66]',
-      stroke: '#ff6b66',
-      fill: 'rgba(255, 107, 102, 0.16)',
+      text: `text-[${COLORS.status.errorSoft}]`,
+      stroke: COLORS.status.errorSoft,
+      fill: `${COLORS.status.errorSoft}29`,
     };
   }
 
   if (trend.trend === 'down') {
     return {
       icon: 'trending_down',
-      text: 'text-[#78a8ff]',
-      stroke: '#78a8ff',
-      fill: 'rgba(120, 168, 255, 0.14)',
+      text: `text-[${COLORS.primary.light}]`,
+      stroke: COLORS.primary.light,
+      fill: `${COLORS.primary.light}24`,
     };
   }
 
   return {
     icon: 'trending_flat',
-    text: 'text-[#9aa4b8]',
-    stroke: '#9aa4b8',
-    fill: 'rgba(154, 164, 184, 0.12)',
+    text: `text-[${COLORS.text.muted}]`,
+    stroke: COLORS.text.muted,
+    fill: `${COLORS.text.muted}1F`,
   };
 }
 
@@ -143,36 +144,36 @@ function buildAreaPath(values: number[]) {
 function getDistrictTone(ratio: number, isActive: boolean) {
   if (isActive) {
     return {
-      dot: '#d8e5ff',
-      border: '#78a8ff',
-      glow: '0 0 0 7px rgba(120, 168, 255, 0.2), 0 0 30px rgba(120, 168, 255, 0.48)',
-      text: '#d8e5ff',
+      dot: COLORS.primary.lightText,
+      border: COLORS.primary.light,
+      glow: `0 0 0 7px ${COLORS.primary.light}33, 0 0 30px ${COLORS.primary.light}7B`,
+      text: COLORS.primary.lightText,
     };
   }
 
   if (ratio > 0.7) {
     return {
-      dot: '#ff6b66',
-      border: '#ff9a91',
-      glow: '0 0 0 5px rgba(255, 107, 102, 0.15), 0 0 26px rgba(255, 107, 102, 0.35)',
-      text: '#ffb0aa',
+      dot: COLORS.status.errorSoft,
+      border: COLORS.status.errorText,
+      glow: `0 0 0 5px ${COLORS.status.errorSoft}26, 0 0 26px ${COLORS.status.errorSoft}59`,
+      text: COLORS.status.errorText,
     };
   }
 
   if (ratio > 0.4) {
     return {
-      dot: '#d9a751',
-      border: '#ffd27a',
-      glow: '0 0 0 5px rgba(217, 167, 81, 0.14), 0 0 22px rgba(217, 167, 81, 0.24)',
-      text: '#ffd27a',
+      dot: COLORS.status.warning,
+      border: COLORS.status.yellowText,
+      glow: `0 0 0 5px ${COLORS.status.warning}24, 0 0 22px ${COLORS.status.warning}3D`,
+      text: COLORS.status.yellowText,
     };
   }
 
   return {
-    dot: '#7ea0d8',
-    border: '#a9c3f6',
-    glow: '0 0 0 5px rgba(126, 160, 216, 0.12)',
-    text: '#b7ccf8',
+    dot: COLORS.primary.light,
+    border: COLORS.primary.fixed,
+    glow: `0 0 0 5px ${COLORS.primary.light}1F`,
+    text: COLORS.primary.fixed,
   };
 }
 
@@ -190,7 +191,10 @@ function PanelShell({
   className?: string;
 }) {
   return (
-    <section className={`rounded-lg border border-white/[0.08] bg-[#10141c]/95 shadow-[0_24px_80px_rgba(0,0,0,0.24)] ${className}`}>
+    <section
+      className={`rounded-lg border border-white/[0.08] shadow-[0_24px_80px_rgba(0,0,0,0.24)] ${className}`}
+      style={{ backgroundColor: `${COLORS.surface.panel}F2` }}
+    >
       {children}
     </section>
   );
@@ -297,8 +301,8 @@ export default function CommandDashboardScreen() {
       value: formatNumber(stats?.total_firs),
       icon: 'description',
       note: selectedDistrict ? `${selectedDistrict.district_name} selected` : 'Statewide register',
-      tone: 'text-[#d8e5ff]',
-      border: 'border-[#78a8ff]/35',
+      tone: `text-[${COLORS.primary.lightText}]`,
+      border: `border-[${COLORS.primary.light}]/35`,
       loading: statsLoading,
       onClick: () => setSelectedDistrict(null),
     },
@@ -307,8 +311,8 @@ export default function CommandDashboardScreen() {
       value: formatNumber(stats?.active_cases),
       icon: 'folder_open',
       note: 'Open investigations',
-      tone: 'text-[#9fe5ce]',
-      border: 'border-[#6fd1a9]/25',
+      tone: `text-[${COLORS.status.greenMint}]`,
+      border: `border-[${COLORS.status.success}]/25`,
       loading: statsLoading,
     },
     {
@@ -316,8 +320,8 @@ export default function CommandDashboardScreen() {
       value: formatNumber(stats?.high_risk_offender_count),
       icon: 'person_alert',
       note: 'Prioritized watchlist',
-      tone: 'text-[#ffd27a]',
-      border: 'border-[#d9a751]/30',
+      tone: `text-[${COLORS.status.yellowLight}]`,
+      border: `border-[${COLORS.status.amber}]/30`,
       loading: statsLoading,
     },
     {
@@ -325,8 +329,8 @@ export default function CommandDashboardScreen() {
       value: formatNumber(apiAlerts.length),
       icon: 'release_alert',
       note: `${criticalAlertCount} critical, ${warningAlertCount} warning`,
-      tone: 'text-[#ff9a91]',
-      border: 'border-[#ff6b66]/30',
+      tone: `text-[${COLORS.status.coral}]`,
+      border: `border-[${COLORS.status.error}]/30`,
       loading: alertsLoading && fetchedAlerts.length === 0,
     },
   ];
@@ -390,10 +394,10 @@ export default function CommandDashboardScreen() {
   };
 
   return (
-    <main className="flex-1 overflow-hidden bg-[#080b10] text-on-surface">
+    <main className="flex-1 overflow-hidden text-on-surface" style={{ backgroundColor: COLORS.background.page }}>
       <div className="h-full overflow-y-auto custom-scrollbar">
         <div className="relative min-h-full px-4 py-4 sm:px-6 lg:px-8">
-          <div className="pointer-events-none fixed inset-0 bg-[radial-gradient(circle_at_18%_8%,rgba(59,111,232,0.14),transparent_28%),radial-gradient(circle_at_82%_18%,rgba(217,167,81,0.08),transparent_24%),linear-gradient(180deg,#080b10_0%,#0b1018_54%,#080b10_100%)]" />
+          <div className="pointer-events-none fixed inset-0" style={{ backgroundImage: `radial-gradient(circle at 18% 8%, ${COLORS.primary.main}24, transparent 28%), radial-gradient(circle at 82% 18%, ${COLORS.status.warning}14, transparent 24%), linear-gradient(180deg, ${COLORS.background.page} 0%, ${COLORS.background.darkAlt} 54%, ${COLORS.background.page} 100%)` }} />
           <div
             className="pointer-events-none fixed inset-0 opacity-[0.07]"
             style={{
@@ -404,42 +408,42 @@ export default function CommandDashboardScreen() {
           />
 
           <div className="relative mx-auto flex max-w-[1520px] flex-col gap-4">
-            <header className="rounded-lg border border-white/[0.08] bg-[#10141c]/90 px-4 py-4 shadow-[0_24px_80px_rgba(0,0,0,0.25)] sm:px-5">
+            <header className="rounded-lg border border-white/[0.08] px-4 py-4 shadow-[0_24px_80px_rgba(0,0,0,0.25)] sm:px-5" style={{ backgroundColor: `${COLORS.surface.panel}E6` }}>
               <div className="flex flex-col gap-4 xl:flex-row xl:items-center xl:justify-between">
                 <div>
                   <div className="mb-2 flex flex-wrap items-center gap-2">
-                    <span className="rounded border border-[#78a8ff]/30 bg-[#78a8ff]/10 px-2 py-1 font-mono text-[11px] font-semibold text-[#d8e5ff]">
+                    <span className="rounded border px-2 py-1 font-mono text-[11px] font-semibold" style={{ borderColor: `${COLORS.primary.light}4D`, backgroundColor: `${COLORS.primary.light}1A`, color: COLORS.primary.lightText }}>
                       PRISM COMMAND
                     </span>
-                    <span className="rounded border border-white/[0.08] bg-white/[0.04] px-2 py-1 font-mono text-[11px] text-[#9aa4b8]">
+                    <span className="rounded border border-white/[0.08] bg-white/[0.04] px-2 py-1 font-mono text-[11px]" style={{ color: COLORS.text.muted }}>
                       {activeTimeframe.toUpperCase()} WINDOW
                     </span>
                   </div>
-                  <h1 className="text-[30px] font-semibold leading-tight tracking-[0] text-[#f4f7fb] sm:text-[36px]">
+                  <h1 className="text-[30px] font-semibold leading-tight tracking-[0] sm:text-[36px]" style={{ color: COLORS.text.heading }}>
                     Situation Overview
                   </h1>
-                  <p className="mt-1 max-w-2xl text-sm leading-6 text-[#9aa4b8]">
+                  <p className="mt-1 max-w-2xl text-sm leading-6" style={{ color: COLORS.text.muted }}>
                     Statewide FIR pressure, live alert triage, and district-level operational density.
                   </p>
                 </div>
 
                 <div className="grid gap-3 sm:grid-cols-3 xl:min-w-[520px]">
-                  <div className="rounded border border-white/[0.08] bg-[#080b10]/70 px-3 py-3">
-                    <div className="font-mono text-[11px] text-[#778196]">SYNC TIME</div>
-                    <div className="mt-1 font-mono text-[12px] font-semibold text-[#eef3fb]">
+                  <div className="rounded border border-white/[0.08] px-3 py-3" style={{ backgroundColor: `${COLORS.background.page}B3` }}>
+                    <div className="font-mono text-[11px]" style={{ color: COLORS.text.dark }}>SYNC TIME</div>
+                    <div className="mt-1 font-mono text-[12px] font-semibold" style={{ color: COLORS.text.heading }}>
                       {currentTime || 'Syncing clock'}
                     </div>
                   </div>
-                  <div className="rounded border border-white/[0.08] bg-[#080b10]/70 px-3 py-3">
-                    <div className="font-mono text-[11px] text-[#778196]">SYSTEM STATE</div>
-                    <div className="mt-1 flex items-center gap-2 font-mono text-[12px] font-semibold text-[#9fe5ce]">
-                      <span className="h-2 w-2 rounded-sm bg-[#6fd1a9] shadow-[0_0_18px_rgba(111,209,169,0.65)]" />
+                  <div className="rounded border border-white/[0.08] px-3 py-3" style={{ backgroundColor: `${COLORS.background.page}B3` }}>
+                    <div className="font-mono text-[11px]" style={{ color: COLORS.text.dark }}>SYSTEM STATE</div>
+                    <div className="mt-1 flex items-center gap-2 font-mono text-[12px] font-semibold" style={{ color: COLORS.status.greenMint }}>
+                      <span className="h-2 w-2 rounded-sm" style={{ backgroundColor: COLORS.status.greenBorder, boxShadow: `0 0 18px ${COLORS.status.greenBorder}A6` }} />
                       Online
                     </div>
                   </div>
-                  <div className="rounded border border-white/[0.08] bg-[#080b10]/70 px-3 py-3">
-                    <div className="font-mono text-[11px] text-[#778196]">ALERT LOAD</div>
-                    <div className="mt-1 font-mono text-[12px] font-semibold text-[#ffb0aa]">
+                  <div className="rounded border border-white/[0.08] px-3 py-3" style={{ backgroundColor: `${COLORS.background.page}B3` }}>
+                    <div className="font-mono text-[11px]" style={{ color: COLORS.text.dark }}>ALERT LOAD</div>
+                    <div className="mt-1 font-mono text-[12px] font-semibold" style={{ color: COLORS.status.errorText }}>
                       {criticalAlertCount} critical / {warningAlertCount} warning
                     </div>
                   </div>
@@ -448,7 +452,7 @@ export default function CommandDashboardScreen() {
             </header>
 
             {hasAnyError && (
-              <div className="rounded-lg border border-[#ff6b66]/30 bg-[#2a1113] px-4 py-3 text-sm text-[#ffb0aa]">
+              <div className="rounded-lg border px-4 py-3 text-sm" style={{ borderColor: `${COLORS.status.errorSoft}4D`, backgroundColor: COLORS.status.errorBgSoft, color: COLORS.status.errorText }}>
                 Some live services did not respond. The dashboard is showing available data and local fallbacks.
               </div>
             )}
@@ -458,11 +462,12 @@ export default function CommandDashboardScreen() {
                 <button
                   key={metric.label}
                   onClick={metric.onClick}
-                  className={`group min-h-[138px] rounded-lg border ${metric.border} bg-[#10141c]/95 p-4 text-left shadow-[0_18px_50px_rgba(0,0,0,0.2)] transition duration-200 hover:-translate-y-0.5 hover:bg-[#121824] focus:outline-none focus:ring-2 focus:ring-[#78a8ff]/70 active:translate-y-0`}
+                  className={`group min-h-[138px] rounded-lg border ${metric.border} p-4 text-left shadow-[0_18px_50px_rgba(0,0,0,0.2)] transition duration-200 hover:-translate-y-0.5 hover:bg-[#121824] focus:outline-none focus:ring-2 focus:ring-[#78a8ff]/70 active:translate-y-0`}
                   type="button"
+                  style={{ backgroundColor: `${COLORS.surface.panel}F2` }}
                 >
                   <div className="flex items-start justify-between">
-                    <span className="font-mono text-[11px] font-semibold text-[#8792a8]">
+                    <span className="font-mono text-[11px] font-semibold" style={{ color: COLORS.text.dim }}>
                       {metric.label}
                     </span>
                     <span className={`material-symbols-outlined text-[22px] ${metric.tone}`}>
@@ -473,7 +478,7 @@ export default function CommandDashboardScreen() {
                     {metric.loading ? <MetricSkeleton /> : metric.value}
                   </div>
                   <div className="mt-3 flex items-center justify-between gap-3">
-                    <span className="text-xs text-[#9aa4b8]">{metric.note}</span>
+                    <span className="text-xs" style={{ color: COLORS.text.muted }}>{metric.note}</span>
                     <span className="h-px flex-1 bg-white/[0.08] transition-colors group-hover:bg-white/[0.18]" />
                   </div>
                 </button>
@@ -485,29 +490,32 @@ export default function CommandDashboardScreen() {
                 <div className="flex flex-col gap-3 border-b border-white/[0.08] px-4 py-4 lg:flex-row lg:items-center lg:justify-between">
                   <div>
                     <div className="flex items-center gap-2">
-                      <span className="material-symbols-outlined text-[20px] text-[#78a8ff]">
+                      <span className="material-symbols-outlined text-[20px]" style={{ color: COLORS.primary.light }}>
                         travel_explore
                       </span>
-                      <h2 className="text-sm font-semibold text-[#eef3fb]">
+                      <h2 className="text-sm font-semibold" style={{ color: COLORS.text.white }}>
                         Karnataka crime density
                       </h2>
                     </div>
-                    <p className="mt-1 text-xs text-[#8792a8]">
+                    <p className="mt-1 text-xs" style={{ color: COLORS.text.dim }}>
                       Drag to pan. Use the wheel to inspect district pressure.
                     </p>
                   </div>
 
                   <div className="flex flex-wrap items-center gap-2">
-                    <div className="rounded border border-white/[0.08] bg-[#080b10] p-1">
+                    <div className="rounded border border-white/[0.08] p-1" style={{ backgroundColor: COLORS.background.dark }}>
                       {(['24h', '7d', '30d'] as const).map((timeframe) => (
                         <button
                           key={timeframe}
                           onClick={() => setActiveTimeframe(timeframe)}
-                          className={`rounded px-3 py-1.5 font-mono text-[11px] font-semibold transition focus:outline-none focus:ring-2 focus:ring-[#78a8ff]/70 ${
+                          className={`rounded px-3 py-1.5 font-mono text-[11px] font-semibold transition focus:outline-none focus:ring-2 ${
                             activeTimeframe === timeframe
-                              ? 'bg-[#d8e5ff] text-[#07101f]'
-                              : 'text-[#9aa4b8] hover:bg-white/[0.06] hover:text-[#eef3fb]'
+                              ? 'bg-primary'
+                              : 'hover:bg-white/[0.06]'
                           }`}
+                          style={{
+                            color: activeTimeframe === timeframe ? COLORS.background.dark : COLORS.text.muted,
+                          }}
                           type="button"
                         >
                           {timeframe}
@@ -516,7 +524,8 @@ export default function CommandDashboardScreen() {
                     </div>
                     <button
                       onClick={resetMap}
-                      className="rounded border border-white/[0.08] bg-white/[0.04] px-3 py-2 font-mono text-[11px] font-semibold text-[#d8e5ff] transition hover:bg-white/[0.08] focus:outline-none focus:ring-2 focus:ring-[#78a8ff]/70 active:translate-y-px"
+                      className="rounded border border-white/[0.08] bg-white/[0.04] px-3 py-2 font-mono text-[11px] font-semibold transition hover:bg-white/[0.08] focus:outline-none focus:ring-2 active:translate-y-px"
+                      style={{ color: COLORS.primary.lightText }}
                       type="button"
                     >
                       Reset map
@@ -526,7 +535,7 @@ export default function CommandDashboardScreen() {
 
                 <div
                   ref={mapContainerRef}
-                  className="relative min-h-[520px] overflow-hidden bg-[#070a0f]"
+                  className="relative min-h-[520px] overflow-hidden check-bg"
                   onMouseDown={handleMouseDown}
                   onMouseMove={handleMouseMove}
                   onMouseUp={handleMouseUp}
@@ -537,7 +546,7 @@ export default function CommandDashboardScreen() {
                     className="absolute inset-0 opacity-[0.16]"
                     style={{
                       backgroundImage:
-                        'radial-gradient(circle at center, rgba(120,168,255,0.55) 1px, transparent 1px)',
+                        `radial-gradient(circle at center, ${COLORS.primary.main}88 1px, transparent 1px)`,
                       backgroundSize: '22px 22px',
                     }}
                   />
@@ -592,18 +601,20 @@ export default function CommandDashboardScreen() {
                               style={{
                                 transform: `scale(${1 / mapZoom})`,
                                 transformOrigin: 'left center',
+                                backgroundColor: COLORS.surface.panel,
+                                borderColor: COLORS.border.default,
                               }}
                             >
                               <span className="block font-mono text-[11px] font-bold" style={{ color: tone.text }}>
                                 {district.district_name}
                               </span>
-                              <span className="mt-1 grid grid-cols-2 gap-x-4 gap-y-1 font-mono text-[10px] text-[#c5cfdf]">
+                              <span className="mt-1 grid grid-cols-2 gap-x-4 gap-y-1 font-mono text-[10px]" style={{ color: COLORS.text.muted }}>
                                 <span>FIRs</span>
-                                <strong className="text-right text-white">{district.total_firs}</strong>
+                                <strong className="text-right" style={{ color: COLORS.text.primary }}>{district.total_firs}</strong>
                                 <span>Active</span>
-                                <strong className="text-right text-white">{district.active_cases}</strong>
+                                <strong className="text-right" style={{ color: COLORS.text.primary }}>{district.active_cases}</strong>
                                 <span>Risk</span>
-                                <strong className="text-right text-white">{district.high_risk_count}</strong>
+                                <strong className="text-right" style={{ color: COLORS.text.primary }}>{district.high_risk_count}</strong>
                               </span>
                             </span>
                           </button>
@@ -612,8 +623,8 @@ export default function CommandDashboardScreen() {
                   </div>
 
                   {mapLoading && (
-                    <div className="absolute inset-0 flex items-center justify-center bg-[#070a0f]/70">
-                      <div className="w-[min(520px,80%)] space-y-3 rounded-lg border border-white/[0.08] bg-[#10141c]/90 p-4">
+                    <div className="absolute inset-0 flex items-center justify-center" style={{ backgroundColor: `${COLORS.background.dark}B3` }}>
+                      <div className="w-[min(520px,80%)] space-y-3 rounded-lg border border-white/[0.08] p-4" style={{ backgroundColor: COLORS.surface.panel }}>
                         <div className="h-4 w-44 rounded bg-white/[0.08] animate-pulse" />
                         <div className="h-48 rounded bg-white/[0.06] animate-pulse" />
                       </div>
@@ -622,27 +633,27 @@ export default function CommandDashboardScreen() {
 
                   {!mapLoading && districts.length === 0 && (
                     <div className="absolute inset-0 flex items-center justify-center p-6 text-center">
-                      <div className="max-w-sm rounded-lg border border-white/[0.08] bg-[#10141c]/95 p-5">
-                        <div className="font-semibold text-[#eef3fb]">No district data available</div>
-                        <p className="mt-2 text-sm text-[#9aa4b8]">
+                      <div className="max-w-sm rounded-lg border border-white/[0.08] p-5" style={{ backgroundColor: COLORS.surface.panel }}>
+                        <div className="font-semibold" style={{ color: COLORS.text.heading }}>No district data available</div>
+                        <p className="mt-2 text-sm" style={{ color: COLORS.text.muted }}>
                           The selected time window has no mapped FIR records yet.
                         </p>
                       </div>
                     </div>
                   )}
 
-                  <div className="absolute bottom-4 left-4 rounded-lg border border-white/[0.08] bg-[#080b10]/90 p-3">
-                    <div className="mb-2 font-mono text-[10px] font-semibold text-[#8792a8]">
+                  <div className="absolute bottom-4 left-4 rounded-lg border border-white/[0.08] p-3" style={{ backgroundColor: `${COLORS.background.dark}E6` }}>
+                    <div className="mb-2 font-mono text-[10px] font-semibold" style={{ color: COLORS.text.secondary }}>
                       DENSITY RANGE
                     </div>
                     <div className="flex items-center gap-2">
-                      <span className="h-2 w-8 rounded-sm bg-[#7ea0d8]" />
-                      <span className="h-2 w-8 rounded-sm bg-[#d9a751]" />
-                      <span className="h-2 w-8 rounded-sm bg-[#ff6b66]" />
+                      <span className="h-2 w-8 rounded-sm" style={{ backgroundColor: COLORS.primary.main }} />
+                      <span className="h-2 w-8 rounded-sm" style={{ backgroundColor: COLORS.status.warning }} />
+                      <span className="h-2 w-8 rounded-sm" style={{ backgroundColor: COLORS.status.error }} />
                     </div>
                   </div>
 
-                  <div className="absolute right-4 top-4 rounded border border-white/[0.08] bg-[#080b10]/90 px-3 py-2 font-mono text-[11px] text-[#9aa4b8]">
+                  <div className="absolute right-4 top-4 rounded border border-white/[0.08] px-3 py-2 font-mono text-[11px]" style={{ backgroundColor: `${COLORS.background.dark}E6`, color: COLORS.text.muted }}>
                     Zoom {Math.round(mapZoom * 100)}%
                   </div>
                 </div>
@@ -653,18 +664,18 @@ export default function CommandDashboardScreen() {
                   <div className="flex items-start justify-between gap-4">
                     <div>
                       <div className="flex items-center gap-2">
-                        <span className="material-symbols-outlined text-[20px] text-[#ff9a91]">
+                        <span className="material-symbols-outlined text-[20px]" style={{ color: COLORS.status.errorText }}>
                           emergency_home
                         </span>
-                        <h2 className="text-sm font-semibold text-[#eef3fb]">
+                        <h2 className="text-sm font-semibold" style={{ color: COLORS.text.heading }}>
                           Active alert queue
                         </h2>
                       </div>
-                      <p className="mt-1 text-xs text-[#8792a8]">
+                      <p className="mt-1 text-xs" style={{ color: COLORS.text.secondary }}>
                         {filteredAlerts.length} of {apiAlerts.length} visible
                       </p>
                     </div>
-                    <span className="rounded border border-[#ff6b66]/25 bg-[#ff6b66]/10 px-2 py-1 font-mono text-[11px] font-semibold text-[#ffb0aa]">
+                    <span className="rounded border px-2 py-1 font-mono text-[11px] font-semibold" style={{ borderColor: `${COLORS.status.error}40`, backgroundColor: `${COLORS.status.error}1A`, color: COLORS.status.errorText }}>
                       {criticalAlertCount}
                     </span>
                   </div>
@@ -672,7 +683,8 @@ export default function CommandDashboardScreen() {
                   <div className="mt-4 grid grid-cols-2 gap-2">
                     <select
                       aria-label="Filter alerts by severity"
-                      className="rounded border border-white/[0.08] bg-[#080b10] px-2 py-2 font-mono text-[11px] text-[#dce5f3] outline-none transition focus:border-[#78a8ff]"
+                      className="rounded border border-white/[0.08] px-2 py-2 font-mono text-[11px] outline-none transition"
+                      style={{ backgroundColor: COLORS.background.dark, color: COLORS.text.primary }}
                       onChange={(event) => setSeverityFilter(event.target.value as SeverityFilter)}
                       value={severityFilter}
                     >
@@ -682,7 +694,8 @@ export default function CommandDashboardScreen() {
                     </select>
                     <select
                       aria-label="Sort alerts"
-                      className="rounded border border-white/[0.08] bg-[#080b10] px-2 py-2 font-mono text-[11px] text-[#dce5f3] outline-none transition focus:border-[#78a8ff]"
+                      className="rounded border border-white/[0.08] px-2 py-2 font-mono text-[11px] outline-none transition"
+                      style={{ backgroundColor: COLORS.background.dark, color: COLORS.text.primary }}
                       onChange={(event) => setSortBy(event.target.value as SortMode)}
                       value={sortBy}
                     >
@@ -694,11 +707,12 @@ export default function CommandDashboardScreen() {
 
                   <div className="mt-2 flex gap-2">
                     <div className="relative flex-1">
-                      <span className="material-symbols-outlined pointer-events-none absolute left-2 top-1/2 -translate-y-1/2 text-[16px] text-[#778196]">
+                      <span className="material-symbols-outlined pointer-events-none absolute left-2 top-1/2 -translate-y-1/2 text-[16px]" style={{ color: COLORS.text.dark }}>
                         search
                       </span>
                       <input
-                        className="w-full rounded border border-white/[0.08] bg-[#080b10] py-2 pl-8 pr-3 text-xs text-[#eef3fb] outline-none transition placeholder:text-[#687386] focus:border-[#78a8ff]"
+                        className="w-full rounded border border-white/[0.08] py-2 pl-8 pr-3 text-xs outline-none transition"
+                        style={{ backgroundColor: COLORS.background.dark, color: COLORS.text.primary }}
                         onChange={(event) => setSearchQuery(event.target.value)}
                         placeholder="Search district or crime"
                         type="text"
@@ -707,7 +721,8 @@ export default function CommandDashboardScreen() {
                     </div>
                     {activeFilterCount > 0 && (
                       <button
-                        className="rounded border border-white/[0.08] bg-white/[0.04] px-3 font-mono text-[11px] font-semibold text-[#d8e5ff] transition hover:bg-white/[0.08] focus:outline-none focus:ring-2 focus:ring-[#78a8ff]/70"
+                        className="rounded border border-white/[0.08] bg-white/[0.04] px-3 font-mono text-[11px] font-semibold transition hover:bg-white/[0.08]"
+                        style={{ color: COLORS.primary.lightText }}
                         onClick={resetFilters}
                         type="button"
                       >
@@ -725,9 +740,9 @@ export default function CommandDashboardScreen() {
                       ))}
                     </div>
                   ) : filteredAlerts.length === 0 ? (
-                    <div className="rounded-lg border border-white/[0.08] bg-[#080b10]/70 p-5 text-center">
-                      <div className="font-semibold text-[#eef3fb]">No matching alerts</div>
-                      <p className="mt-2 text-sm text-[#9aa4b8]">
+                    <div className="rounded-lg border border-white/[0.08] p-5 text-center" style={{ backgroundColor: `${COLORS.background.dark}B3` }}>
+                      <div className="font-semibold" style={{ color: COLORS.text.heading }}>No matching alerts</div>
+                      <p className="mt-2 text-sm" style={{ color: COLORS.text.muted }}>
                         Adjust the filters to bring incidents back into the queue.
                       </p>
                     </div>
@@ -738,30 +753,30 @@ export default function CommandDashboardScreen() {
                         return (
                           <article
                             key={alert.alert_id}
-                            className={`group rounded-lg border bg-[#080b10]/72 p-3 transition duration-200 hover:-translate-y-0.5 ${
-                              isCritical
-                                ? 'border-[#ff6b66]/22 hover:border-[#ff6b66]/50'
-                                : 'border-[#d9a751]/22 hover:border-[#d9a751]/45'
-                            }`}
+                            className="group rounded-lg border p-3 transition duration-200 hover:-translate-y-0.5"
+                            style={{
+                              backgroundColor: COLORS.background.dark,
+                              borderColor: isCritical ? `${COLORS.status.error}33` : `${COLORS.status.warning}33`,
+                            }}
                           >
                             <div className="flex items-start justify-between gap-3">
                               <div>
-                                <h3 className="text-sm font-semibold leading-5 text-[#eef3fb]">
+                                <h3 className="text-sm font-semibold leading-5" style={{ color: COLORS.text.heading }}>
                                   {alert.title}
                                 </h3>
-                                <p className={`mt-1 font-mono text-[12px] font-semibold ${isCritical ? 'text-[#ff9a91]' : 'text-[#ffd27a]'}`}>
+                                <p className="mt-1 font-mono text-[12px] font-semibold" style={{ color: isCritical ? COLORS.status.errorText : COLORS.status.warning }}>
                                   {alert.details}
                                 </p>
                               </div>
-                              <span className={`rounded border px-2 py-1 font-mono text-[10px] font-semibold ${
-                                isCritical
-                                  ? 'border-[#ff6b66]/30 bg-[#ff6b66]/10 text-[#ffb0aa]'
-                                  : 'border-[#d9a751]/30 bg-[#d9a751]/10 text-[#ffd27a]'
-                              }`}>
+                              <span className="rounded border px-2 py-1 font-mono text-[10px] font-semibold" style={{
+                                borderColor: isCritical ? `${COLORS.status.error}40` : `${COLORS.status.warning}40`,
+                                backgroundColor: isCritical ? `${COLORS.status.error}1A` : `${COLORS.status.warning}1A`,
+                                color: isCritical ? COLORS.status.errorText : COLORS.status.warning,
+                              }}>
                                 {alert.level}
                               </span>
                             </div>
-                            <div className="mt-3 grid grid-cols-2 gap-2 border-t border-white/[0.07] pt-3 font-mono text-[10px] text-[#8792a8]">
+                            <div className="mt-3 grid grid-cols-2 gap-2 border-t pt-3 font-mono text-[10px]" style={{ borderColor: `${COLORS.border.default}40`, color: COLORS.text.secondary }}>
                               <span>{alert.district_name}</span>
                               <span className="text-right">{alert.time_ago}</span>
                               <span>{alert.crime_type}</span>
@@ -781,16 +796,17 @@ export default function CommandDashboardScreen() {
                 <div className="border-b border-white/[0.08] px-4 py-4">
                   <div className="flex items-center justify-between gap-3">
                     <div>
-                      <h2 className="text-sm font-semibold text-[#eef3fb]">
+                      <h2 className="text-sm font-semibold" style={{ color: COLORS.text.heading }}>
                         District focus
                       </h2>
-                      <p className="mt-1 text-xs text-[#8792a8]">
+                      <p className="mt-1 text-xs" style={{ color: COLORS.text.secondary }}>
                         {selectedDistrict ? 'Selected map jurisdiction' : 'Highest FIR pressure'}
                       </p>
                     </div>
                     {selectedDistrict && (
                       <button
-                        className="rounded border border-white/[0.08] px-3 py-2 font-mono text-[11px] font-semibold text-[#d8e5ff] transition hover:bg-white/[0.06] focus:outline-none focus:ring-2 focus:ring-[#78a8ff]/70"
+                        className="rounded border border-white/[0.08] px-3 py-2 font-mono text-[11px] font-semibold transition hover:bg-white/[0.06]"
+                        style={{ color: COLORS.primary.lightText }}
                         onClick={() => setSelectedDistrict(null)}
                         type="button"
                       >
@@ -803,38 +819,38 @@ export default function CommandDashboardScreen() {
                 <div className="p-4">
                   {selectedDistrict ? (
                     <div>
-                      <div className="rounded-lg border border-[#78a8ff]/25 bg-[#78a8ff]/10 p-4">
-                        <div className="font-mono text-[11px] text-[#9aa4b8]">SELECTED DISTRICT</div>
-                        <div className="mt-2 text-2xl font-semibold tracking-[0] text-[#eef3fb]">
+                      <div className="rounded-lg border p-4" style={{ borderColor: `${COLORS.primary.main}40`, backgroundColor: `${COLORS.primary.main}1A` }}>
+                        <div className="font-mono text-[11px]" style={{ color: COLORS.text.muted }}>SELECTED DISTRICT</div>
+                        <div className="mt-2 text-2xl font-semibold tracking-[0]" style={{ color: COLORS.text.heading }}>
                           {selectedDistrict.district_name}
                         </div>
                         <div className="mt-4 grid grid-cols-3 gap-3">
                           <div>
-                            <div className="font-mono text-[10px] text-[#8792a8]">FIRs</div>
-                            <div className="mt-1 font-mono text-xl font-bold text-[#d8e5ff]">
+                            <div className="font-mono text-[10px]" style={{ color: COLORS.text.secondary }}>FIRs</div>
+                            <div className="mt-1 font-mono text-xl font-bold" style={{ color: COLORS.primary.lightText }}>
                               {selectedDistrict.total_firs}
                             </div>
                           </div>
                           <div>
-                            <div className="font-mono text-[10px] text-[#8792a8]">Active</div>
-                            <div className="mt-1 font-mono text-xl font-bold text-[#9fe5ce]">
+                            <div className="font-mono text-[10px]" style={{ color: COLORS.text.secondary }}>Active</div>
+                            <div className="mt-1 font-mono text-xl font-bold" style={{ color: COLORS.status.greenMint }}>
                               {selectedDistrict.active_cases}
                             </div>
                           </div>
                           <div>
-                            <div className="font-mono text-[10px] text-[#8792a8]">Risk</div>
-                            <div className="mt-1 font-mono text-xl font-bold text-[#ffd27a]">
+                            <div className="font-mono text-[10px]" style={{ color: COLORS.text.secondary }}>Risk</div>
+                            <div className="mt-1 font-mono text-xl font-bold" style={{ color: COLORS.status.warning }}>
                               {selectedDistrict.high_risk_count}
                             </div>
                           </div>
                         </div>
                       </div>
-                      <div className="mt-3 rounded border border-white/[0.08] bg-[#080b10]/70 px-3 py-3 text-sm text-[#c5cfdf]">
-                        Dominant pattern: <strong className="font-semibold text-[#eef3fb]">{selectedDistrict.dominant_crime_type || 'Not classified'}</strong>
+                      <div className="mt-3 rounded border border-white/[0.08] px-3 py-3 text-sm" style={{ backgroundColor: COLORS.background.dark, color: COLORS.text.primary }}>
+                        Dominant pattern: <strong className="font-semibold" style={{ color: COLORS.text.heading }}>{selectedDistrict.dominant_crime_type || 'Not classified'}</strong>
                       </div>
                     </div>
                   ) : topDistricts.length === 0 ? (
-                    <div className="rounded-lg border border-white/[0.08] bg-[#080b10]/70 p-5 text-sm text-[#9aa4b8]">
+                    <div className="rounded-lg border border-white/[0.08] p-5 text-sm" style={{ backgroundColor: COLORS.background.dark, color: COLORS.text.muted }}>
                       No district ranking is available for this time window.
                     </div>
                   ) : (
@@ -844,26 +860,27 @@ export default function CommandDashboardScreen() {
                         return (
                           <button
                             key={district.district_id}
-                            className="w-full rounded-lg border border-white/[0.08] bg-[#080b10]/72 p-3 text-left transition hover:border-[#78a8ff]/35 hover:bg-[#111722] focus:outline-none focus:ring-2 focus:ring-[#78a8ff]/70"
+                            className="w-full rounded-lg border border-white/[0.08] p-3 text-left transition hover:bg-white/[0.04]"
+                            style={{ backgroundColor: COLORS.background.dark }}
                             onClick={() => setSelectedDistrict(district)}
                             type="button"
                           >
                             <div className="flex items-center justify-between gap-4">
                               <div className="flex items-center gap-3">
-                                <span className="flex h-7 w-7 items-center justify-center rounded border border-white/[0.08] bg-white/[0.04] font-mono text-[11px] text-[#9aa4b8]">
+                                <span className="flex h-7 w-7 items-center justify-center rounded border border-white/[0.08] bg-white/[0.04] font-mono text-[11px]" style={{ color: COLORS.text.muted }}>
                                   {index + 1}
                                 </span>
                                 <div>
-                                  <div className="text-sm font-semibold text-[#eef3fb]">{district.district_name}</div>
-                                  <div className="mt-0.5 text-xs text-[#8792a8]">{district.dominant_crime_type}</div>
+                                  <div className="text-sm font-semibold" style={{ color: COLORS.text.heading }}>{district.district_name}</div>
+                                  <div className="mt-0.5 text-xs" style={{ color: COLORS.text.secondary }}>{district.dominant_crime_type}</div>
                                 </div>
                               </div>
-                              <span className="font-mono text-sm font-bold text-[#d8e5ff]">{district.total_firs}</span>
+                              <span className="font-mono text-sm font-bold" style={{ color: COLORS.primary.lightText }}>{district.total_firs}</span>
                             </div>
                             <div className="mt-3 h-1.5 rounded-sm bg-white/[0.06]">
                               <div
-                                className="h-full rounded-sm bg-[#78a8ff]"
-                                style={{ width: `${percent}%` }}
+                                className="h-full rounded-sm"
+                                style={{ width: `${percent}%`, backgroundColor: COLORS.primary.main }}
                               />
                             </div>
                           </button>
@@ -877,14 +894,14 @@ export default function CommandDashboardScreen() {
               <PanelShell className="overflow-hidden">
                 <div className="flex flex-col gap-2 border-b border-white/[0.08] px-4 py-4 sm:flex-row sm:items-center sm:justify-between">
                   <div>
-                    <h2 className="text-sm font-semibold text-[#eef3fb]">
+                    <h2 className="text-sm font-semibold" style={{ color: COLORS.text.heading }}>
                       30-day crime trend analytics
                     </h2>
-                    <p className="mt-1 text-xs text-[#8792a8]">
+                    <p className="mt-1 text-xs" style={{ color: COLORS.text.secondary }}>
                       Weekly movement across major crime categories.
                     </p>
                   </div>
-                  <span className="font-mono text-[11px] text-[#8792a8]">
+                  <span className="font-mono text-[11px]" style={{ color: COLORS.text.secondary }}>
                     LIVE CACHE
                   </span>
                 </div>
@@ -894,9 +911,10 @@ export default function CommandDashboardScreen() {
                     Array.from({ length: 5 }).map((_, index) => (
                       <div
                         key={index}
-                        className={`min-h-[188px] rounded-lg border border-white/[0.08] bg-[#080b10]/72 p-4 ${
+                        className={`min-h-[188px] rounded-lg border border-white/[0.08] p-4 ${
                           index < 2 ? 'xl:col-span-3' : 'xl:col-span-2'
                         }`}
+                        style={{ backgroundColor: COLORS.background.dark }}
                       >
                         <div className="flex items-start justify-between gap-3">
                           <div className="flex flex-col gap-2">
@@ -913,11 +931,11 @@ export default function CommandDashboardScreen() {
                       </div>
                     ))
                   ) : trends.length === 0 ? (
-                    <div className="col-span-full flex min-h-[188px] flex-col items-center justify-center rounded-lg border border-dashed border-white/[0.12] bg-[#080b10]/70 p-6 text-center">
-                      <span className="font-mono text-[11px] uppercase tracking-[0.22em] text-[#6d7890]">
+                    <div className="col-span-full flex min-h-[188px] flex-col items-center justify-center rounded-lg border border-dashed border-white/[0.12] p-6 text-center" style={{ backgroundColor: COLORS.background.dark }}>
+                      <span className="font-mono text-[11px] uppercase tracking-[0.22em]" style={{ color: COLORS.text.dark }}>
                         Analytics pending
                       </span>
-                      <p className="mt-2 text-sm font-medium text-[#cbd6e8]">
+                      <p className="mt-2 text-sm font-medium" style={{ color: COLORS.text.primary }}>
                         Trend data is not available yet.
                       </p>
                     </div>
@@ -936,16 +954,17 @@ export default function CommandDashboardScreen() {
                       return (
                         <article
                           key={trend.crime_category}
-                          className={`min-h-[188px] rounded-lg border border-white/[0.08] bg-[#080b10]/72 p-4 transition-colors hover:border-[#78a8ff]/35 hover:bg-[#0b1018]/82 ${
+                          className={`min-h-[188px] rounded-lg border border-white/[0.08] p-4 transition-colors hover:border-white/[0.2] ${
                             index < 2 ? 'xl:col-span-3' : 'xl:col-span-2'
                           }`}
+                          style={{ backgroundColor: COLORS.background.dark }}
                         >
                           <div className="flex items-start justify-between gap-2">
                             <div>
-                              <h3 className="text-sm font-semibold text-[#eef3fb]">
+                              <h3 className="text-sm font-semibold" style={{ color: COLORS.text.heading }}>
                                 {trend.crime_category}
                               </h3>
-                              <p className="mt-1 font-mono text-[10px] uppercase tracking-[0.16em] text-[#8792a8]">
+                              <p className="mt-1 font-mono text-[10px] uppercase tracking-[0.16em]" style={{ color: COLORS.text.secondary }}>
                                 30-day category movement
                               </p>
                             </div>
@@ -960,7 +979,7 @@ export default function CommandDashboardScreen() {
                             </Badge>
                           </div>
 
-                          <div className="mt-5 h-20 rounded-md border border-white/[0.06] bg-[#05070b]/60 p-2">
+                          <div className="mt-5 h-20 rounded-md border border-white/[0.06] bg-black/30 p-2">
                             <svg className="h-full w-full" preserveAspectRatio="none" viewBox="0 0 100 44">
                               <defs>
                                 <linearGradient id={`trendFill-${index}`} x1="0" x2="0" y1="0" y2="1">
@@ -984,18 +1003,18 @@ export default function CommandDashboardScreen() {
 
                           <div className="mt-4 grid grid-cols-2 gap-2">
                             <div className="rounded-md border border-white/[0.06] bg-white/[0.035] px-3 py-2">
-                              <p className="font-mono text-[9px] uppercase tracking-[0.18em] text-[#69758a]">
+                              <p className="font-mono text-[9px] uppercase tracking-[0.18em]" style={{ color: COLORS.text.dark }}>
                                 Current
                               </p>
-                              <p className="mt-1 font-mono text-sm font-semibold text-[#eef3fb]">
+                              <p className="mt-1 font-mono text-sm font-semibold" style={{ color: COLORS.text.heading }}>
                                 {formatNumber(trend.total_current)}
                               </p>
                             </div>
                             <div className="rounded-md border border-white/[0.06] bg-white/[0.025] px-3 py-2">
-                              <p className="font-mono text-[9px] uppercase tracking-[0.18em] text-[#69758a]">
+                              <p className="font-mono text-[9px] uppercase tracking-[0.18em]" style={{ color: COLORS.text.dark }}>
                                 Prior
                               </p>
-                              <p className="mt-1 font-mono text-sm font-semibold text-[#aebbd0]">
+                              <p className="mt-1 font-mono text-sm font-semibold" style={{ color: COLORS.text.secondary }}>
                                 {formatNumber(trend.total_prior)}
                               </p>
                             </div>

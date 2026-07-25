@@ -7,6 +7,8 @@ import React, { useRef, useCallback, useEffect, useState } from 'react';
 import ForceGraph2D, { ForceGraphMethods, NodeObject, LinkObject } from 'react-force-graph-2d';
 import { NetworkGraphNode, NetworkGraphEdge, EdgeIncident } from '../../types/network';
 
+import { COLORS } from '../../constants/colors';
+
 // ─── Types ───────────────────────────────────────────────────────────────────
 
 interface FGNode extends NodeObject {
@@ -33,20 +35,11 @@ interface NetworkGraphProps {
   onNodeClick?: (nodeId: string) => void;
 }
 
-// ─── Gang cluster colour palette (Obsidian-inspired) ─────────────────────────
-const CLUSTER_COLORS: Record<number, string> = {
-  0:  '#7B61FF', // violet
-  1:  '#FF6B6B', // coral
-  2:  '#4ECDC4', // teal
-  3:  '#FFE66D', // gold
-  4:  '#A8FF78', // lime
-  5:  '#FF8B94', // pink
-  6:  '#00D2FF', // cyan
-  7:  '#FF9A3C', // orange
-};
+// ─── Gang cluster colour palette (Centralized) ─────────────────────────
+const CLUSTER_COLORS: Record<number, string> = COLORS.graph.clusters;
 
 const getClusterColor = (cluster: number | null | undefined): string =>
-  cluster != null ? (CLUSTER_COLORS[cluster % 8] ?? '#7B61FF') : '#5A6478';
+  cluster != null ? (CLUSTER_COLORS[cluster % 8] ?? COLORS.accent.violet) : COLORS.graph.linkDefault;
 
 // ─── Canvas node painter (Obsidian glow style) ────────────────────────────────
 function drawCrispLabel(
@@ -267,10 +260,10 @@ export function NetworkGraph({ nodes, edges, selectedNodeId, onNodeClick }: Netw
       // Glowing link
       ctx.shadowBlur = 8;
       ctx.shadowColor = getClusterColor(src.nodeData.gang_cluster);
-      ctx.strokeStyle = '#ffffff';
+      ctx.strokeStyle = COLORS.text.white;
       ctx.lineWidth = l.thickness + 1;
     } else {
-      ctx.strokeStyle = '#5A6478';
+      ctx.strokeStyle = COLORS.graph.linkDefault;
       ctx.lineWidth = l.thickness;
     }
     ctx.stroke();
@@ -292,7 +285,7 @@ export function NetworkGraph({ nodes, edges, selectedNodeId, onNodeClick }: Netw
   }, [onNodeClick, selectedNodeId]);
 
   return (
-    <div ref={containerRef} className="w-full h-full relative overflow-hidden" style={{ background: '#050608' }}>
+    <div ref={containerRef} className="w-full h-full relative overflow-hidden" style={{ background: COLORS.background.canvas }}>
       <ForceGraph2D<FGNode, FGLink>
         ref={fgRef}
         width={dimensions.width}
@@ -308,7 +301,7 @@ export function NetworkGraph({ nodes, edges, selectedNodeId, onNodeClick }: Netw
         onBackgroundClick={handleBackgroundClick}
         onNodeHover={node => setHoveredNode(node as FGNode | null)}
         onLinkHover={link => setHoveredLink(link as FGLink | null)}
-        backgroundColor="#050608"
+        backgroundColor={COLORS.background.canvas}
         linkDirectionalParticles={3}
         linkDirectionalParticleWidth={(link: object) => {
           const l = link as FGLink;
@@ -316,7 +309,7 @@ export function NetworkGraph({ nodes, edges, selectedNodeId, onNodeClick }: Netw
           const tgt = typeof l.target === 'object' ? (l.target as FGNode).id : l.target as string;
           return (selectedNodeId && (src === selectedNodeId || tgt === selectedNodeId)) ? 2 : 0;
         }}
-        linkDirectionalParticleColor={() => '#ffffff'}
+        linkDirectionalParticleColor={() => COLORS.text.white}
         linkDirectionalParticleSpeed={0.004}
         cooldownTicks={120}
         d3AlphaDecay={0.01}
@@ -367,14 +360,14 @@ export function NetworkGraph({ nodes, edges, selectedNodeId, onNodeClick }: Netw
             minWidth: 200,
           }}
         >
-          <div style={{ fontSize: 13, fontWeight: 600, color: '#E8EAF0', marginBottom: 6 }}>
+          <div style={{ fontSize: 13, fontWeight: 600, color: COLORS.text.primary, marginBottom: 6 }}>
             {hoveredNode.nodeData.label}
           </div>
-          <div style={{ fontSize: 11, color: '#8A909E', display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '3px 12px' }}>
+          <div style={{ fontSize: 11, color: COLORS.text.secondary, display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '3px 12px' }}>
             <span>FIRs</span>
-            <span style={{ color: '#E8EAF0' }}>{hoveredNode.nodeData.fir_count}</span>
+            <span style={{ color: COLORS.text.primary }}>{hoveredNode.nodeData.fir_count}</span>
             <span>Risk Score</span>
-            <span style={{ color: hoveredNode.nodeData.risk_score > 70 ? '#FF6B6B' : '#4ECDC4' }}>
+            <span style={{ color: hoveredNode.nodeData.risk_score > 70 ? COLORS.status.coral : COLORS.accent.tealBright }}>
               {Math.round(hoveredNode.nodeData.risk_score)}
             </span>
             {hoveredNode.nodeData.gang_cluster != null && (
@@ -386,13 +379,13 @@ export function NetworkGraph({ nodes, edges, selectedNodeId, onNodeClick }: Netw
               </>
             )}
             <span>Status</span>
-            <span style={{ color: hoveredNode.nodeData.is_absconding ? '#FF6B6B' : '#4ECDC4' }}>
+            <span style={{ color: hoveredNode.nodeData.is_absconding ? COLORS.status.coral : COLORS.accent.tealBright }}>
               {hoveredNode.nodeData.is_absconding ? 'Absconding' : 'Arrested'}
             </span>
             {hoveredNode.nodeData.primary_district && (
               <>
                 <span>District</span>
-                <span style={{ color: '#E8EAF0' }}>{hoveredNode.nodeData.primary_district}</span>
+                <span style={{ color: COLORS.text.primary }}>{hoveredNode.nodeData.primary_district}</span>
               </>
             )}
           </div>
@@ -405,26 +398,26 @@ export function NetworkGraph({ nodes, edges, selectedNodeId, onNodeClick }: Netw
           className="absolute top-20 left-4 pointer-events-none z-10"
           style={{
             background: 'rgba(10,12,18,0.92)',
-            border: '1px solid #252830',
+            border: `1px solid ${COLORS.border.variant}`,
             borderRadius: 10,
             padding: '8px 12px',
             fontSize: 11,
-            color: '#8A909E',
+            color: COLORS.text.secondary,
             maxWidth: 280,
           }}
         >
           <div style={{ marginBottom: 4 }}>
-            <span style={{ color: '#E8EAF0' }}>Shared FIRs: </span>
+            <span style={{ color: COLORS.text.primary }}>Shared FIRs: </span>
             {hoveredLink.incidents.length}
-            <span style={{ marginLeft: 12, color: '#E8EAF0' }}>Strength: </span>
+            <span style={{ marginLeft: 12, color: COLORS.text.primary }}>Strength: </span>
             {(hoveredLink.strength * 100).toFixed(0)}%
           </div>
           {hoveredLink.incidents.length > 0 && (
-            <div style={{ fontSize: 10, color: '#5A6478', marginTop: 4, maxHeight: 80, overflow: 'auto' }}>
+            <div style={{ fontSize: 10, color: COLORS.graph.linkDefault, marginTop: 4, maxHeight: 80, overflow: 'auto' }}>
               {hoveredLink.incidents.map((inc, idx) => (
                 <div key={idx} style={{ marginBottom: 2 }}>
-                  <span style={{ color: '#4ECDC4' }}>•</span>
-                  <span style={{ marginLeft: 4, color: '#B3C5FF' }}>
+                  <span style={{ color: COLORS.accent.tealBright }}>•</span>
+                  <span style={{ marginLeft: 4, color: COLORS.primary.fixed }}>
                     {inc.crime_no || `Case #${inc.case_master_id}`}
                   </span>
                 </div>
@@ -476,24 +469,24 @@ export function NetworkGraph({ nodes, edges, selectedNodeId, onNodeClick }: Netw
         className="absolute bottom-4 left-4 z-10 pointer-events-none"
         style={{
           background: 'rgba(10,12,18,0.85)',
-          border: '1px solid #1E2130',
+          border: `1px solid ${COLORS.border.line}`,
           borderRadius: 8,
           padding: '8px 12px',
           fontSize: 10,
-          color: '#5A6478',
+          color: COLORS.graph.linkDefault,
         }}
       >
         <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-            <div style={{ width: 8, height: 8, borderRadius: '50%', background: '#7B61FF' }} />
+            <div style={{ width: 8, height: 8, borderRadius: '50%', background: COLORS.accent.violet }} />
             <span>Gang cluster node</span>
           </div>
           <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-            <div style={{ width: 8, height: 8, borderRadius: '50%', border: '1px dashed #FF6B6B', background: 'transparent' }} />
+            <div style={{ width: 8, height: 8, borderRadius: '50%', border: `1px dashed ${COLORS.status.coral}`, background: 'transparent' }} />
             <span>Absconding</span>
           </div>
           <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-            <div style={{ width: 12, height: 2, background: '#5A6478' }} />
+            <div style={{ width: 12, height: 2, background: COLORS.graph.linkDefault }} />
             <span>Shared FIR link</span>
           </div>
         </div>
@@ -512,9 +505,9 @@ export function NetworkGraph({ nodes, edges, selectedNodeId, onNodeClick }: Netw
             style={{
               width: 32, height: 32,
               background: 'rgba(10,12,18,0.9)',
-              border: '1px solid #252830',
+              border: `1px solid ${COLORS.border.variant}`,
               borderRadius: 6,
-              color: '#8A909E',
+              color: COLORS.text.secondary,
               fontSize: 14,
               cursor: 'pointer',
               display: 'flex', alignItems: 'center', justifyContent: 'center',
