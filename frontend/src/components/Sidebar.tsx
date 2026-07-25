@@ -14,6 +14,7 @@ import {
   LogOut,
   LucideIcon,
 } from "lucide-react";
+import { useClerk, useUser } from "@clerk/clerk-react";
 import { Badge } from "components/ui/badge";
 import { Button } from "components/ui/button";
 import {
@@ -31,7 +32,6 @@ import { COLORS } from "../constants/colors";
 interface SidebarProps {
   currentScreen: Screen;
   onNavigate: (screen: Screen) => void;
-  onLogout: () => void;
 }
 
 type NavItem = {
@@ -106,8 +106,15 @@ function NavVectorIcon({
 export default function Sidebar({
   currentScreen,
   onNavigate,
-  onLogout,
 }: SidebarProps) {
+  const { signOut } = useClerk();
+  const { user } = useUser();
+
+  const handleLogout = () => signOut({ redirectUrl: '/' });
+
+  const displayName = user?.fullName || user?.firstName || user?.emailAddresses?.[0]?.emailAddress || 'Command user';
+  const displayRole = user?.publicMetadata?.role as string || 'Analyst access';
+
   return (
     <aside
       className="fixed left-0 top-0 z-10 hidden h-full w-64 shrink-0 border-r text-foreground md:flex"
@@ -226,15 +233,19 @@ export default function Sidebar({
         <div className="flex flex-col gap-3 p-3">
           <Card className="border-border bg-card/80 shadow-none">
             <CardContent className="flex items-center gap-3 p-3">
-              <div className="flex size-9 items-center justify-center rounded-md border border-border bg-muted">
-                <User className="size-4 text-muted-foreground" />
+              <div className="flex size-9 shrink-0 items-center justify-center rounded-md border border-border bg-muted overflow-hidden">
+                {user?.imageUrl ? (
+                  <img src={user.imageUrl} alt="avatar" className="size-9 object-cover" />
+                ) : (
+                  <User className="size-4 text-muted-foreground" />
+                )}
               </div>
               <div className="min-w-0 flex-1">
                 <div className="truncate text-sm font-semibold text-foreground">
-                  Command user
+                  {displayName}
                 </div>
                 <div className="truncate font-mono text-[10px] text-muted-foreground">
-                  Analyst access
+                  {displayRole}
                 </div>
               </div>
             </CardContent>
@@ -249,7 +260,7 @@ export default function Sidebar({
               type="button"
               variant="destructive"
               className="justify-start gap-2"
-              onClick={onLogout}
+              onClick={handleLogout}
             >
               <LogOut className="size-4" />
               Logout
