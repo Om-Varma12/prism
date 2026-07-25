@@ -278,3 +278,28 @@ Search for the keywords to learn more about each warning.
 [info] [2026-07-25T13:46:22.087Z] : [1784987182087]  Appsail[backend]  "GET"  "/api/dashboard/alerts?limit=10"
 [info] [2026-07-25T13:46:22.088Z] : [1784987182088]  Appsail[backend]  "GET"  "/api/dashboard/trends"
 [info] [2026-07-25T13:47:25.699Z] : [1784987245698]  Appsail[backend]  "GET"  "/api/dashboard/alerts?limit=10"
+[info] [2026-07-25T13:48:34.458Z] : [react-plugin]: Compiling...
+[info] [2026-07-25T13:48:35.439Z] : [react-plugin]: Compiled with warnings.
+
+[info] [2026-07-25T13:48:35.439Z] : [react-plugin]: [eslint] 
+src\components\ClerkAuthPage.tsx
+  Line 388:11:  'signUp' is assigned a value but never used  @typescript-eslint/no-unused-vars
+  Line 542:11:  'signIn' is assigned a value but never used  @typescript-eslint/no-unused-vars
+  Line 748:9:   'clerk' is assigned a value but never used   @typescript-eslint/no-unused-vars
+[info] [2026-07-25T13:48:35.439Z] : [react-plugin]: 
+Search for the keywords to learn more about each warning.
+[info] [2026-07-25T13:48:35.439Z] : [react-plugin]: To ignore, add // eslint-disable-next-line to the line before.
+
+[info] [2026-07-25T13:48:35.760Z] : [1784987315759]  "GET"  "/app/main.7603fd520726ee51c2e5.hot-update.json"
+[info] [2026-07-25T13:48:36.023Z] : [1784987316023]  "GET"  "/app/main.7603fd520726ee51c2e5.hot-update.js"
+[info] [2026-07-25T13:48:36.085Z] : [1784987316085]  "GET"  "/app/logo.svg"
+[info] [2026-07-25T13:48:56.228Z] : [1784987336228]  Appsail[backend]  "GET"  "/api/dashboard/district-crimes?timeframe=7d"
+[info] [2026-07-25T13:48:57.557Z] : [1784987337556]  Appsail[backend]  "GET"  "/api/dashboard/district-crimes?timeframe=24h"
+[info] [2026-07-25T13:49:02.708Z] : [1784987342708]  Appsail[backend]  "GET"  "/api/chat/history"
+[info] [2026-07-25T13:49:02.709Z] : [1784987342709]  Appsail[backend]  "POST"  "/api/chat/new"
+[info] [2026-07-25T13:49:03.724Z] : [1784987343723]  Appsail[backend]  "GET"  "/api/chat/history"
+[info] [2026-07-25T13:49:04.036Z] : [1784987344036]  Appsail[backend]  "POST"  "/api/chat/new"
+[info] [2026-07-25T13:49:04.370Z] : [1784987344369]  Appsail[backend]  "GET"  "/api/network/graph?view=all"
+[info] [2026-07-25T13:49:04.373Z] : [1784987344372]  Appsail[backend]  "GET"  "/api/network/graph?date_from=2026-06-25&date_to=2026-07-25&view=all"
+[info] [2026-07-25T13:49:07.242Z] : [1784987347242]  "GET"  "/app/map.svg"
+[info] [2026-07-25T13:49:13.493Z] : [1784987353493]  "GET"  "/app/map.svg"
