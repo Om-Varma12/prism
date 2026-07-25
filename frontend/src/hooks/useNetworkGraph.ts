@@ -46,6 +46,18 @@ export function useSearchAccused(query: string, filters?: NetworkGraphFilters) {
 }
 
 /**
+ * Hook for fetching distinct crime type names from the DB for the filter dropdown
+ */
+export function useCrimeTypes() {
+  return useQuery({
+    queryKey: ['network-crime-types'],
+    queryFn: () => networkService.getCrimeTypes(),
+    staleTime: 24 * 60 * 60 * 1000, // 24 hours — these change rarely
+    gcTime: 48 * 60 * 60 * 1000,
+  });
+}
+
+/**
  * Hook for invalidating network graph cache (useful after mutations)
  */
 export function useInvalidateNetworkGraph() {

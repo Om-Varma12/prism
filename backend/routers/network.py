@@ -42,6 +42,51 @@ def _empty_graph_response() -> GraphResponse:
     )
 
 
+@router.get("/crime-types")
+async def get_crime_types(
+    zcql=Depends(get_zcql),
+    cache_segment=Depends(get_cache_segment),
+    user=Depends(require_role(["investigator", "analyst", "supervisor"])),
+):
+    """
+    Return a sorted list of distinct crime type names from CrimeSubHead.
+
+    Used to populate the crime type dropdown in the Network Explorer so that
+    filter values exactly match what is stored in the database.
+    """
+    cache = CacheService(cache_segment)
+    cache_key = "network:crime-types"
+    cached = cache.get(cache_key)
+    if cached:
+        return cached
+
+    try:
+        query = """
+            SELECT CrimeSubHead.CrimeHeadName
+            FROM CrimeSubHead
+            LIMIT 500
+        """
+        result = zcql.execute_query(query)
+        rows = result if isinstance(result, list) else []
+
+        seen = set()
+        names = []
+        for row in rows:
+            name = _value(row, "CrimeSubHead", "CrimeHeadName", "CrimeHeadName")
+            if name and str(name).strip() and name not in seen:
+                seen.add(name)
+                names.append(str(name).strip())
+
+        names.sort()
+        payload = {"crime_types": names}
+        cache.put(cache_key, payload, expiry_in_hours=24)
+        print(f"[Cache] Stored crime types: {len(names)} entries")
+        return payload
+    except Exception as exc:
+        print(f"[Warning] Failed to fetch crime types: {exc}")
+        return {"crime_types": []}
+
+
 @router.get("/graph", response_model=GraphResponse)
 async def get_network_graph(
     crime_type: Optional[str] = None,

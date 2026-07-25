@@ -9,6 +9,7 @@ import {
   NetworkGraphFilters,
   AccusedProfileResponse,
   NetworkSearchResponse,
+  CrimeTypesResponse,
 } from '../types/network';
 
 export const networkService = {
@@ -64,6 +65,13 @@ export const networkService = {
     const response = await apiClient.get<NetworkSearchResponse>(
       `/api/network/search?${params.toString()}`
     );
+    return response.data;
+  },
+  /**
+   * Get distinct crime type names from CrimeSubHead (used to populate filter dropdown)
+   */
+  getCrimeTypes: async (): Promise<CrimeTypesResponse> => {
+    const response = await apiClient.get<CrimeTypesResponse>('/api/network/crime-types');
     return response.data;
   },
 };

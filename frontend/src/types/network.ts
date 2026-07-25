@@ -119,3 +119,7 @@ export interface NetworkSearchResult {
 export interface NetworkSearchResponse {
   results: NetworkSearchResult[];
 }
+
+export interface CrimeTypesResponse {
+  crime_types: string[];
+}
