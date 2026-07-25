@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import React from "react";
+import React, { useState, useEffect } from "react";
 import {
   LayoutDashboard,
   MessageSquareText,
@@ -13,6 +13,8 @@ import {
   Settings as SettingsIcon,
   LogOut,
   LucideIcon,
+  ChevronLeft,
+  ChevronRight,
 } from "lucide-react";
 import { useClerk, useUser } from "@clerk/clerk-react";
 import { Badge } from "components/ui/badge";
@@ -32,6 +34,8 @@ import { COLORS } from "../constants/colors";
 interface SidebarProps {
   currentScreen: Screen;
   onNavigate: (screen: Screen) => void;
+  isCollapsed?: boolean;
+  onToggleCollapse?: () => void;
 }
 
 type NavItem = {
@@ -81,7 +85,8 @@ function NavVectorIcon({
     <span
       aria-hidden="true"
       className={cn(
-        "flex size-8 shrink-0 items-center justify-center rounded-md border transition-colors",
+        "flex shrink-0 items-center justify-center rounded-md border transition-colors",
+        active ? "size-8" : "size-8"
       )}
       style={
         active
@@ -106,6 +111,8 @@ function NavVectorIcon({
 export default function Sidebar({
   currentScreen,
   onNavigate,
+  isCollapsed = false,
+  onToggleCollapse,
 }: SidebarProps) {
   const { signOut } = useClerk();
   const { user } = useUser();
@@ -117,7 +124,11 @@ export default function Sidebar({
 
   return (
     <aside
-      className="fixed left-0 top-0 z-10 hidden h-full w-64 shrink-0 border-r text-foreground md:flex"
+      className={cn(
+        "fixed left-0 top-0 z-10 h-full shrink-0 border-r text-foreground transition-all duration-300 ease-in-out",
+        isCollapsed ? "w-16" : "w-64",
+        "hidden md:flex"
+      )}
       style={{
         backgroundColor: COLORS.surface.panel,
         borderColor: COLORS.border.default,
@@ -127,35 +138,50 @@ export default function Sidebar({
         aria-label="Primary navigation"
         className="flex min-h-0 w-full flex-col"
       >
-        <div className="p-4">
-          <Card>
-            <CardHeader className="gap-0 p-4">
-              <div className="flex items-center gap-3">
-                <div className="flex size-11 items-center justify-center rounded-lg ">
-                  <img
-                    src="/logo.svg"
-                    alt="PRISM Logo"
-                    className="h-7 w-7 object-contain"
-                  />
+        <div className={cn("p-4", isCollapsed && "p-2")}>
+          {!isCollapsed && (
+            <Card>
+              <CardHeader className="gap-0 p-4">
+                <div className="flex items-center gap-3">
+                  <div className="flex size-11 items-center justify-center rounded-lg ">
+                    <img
+                      src={process.env.PUBLIC_URL + '/logo.svg'}
+                      alt="PRISM Logo"
+                      className="h-7 w-7 object-contain"
+                    />
+                  </div>
+                  <div className="min-w-0">
+                    <CardTitle className="font-mono text-[22px] font-bold tracking-[0] text-foreground">
+                      PRISM
+                    </CardTitle>
+                    <CardDescription className="mt-0 font-mono text-[11px]">
+                      Operations monitor
+                    </CardDescription>
+                  </div>
                 </div>
-                <div className="min-w-0">
-                  <CardTitle className="font-mono text-[22px] font-bold tracking-[0] text-foreground">
-                    PRISM
-                  </CardTitle>
-                  <CardDescription className="mt-0 font-mono text-[11px]">
-                    Operations monitor
-                  </CardDescription>
-                </div>
-              </div>
-            </CardHeader>
-          </Card>
+              </CardHeader>
+            </Card>
+          )}
+          {isCollapsed && (
+            <div className="flex justify-center">
+              <img
+                src={process.env.PUBLIC_URL + '/logo.svg'}
+                alt="PRISM Logo"
+                className="h-8 w-8 object-contain"
+              />
+            </div>
+          )}
         </div>
 
         <Separator />
 
         <div className="flex min-h-0 flex-1 flex-col gap-2 overflow-y-auto p-3 custom-scrollbar">
-          <div className="px-2 py-1 font-mono text-[10px] font-semibold uppercase tracking-[0.16em] text-muted-foreground">
-            Workspace
+          <div className="flex items-center justify-between px-2 py-1">
+            {!isCollapsed && (
+              <span className="font-mono text-[10px] font-semibold uppercase tracking-[0.16em] text-muted-foreground">
+                Workspace
+              </span>
+            )}
           </div>
 
           <div className="flex flex-col gap-1">
@@ -168,7 +194,8 @@ export default function Sidebar({
                   type="button"
                   variant={isActive ? "secondary" : "ghost"}
                   className={cn(
-                    "h-auto w-full justify-start rounded-lg px-2.5 py-2.5 text-left",
+                    "h-12 w-full justify-start rounded-lg text-left",
+                    isCollapsed ? "justify-center px-2" : "px-2.5"
                   )}
                   style={
                     isActive
@@ -179,49 +206,52 @@ export default function Sidebar({
                       : {}
                   }
                   onClick={() => onNavigate(item.screen)}
+                  title={isCollapsed ? item.label : undefined}
                 >
                   <NavVectorIcon icon={item.icon} active={isActive} />
-                  <span className="flex min-w-0 flex-1 flex-col items-start gap-0.5">
-                    <span className="flex w-full items-center justify-between gap-2">
+                  {!isCollapsed && (
+                    <span className="flex min-w-0 flex-1 flex-col items-start gap-0.5">
+                      <span className="flex w-full items-center justify-between gap-2">
+                        <span
+                          className="truncate text-sm font-semibold leading-none"
+                          style={{
+                            color: isActive
+                              ? COLORS.primary.light
+                              : COLORS.text.primary,
+                          }}
+                        >
+                          {item.label}
+                        </span>
+                        {item.badge && (
+                          <Badge
+                            variant={isActive ? "default" : "outline"}
+                            className="rounded-md font-mono text-[10px]"
+                            style={
+                              isActive
+                                ? {
+                                    backgroundColor: COLORS.primary.main,
+                                    color: "#fff",
+                                    borderColor: "transparent",
+                                  }
+                                : {}
+                            }
+                          >
+                            {item.badge}
+                          </Badge>
+                        )}
+                      </span>
                       <span
-                        className="truncate text-sm font-semibold leading-none"
+                        className="truncate text-[11px] font-normal leading-4"
                         style={{
                           color: isActive
-                            ? COLORS.primary.light
-                            : COLORS.text.primary,
+                            ? `${COLORS.primary.light}99`
+                            : COLORS.text.muted,
                         }}
                       >
-                        {item.label}
+                        {item.description}
                       </span>
-                      {item.badge && (
-                        <Badge
-                          variant={isActive ? "default" : "outline"}
-                          className="rounded-md font-mono text-[10px]"
-                          style={
-                            isActive
-                              ? {
-                                  backgroundColor: COLORS.primary.main,
-                                  color: "#fff",
-                                  borderColor: "transparent",
-                                }
-                              : {}
-                          }
-                        >
-                          {item.badge}
-                        </Badge>
-                      )}
                     </span>
-                    <span
-                      className="truncate text-[11px] font-normal leading-4"
-                      style={{
-                        color: isActive
-                          ? `${COLORS.primary.light}99`
-                          : COLORS.text.muted,
-                      }}
-                    >
-                      {item.description}
-                    </span>
-                  </span>
+                  )}
                 </Button>
               );
             })}
@@ -231,8 +261,28 @@ export default function Sidebar({
         <Separator />
 
         <div className="flex flex-col gap-3 p-3">
-          <Card className="border-border bg-card/80 shadow-none">
-            <CardContent className="flex items-center gap-3 p-3">
+          {!isCollapsed ? (
+            <Card className="border-border bg-card/80 shadow-none">
+              <CardContent className="flex items-center gap-3 p-3">
+                <div className="flex size-9 shrink-0 items-center justify-center rounded-md border border-border bg-muted overflow-hidden">
+                  {user?.imageUrl ? (
+                    <img src={user.imageUrl} alt="avatar" className="size-9 object-cover" />
+                  ) : (
+                    <User className="size-4 text-muted-foreground" />
+                  )}
+                </div>
+                <div className="min-w-0 flex-1">
+                  <div className="truncate text-sm font-semibold text-foreground">
+                    {displayName}
+                  </div>
+                  <div className="truncate font-mono text-[10px] text-muted-foreground">
+                    {displayRole}
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          ) : (
+            <div className="flex justify-center">
               <div className="flex size-9 shrink-0 items-center justify-center rounded-md border border-border bg-muted overflow-hidden">
                 {user?.imageUrl ? (
                   <img src={user.imageUrl} alt="avatar" className="size-9 object-cover" />
@@ -240,32 +290,26 @@ export default function Sidebar({
                   <User className="size-4 text-muted-foreground" />
                 )}
               </div>
-              <div className="min-w-0 flex-1">
-                <div className="truncate text-sm font-semibold text-foreground">
-                  {displayName}
-                </div>
-                <div className="truncate font-mono text-[10px] text-muted-foreground">
-                  {displayRole}
-                </div>
-              </div>
-            </CardContent>
-          </Card>
+            </div>
+          )}
 
-          <div className="grid grid-cols-2 gap-2">
-            <Button type="button" variant="outline" className="justify-start gap-2">
-              <SettingsIcon className="size-4" />
-              Settings
-            </Button>
-            <Button
-              type="button"
-              variant="destructive"
-              className="justify-start gap-2"
-              onClick={handleLogout}
-            >
-              <LogOut className="size-4" />
-              Logout
-            </Button>
-          </div>
+          {!isCollapsed && (
+            <div className="grid grid-cols-2 gap-2">
+              <Button type="button" variant="outline" className="justify-start gap-2">
+                <SettingsIcon className="size-4" />
+                Settings
+              </Button>
+              <Button
+                type="button"
+                variant="destructive"
+                className="justify-start gap-2"
+                onClick={handleLogout}
+              >
+                <LogOut className="size-4" />
+                Logout
+              </Button>
+            </div>
+          )}
         </div>
       </nav>
     </aside>

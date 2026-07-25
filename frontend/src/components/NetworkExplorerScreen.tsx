@@ -6,7 +6,7 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { SuspectProfile } from '../types';
-import { useNetworkGraph, useAccusedProfile, useSearchAccused } from '../hooks/useNetworkGraph';
+import { useNetworkGraph, useAccusedProfile, useSearchAccused, useCrimeTypes } from '../hooks/useNetworkGraph';
 import { NetworkGraphFilters, NetworkGraphView, NetworkGraphNode } from '../types/network';
 import { NetworkGraph } from './network/NetworkGraph';
 import { COLORS } from '../constants/colors';
@@ -77,6 +77,10 @@ export default function NetworkExplorerScreen() {
   const [selectedRowId, setSelectedRowId] = useState<number | null>(null);
   const [showProfilePanel, setShowProfilePanel] = useState(false);
   
+  // Fetch crime types from DB for the filter dropdown
+  const { data: crimeTypesData, isLoading: crimeTypesLoading } = useCrimeTypes();
+  const crimeTypeOptions = crimeTypesData?.crime_types || [];
+
   // Fetch live graph data
   const { data: graphData, isLoading, error } = useNetworkGraph(filters);
 
@@ -284,14 +288,21 @@ export default function NetworkExplorerScreen() {
               <select
                 value={selectedCrimeType}
                 onChange={(e) => setSelectedCrimeType(e.target.value)}
-                className="input-border text-sm rounded-DEFAULT p-2 focus:ring-0 outline-none"
-                style={{ backgroundColor: COLORS.background.dark, color: COLORS.text.primary }}
+                className="bg-[#0A0C10] input-border text-sm text-on-surface rounded-DEFAULT p-2 focus:ring-0 focus:border-[#3b6fe8] outline-none"
               >
-                <option>All Types</option>
-                <option>Murder</option>
-                <option>Robbery</option>
-                <option>Chain Snatching</option>
-                <option>Vehicle Theft</option>
+                <option value="All Types">All Types</option>
+                {crimeTypesLoading ? (
+                  <option disabled>Loading...</option>
+                ) : crimeTypeOptions.length > 0 ? (
+                  crimeTypeOptions.map((ct: string) => (
+                    <option key={ct} value={ct}>{ct}</option>
+                  ))
+                ) : (
+                  // Minimal fallback if fetch fails
+                  ['Murder', 'Robbery', 'Chain Snatching', 'Vehicle Theft'].map((ct) => (
+                    <option key={ct} value={ct}>{ct}</option>
+                  ))
+                )}
               </select>
             </div>
 

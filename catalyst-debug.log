@@ -1,293 +1,929 @@
-[debug] [2026-07-19T06:50:36.978Z] : 
-[debug] [2026-07-19T06:50:36.980Z] : ----------------------------------------------------------------------
-[debug] [2026-07-19T06:50:36.980Z] : Command:      C:\Program Files\nodejs\node.exe C:\Users\Acer\AppData\Roaming\npm\node_modules\zcatalyst-cli\lib\bin\catalyst.js serve
-[debug] [2026-07-19T06:50:36.980Z] : CLI Version:  1.26.1
-[debug] [2026-07-19T06:50:36.980Z] : Platform:     win32
-[debug] [2026-07-19T06:50:36.980Z] : Node Version: v22.20.0
-[debug] [2026-07-19T06:50:36.980Z] : Time:         Sun Jul 19 2026 12:20:36 GMT+0530 (India Standard Time)
-[debug] [2026-07-19T06:50:36.980Z] : ----------------------------------------------------------------------
-[debug] [2026-07-19T06:50:36.980Z] : 
-[debug] [2026-07-19T06:50:37.754Z] : > authorizing via signed-in user option
-[debug] [2026-07-19T06:50:37.755Z] : > command requires scopes: ["ZohoCatalyst.projects.ALL","ZohoCatalyst.apigateway.apis.READ","ZohoCatalyst.apigateway.READ","ZohoCatalyst.segments.ALL","ZohoCatalyst.cache.READ","ZohoCatalyst.cache.CREATE","ZohoCatalyst.cache.DELETE","ZohoCatalyst.projects.ALL","ZohoCatalyst.cron.ALL","ZohoCatalyst.zcql.CREATE","ZohoCatalyst.projects.users.READ","ZohoCatalyst.projects.users.CREATE","ZohoCatalyst.projects.users.DELETE","ZohoCatalyst.projects.users.UPDATE","ZohoCatalyst.authentication.CREATE","ZohoCatalyst.email.CREATE","ZohoCatalyst.tables.ALL","ZohoCatalyst.tables.rows.ALL","ZohoCatalyst.tables.columns.ALL","ZohoCatalyst.tables.bulk.CREATE","ZohoCatalyst.tables.bulk.READ","ZohoCatalyst.folders.ALL","ZohoCatalyst.files.CREATE","ZohoCatalyst.files.READ","ZohoCatalyst.files.DELETE","ZohoCatalyst.functions.ALL","ZohoCatalyst.functions.EXECUTE","ZohoCatalyst.eventlistners.ALL","ZohoCatalyst.eventlisteners.produce","ZohoCatalyst.security.rules.Read","ZohoCatalyst.security.rules.Update","ZohoCatalyst.notifications.mobile","ZohoCatalyst.notifications.web","ZohoCatalyst.search.READ","ZohoCatalyst.mlkit.READ","QuickML.deployment.READ","ZohoCatalyst.pdfshot.execute","ZohoCatalyst.grid.READ","ZohoCatalyst.grid.terminate","ZohoCatalyst.circuits.execution.DELETE","ZohoCatalyst.circuits.execution.READ","ZohoCatalyst.circuits.execute","ZohoCatalyst.appsail.Read","ZohoCatalyst.jobpool.READ","ZohoCatalyst.job.ALL","ZohoCatalyst.nosql.READ","ZohoCatalyst.nosql.rows.ALL"]
-[debug] [2026-07-19T06:50:37.770Z] : >>>> HTTP REQUEST : GET https://api.catalyst.zoho.in/baas/v1/project/46143000000022001 
+[debug] [2026-07-25T13:32:23.787Z] : 
+[debug] [2026-07-25T13:32:23.788Z] : ----------------------------------------------------------------------
+[debug] [2026-07-25T13:32:23.788Z] : Command:      C:\Program Files\nodejs\node.exe C:\Users\Acer\AppData\Roaming\npm\node_modules\zcatalyst-cli\lib\bin\catalyst.js serve
+[debug] [2026-07-25T13:32:23.788Z] : CLI Version:  1.26.1
+[debug] [2026-07-25T13:32:23.788Z] : Platform:     win32
+[debug] [2026-07-25T13:32:23.788Z] : Node Version: v22.20.0
+[debug] [2026-07-25T13:32:23.788Z] : Time:         Sat Jul 25 2026 19:02:23 GMT+0530 (India Standard Time)
+[debug] [2026-07-25T13:32:23.788Z] : ----------------------------------------------------------------------
+[debug] [2026-07-25T13:32:23.788Z] : 
+[debug] [2026-07-25T13:32:24.336Z] : > authorizing via signed-in user option
+[debug] [2026-07-25T13:32:24.336Z] : > command requires scopes: ["ZohoCatalyst.projects.ALL","ZohoCatalyst.apigateway.apis.READ","ZohoCatalyst.apigateway.READ","ZohoCatalyst.segments.ALL","ZohoCatalyst.cache.READ","ZohoCatalyst.cache.CREATE","ZohoCatalyst.cache.DELETE","ZohoCatalyst.projects.ALL","ZohoCatalyst.cron.ALL","ZohoCatalyst.zcql.CREATE","ZohoCatalyst.projects.users.READ","ZohoCatalyst.projects.users.CREATE","ZohoCatalyst.projects.users.DELETE","ZohoCatalyst.projects.users.UPDATE","ZohoCatalyst.authentication.CREATE","ZohoCatalyst.email.CREATE","ZohoCatalyst.tables.ALL","ZohoCatalyst.tables.rows.ALL","ZohoCatalyst.tables.columns.ALL","ZohoCatalyst.tables.bulk.CREATE","ZohoCatalyst.tables.bulk.READ","ZohoCatalyst.folders.ALL","ZohoCatalyst.files.CREATE","ZohoCatalyst.files.READ","ZohoCatalyst.files.DELETE","ZohoCatalyst.functions.ALL","ZohoCatalyst.functions.EXECUTE","ZohoCatalyst.eventlistners.ALL","ZohoCatalyst.eventlisteners.produce","ZohoCatalyst.security.rules.Read","ZohoCatalyst.security.rules.Update","ZohoCatalyst.notifications.mobile","ZohoCatalyst.notifications.web","ZohoCatalyst.search.READ","ZohoCatalyst.mlkit.READ","QuickML.deployment.READ","ZohoCatalyst.pdfshot.execute","ZohoCatalyst.grid.READ","ZohoCatalyst.grid.terminate","ZohoCatalyst.circuits.execution.DELETE","ZohoCatalyst.circuits.execution.READ","ZohoCatalyst.circuits.execute","ZohoCatalyst.appsail.Read","ZohoCatalyst.jobpool.READ","ZohoCatalyst.job.ALL","ZohoCatalyst.nosql.READ","ZohoCatalyst.nosql.rows.ALL"]
+[debug] [2026-07-25T13:32:24.348Z] : >>>> HTTP REQUEST : GET https://api.catalyst.zoho.in/baas/v1/project/46143000000022001 
 
-[debug] [2026-07-19T06:50:37.888Z] : <<<< HTTP RESPONSE : 200
-Response Headers: {"server":"ZGS","date":"Sun, 19 Jul 2026 06:50:39 GMT","content-type":"application/vnd.catalyst.v2+json","transfer-encoding":"chunked","connection":"keep-alive","x-content-type-options":"nosniff","cache-control":"private,no-cache,no-store,max-age=0,must-revalidate","pragma":"no-cache","expires":"Thu, 01 Jan 1970 00:00:00 GMT","x-frame-options":"DENY","strict-transport-security":"max-age=64072000; includeSubDomains; preload"}
+[debug] [2026-07-25T13:32:24.476Z] : <<<< HTTP RESPONSE : 200
+Response Headers: {"server":"ZGS","date":"Sat, 25 Jul 2026 13:32:25 GMT","content-type":"application/vnd.catalyst.v2+json","transfer-encoding":"chunked","connection":"keep-alive","x-content-type-options":"nosniff","cache-control":"private,no-cache,no-store,max-age=0,must-revalidate","pragma":"no-cache","expires":"Thu, 01 Jan 1970 00:00:00 GMT","x-frame-options":"DENY","strict-transport-security":"max-age=64072000; includeSubDomains; preload"}
 
-[debug] [2026-07-19T06:50:37.892Z] : >>>> HTTP REQUEST : GET https://api.catalyst.zoho.in/baas/v1/project/46143000000022001/environment 
+[debug] [2026-07-25T13:32:24.480Z] : >>>> HTTP REQUEST : GET https://api.catalyst.zoho.in/baas/v1/project/46143000000022001/environment 
 
-[debug] [2026-07-19T06:50:37.932Z] : <<<< HTTP RESPONSE : 200
-Response Headers: {"server":"ZGS","date":"Sun, 19 Jul 2026 06:50:39 GMT","content-type":"application/vnd.catalyst.v2+json","transfer-encoding":"chunked","connection":"keep-alive","x-content-type-options":"nosniff","cache-control":"private,no-cache,no-store,max-age=0,must-revalidate","pragma":"no-cache","expires":"Thu, 01 Jan 1970 00:00:00 GMT","x-frame-options":"DENY","strict-transport-security":"max-age=64072000; includeSubDomains; preload"}
+[debug] [2026-07-25T13:32:24.523Z] : <<<< HTTP RESPONSE : 200
+Response Headers: {"server":"ZGS","date":"Sat, 25 Jul 2026 13:32:25 GMT","content-type":"application/vnd.catalyst.v2+json","transfer-encoding":"chunked","connection":"keep-alive","x-content-type-options":"nosniff","cache-control":"private,no-cache,no-store,max-age=0,must-revalidate","pragma":"no-cache","expires":"Thu, 01 Jan 1970 00:00:00 GMT","x-frame-options":"DENY","strict-transport-security":"max-age=64072000; includeSubDomains; preload"}
 
-[debug] [2026-07-19T06:50:38.198Z] : http port : '3000' is not available. Hence port '3001' will be used instead.
-[debug] [2026-07-19T06:50:38.326Z] : No basic functions to add
-[info] [2026-07-19T06:50:40.864Z] : [react-plugin]: Starting the development server...
+[debug] [2026-07-25T13:32:24.928Z] : http port : '3000' is not available. Hence port '3001' will be used instead.
+[debug] [2026-07-25T13:32:25.088Z] : No basic functions to add
+[info] [2026-07-25T13:32:26.926Z] : [react-plugin]: Starting the development server...
 
-[info] [2026-07-19T06:50:40.866Z] : 
-[info] [2026-07-19T06:50:40.866Z] : i Client[frontend]: Plugin : "zcatalyst-cli-plugin-react" is used for client serve
-[info] [2026-07-19T06:50:40.867Z] : 
-[debug] [2026-07-19T06:50:41.996Z] : No API Gateway configuration found. Skipping API Gateway rules
-[debug] [2026-07-19T06:50:42.070Z] : No API Gateway configuration found. Skipping API Gateway rules
-[info] [2026-07-19T06:50:42.174Z] : 
-[info] [2026-07-19T06:50:42.175Z] :  >>>>>>>>>>>>>> AppSail <<<<<<<<<<<<<< 
-[info] [2026-07-19T06:50:42.175Z] : i backend: http://localhost:3001
-[info] [2026-07-19T06:50:42.175Z] : 
-[info] [2026-07-19T06:50:42.176Z] : 
-[info] [2026-07-19T06:50:42.177Z] :  >>>>>>>>>>>>> Web Client <<<<<<<<<<<<
-[info] [2026-07-19T06:50:42.178Z] : i client[frontend]: http://localhost:3000/app/
-[info] [2026-07-19T06:50:42.178Z] : 
-[info] [2026-07-19T06:50:43.552Z] : [1784443843551]  "GET"  "/app/"
-[info] [2026-07-19T06:50:47.789Z] : [react-plugin]: Compiled successfully!
-[info] [2026-07-19T06:50:47.790Z] : [react-plugin]: 
-[info] [2026-07-19T06:50:47.790Z] : [react-plugin]: You can now view fron in the browser.
-[info] [2026-07-19T06:50:47.790Z] : [react-plugin]: 
-[info] [2026-07-19T06:50:47.791Z] : [react-plugin]:   http://localhost:3000/app/
-[info] [2026-07-19T06:50:47.791Z] : [react-plugin]: 
-[info] [2026-07-19T06:50:47.791Z] : [react-plugin]: Note that the development build is not optimized.
-[info] [2026-07-19T06:50:47.791Z] : [react-plugin]: To create a production build, use npm run build.
-[info] [2026-07-19T06:50:47.791Z] : [react-plugin]: 
-[info] [2026-07-19T06:50:48.235Z] : [1784443848235]  "GET"  "/app/static/js/bundle.js"
-[info] [2026-07-19T06:50:48.417Z] : [1784443848415]  "GET"  "/app/manifest.json"
-[info] [2026-07-19T06:50:48.812Z] : [1784443848811]  "GET"  "/app/map.svg"
-[info] [2026-07-19T06:50:49.123Z] : [1784443849123]  "GET"  "/app/favicon.ico"
-[info] [2026-07-19T06:50:49.218Z] : [1784443849218]  Appsail[backend]  "GET"  "/api/dashboard/trends"
-[info] [2026-07-19T06:50:49.220Z] : [1784443849220]  Appsail[backend]  "GET"  "/api/dashboard/stats"
-[info] [2026-07-19T06:50:49.223Z] : [1784443849223]  Appsail[backend]  "GET"  "/api/dashboard/district-crimes?timeframe=30d"
-[info] [2026-07-19T06:50:49.225Z] : [1784443849225]  Appsail[backend]  "GET"  "/api/dashboard/alerts?limit=10"
-[info] [2026-07-19T06:50:49.233Z] : [1784443849233]  "GET"  "/app/logo192.png"
-[info] [2026-07-19T06:50:49.434Z] : [1784443849434]  "GET"  "/app/favicon.ico"
-[info] [2026-07-19T06:50:58.811Z] : [1784443858810]  Appsail[backend]  "GET"  "/api/chat/history"
-[info] [2026-07-19T06:50:59.132Z] : [1784443859132]  Appsail[backend]  "OPTIONS"  "/api/chat/new"
-[info] [2026-07-19T06:50:59.133Z] : [1784443859133]  "GET"  "/app/favicon.ico"
-[info] [2026-07-19T06:50:59.506Z] : [1784443859505]  Appsail[backend]  "POST"  "/api/chat/new"
-[info] [2026-07-19T06:50:59.842Z] : [1784443859842]  Appsail[backend]  "GET"  "/api/chat/history"
-[info] [2026-07-19T06:50:59.858Z] : [1784443859858]  "GET"  "/app/favicon.ico"
-[info] [2026-07-19T06:51:00.159Z] : [1784443860159]  Appsail[backend]  "GET"  "/api/chat/messages?session_id=b5e0150f-4ae6-4857-bd95-4d5e8a6c4dd1"
-[info] [2026-07-19T06:51:05.079Z] : [1784443865079]  Appsail[backend]  "GET"  "/api/chat/messages?session_id=e5f709f1-1b95-400c-b944-964692cbf709"
-[info] [2026-07-19T06:51:05.080Z] : [1784443865080]  "GET"  "/app/favicon.ico"
-[info] [2026-07-19T06:51:05.369Z] : [1784443865369]  Appsail[backend]  "GET"  "/api/chat/messages?session_id=a771c88d-3c9a-45bd-bf21-ea014c11dc3f"
-[info] [2026-07-19T06:51:05.376Z] : [1784443865376]  "GET"  "/app/favicon.ico"
-[info] [2026-07-19T06:54:32.542Z] : [react-plugin]: Compiling...
-[info] [2026-07-19T06:54:36.520Z] : [react-plugin]: Compiled successfully!
-[info] [2026-07-19T06:54:36.521Z] : [react-plugin]: 
-[info] [2026-07-19T06:54:36.521Z] : [react-plugin]: You can now view fron in the browser.
-[info] [2026-07-19T06:54:36.521Z] : [react-plugin]: 
-[info] [2026-07-19T06:54:36.521Z] : [react-plugin]:   http://localhost:3000/app/
-[info] [2026-07-19T06:54:36.521Z] : [react-plugin]: 
-[info] [2026-07-19T06:54:36.521Z] : [react-plugin]: Note that the development build is not optimized.
-[info] [2026-07-19T06:54:36.522Z] : [react-plugin]: To create a production build, use npm run build.
-[info] [2026-07-19T06:54:36.522Z] : [react-plugin]: 
-[info] [2026-07-19T06:54:36.841Z] : [1784444076841]  "GET"  "/app/main.b6bf5753075930a0596b.hot-update.json"
-[info] [2026-07-19T06:54:37.090Z] : [1784444077089]  "GET"  "/app/main.b6bf5753075930a0596b.hot-update.js"
-[info] [2026-07-19T06:54:37.604Z] : [1784444077604]  Appsail[backend]  "GET"  "/api/chat/history"
-[info] [2026-07-19T06:54:37.607Z] : [1784444077606]  Appsail[backend]  "GET"  "/api/chat/messages?session_id=a771c88d-3c9a-45bd-bf21-ea014c11dc3f"
-[info] [2026-07-19T06:55:58.651Z] : [1784444158651]  "GET"  "/"
-[info] [2026-07-19T06:55:58.656Z] : [1784444158656]  "GET"  "/app/"
-[info] [2026-07-19T06:55:58.672Z] : [1784444158672]  "GET"  "/app/static/js/bundle.js"
-[info] [2026-07-19T06:55:59.224Z] : [1784444159224]  "GET"  "/app/map.svg"
-[info] [2026-07-19T06:55:59.591Z] : [1784444159591]  Appsail[backend]  "GET"  "/api/dashboard/stats"
-[info] [2026-07-19T06:55:59.592Z] : [1784444159592]  Appsail[backend]  "GET"  "/api/dashboard/district-crimes?timeframe=30d"
-[info] [2026-07-19T06:55:59.594Z] : [1784444159593]  Appsail[backend]  "GET"  "/api/dashboard/alerts?limit=10"
-[info] [2026-07-19T06:55:59.595Z] : [1784444159595]  Appsail[backend]  "GET"  "/api/dashboard/trends"
-[info] [2026-07-19T06:56:02.152Z] : [1784444162151]  "GET"  "/app/favicon.ico"
-[info] [2026-07-19T06:56:02.792Z] : [1784444162791]  Appsail[backend]  "GET"  "/api/chat/history"
-[info] [2026-07-19T06:56:02.824Z] : [1784444162824]  "GET"  "/app/favicon.ico"
-[info] [2026-07-19T06:56:03.127Z] : [1784444163127]  Appsail[backend]  "OPTIONS"  "/api/chat/new"
-[info] [2026-07-19T06:56:03.210Z] : [1784444163210]  "GET"  "/app/favicon.ico"
-[info] [2026-07-19T06:56:03.516Z] : [1784444163516]  Appsail[backend]  "GET"  "/api/chat/messages?session_id=a114fb31-d09f-4e59-a37f-1499436a25ec"
-[info] [2026-07-19T06:56:04.200Z] : [1784444164199]  Appsail[backend]  "GET"  "/api/chat/history"
-[info] [2026-07-19T06:56:18.026Z] : [1784444178026]  "GET"  "/"
-[info] [2026-07-19T06:56:18.028Z] : [1784444178028]  "GET"  "/app/"
-[info] [2026-07-19T06:56:18.039Z] : [1784444178038]  "GET"  "/app/static/js/bundle.js"
-[info] [2026-07-19T06:56:18.529Z] : [1784444178529]  "GET"  "/app/map.svg"
-[info] [2026-07-19T06:56:18.892Z] : [1784444178891]  Appsail[backend]  "GET"  "/api/dashboard/stats"
-[info] [2026-07-19T06:56:18.893Z] : [1784444178893]  Appsail[backend]  "GET"  "/api/dashboard/district-crimes?timeframe=30d"
-[info] [2026-07-19T06:56:18.894Z] : [1784444178894]  Appsail[backend]  "GET"  "/api/dashboard/alerts?limit=10"
-[info] [2026-07-19T06:56:18.895Z] : [1784444178895]  Appsail[backend]  "GET"  "/api/dashboard/trends"
-[info] [2026-07-19T06:56:21.317Z] : [1784444181317]  Appsail[backend]  "GET"  "/api/dashboard/alerts?limit=10"
-[info] [2026-07-19T06:56:21.423Z] : [1784444181423]  "GET"  "/app/favicon.ico"
-[info] [2026-07-19T06:56:21.623Z] : [1784444181623]  Appsail[backend]  "GET"  "/api/dashboard/district-crimes?timeframe=30d"
-[info] [2026-07-19T06:56:21.624Z] : [1784444181624]  Appsail[backend]  "GET"  "/api/dashboard/stats"
-[info] [2026-07-19T06:56:22.061Z] : [1784444182061]  Appsail[backend]  "GET"  "/api/dashboard/trends"
-[info] [2026-07-19T06:56:23.772Z] : [1784444183772]  "GET"  "/app/favicon.ico"
-[info] [2026-07-19T06:56:24.057Z] : [1784444184057]  Appsail[backend]  "GET"  "/api/chat/history"
-[info] [2026-07-19T06:56:24.073Z] : [1784444184073]  Appsail[backend]  "OPTIONS"  "/api/chat/new"
-[info] [2026-07-19T06:56:24.475Z] : [1784444184474]  Appsail[backend]  "GET"  "/api/chat/messages?session_id=8c5be6b3-cfeb-4d43-a5c1-3357a02d01ad"
-[info] [2026-07-19T06:56:24.481Z] : [1784444184480]  "GET"  "/app/favicon.ico"
-[info] [2026-07-19T06:56:24.622Z] : [1784444184621]  Appsail[backend]  "OPTIONS"  "/api/chat/query"
-[info] [2026-07-19T06:56:25.777Z] : [1784444185777]  Appsail[backend]  "GET"  "/api/chat/history"
-[info] [2026-07-19T06:56:26.258Z] : [1784444186258]  Appsail[backend]  "GET"  "/api/chat/messages?session_id=8c5be6b3-cfeb-4d43-a5c1-3357a02d01ad"
-[info] [2026-07-19T06:57:04.634Z] : [react-plugin]: Compiling...
-[info] [2026-07-19T06:57:06.015Z] : [react-plugin]: Compiled successfully!
-[info] [2026-07-19T06:57:06.016Z] : [react-plugin]: 
-[info] [2026-07-19T06:57:06.016Z] : [react-plugin]: You can now view fron in the browser.
-[info] [2026-07-19T06:57:06.016Z] : [react-plugin]: 
-[info] [2026-07-19T06:57:06.016Z] : [react-plugin]:   http://localhost:3000/app/
-[info] [2026-07-19T06:57:06.017Z] : [react-plugin]: 
-[info] [2026-07-19T06:57:06.017Z] : [react-plugin]: Note that the development build is not optimized.
-[info] [2026-07-19T06:57:06.017Z] : [react-plugin]: To create a production build, use npm run build.
-[info] [2026-07-19T06:57:06.017Z] : [react-plugin]: 
-[info] [2026-07-19T06:57:06.334Z] : [1784444226334]  "GET"  "/app/main.be9c0e47e96337fd7f02.hot-update.json"
-[info] [2026-07-19T06:57:06.583Z] : [1784444226583]  "GET"  "/app/main.be9c0e47e96337fd7f02.hot-update.js"
-[info] [2026-07-19T06:57:07.584Z] : [1784444227584]  Appsail[backend]  "GET"  "/api/chat/history"
-[info] [2026-07-19T06:57:07.586Z] : [1784444227585]  Appsail[backend]  "GET"  "/api/chat/messages?session_id=a771c88d-3c9a-45bd-bf21-ea014c11dc3f"
-[info] [2026-07-19T06:57:45.437Z] : [1784444265437]  "GET"  "/"
-[info] [2026-07-19T06:57:45.440Z] : [1784444265440]  "GET"  "/app/"
-[info] [2026-07-19T06:57:45.452Z] : [1784444265452]  "GET"  "/app/static/js/bundle.js"
-[info] [2026-07-19T06:57:45.943Z] : [1784444265943]  "GET"  "/app/map.svg"
-[info] [2026-07-19T06:57:46.309Z] : [1784444266308]  Appsail[backend]  "GET"  "/api/dashboard/stats"
-[info] [2026-07-19T06:57:46.310Z] : [1784444266310]  Appsail[backend]  "GET"  "/api/dashboard/district-crimes?timeframe=30d"
-[info] [2026-07-19T06:57:46.311Z] : [1784444266311]  Appsail[backend]  "GET"  "/api/dashboard/alerts?limit=10"
-[info] [2026-07-19T06:57:46.312Z] : [1784444266312]  Appsail[backend]  "GET"  "/api/dashboard/trends"
-[info] [2026-07-19T06:57:48.849Z] : [1784444268849]  "GET"  "/app/favicon.ico"
-[info] [2026-07-19T06:57:49.430Z] : [1784444269429]  Appsail[backend]  "GET"  "/api/chat/history"
-[info] [2026-07-19T06:57:49.451Z] : [1784444269451]  "GET"  "/app/favicon.ico"
-[info] [2026-07-19T06:57:49.749Z] : [1784444269749]  Appsail[backend]  "OPTIONS"  "/api/chat/new"
-[info] [2026-07-19T06:57:49.831Z] : [1784444269831]  "GET"  "/app/favicon.ico"
-[info] [2026-07-19T06:57:50.125Z] : [1784444270125]  Appsail[backend]  "GET"  "/api/chat/messages?session_id=b1f22c42-eec8-4d3c-8a67-be88301bc401"
-[info] [2026-07-19T06:57:50.295Z] : [1784444270294]  Appsail[backend]  "OPTIONS"  "/api/chat/query"
-[info] [2026-07-19T06:57:50.824Z] : [1784444270824]  Appsail[backend]  "GET"  "/api/chat/history"
-[info] [2026-07-19T06:57:52.148Z] : [1784444272147]  Appsail[backend]  "GET"  "/api/chat/messages?session_id=b1f22c42-eec8-4d3c-8a67-be88301bc401"
-[info] [2026-07-19T06:58:48.806Z] : [1784444328806]  Appsail[backend]  "GET"  "/api/chat/export-pdf?session_id=a771c88d-3c9a-45bd-bf21-ea014c11dc3f"
-[info] [2026-07-19T06:59:10.698Z] : [1784444350697]  Appsail[backend]  "GET"  "/api/dashboard/stats"
-[info] [2026-07-19T06:59:10.699Z] : [1784444350699]  Appsail[backend]  "GET"  "/api/dashboard/district-crimes?timeframe=30d"
-[info] [2026-07-19T06:59:10.700Z] : [1784444350700]  Appsail[backend]  "GET"  "/api/dashboard/alerts?limit=10"
-[info] [2026-07-19T06:59:10.701Z] : [1784444350700]  Appsail[backend]  "GET"  "/api/dashboard/trends"
-[info] [2026-07-19T06:59:10.702Z] : [1784444350702]  "GET"  "/app/favicon.ico"
-[info] [2026-07-19T06:59:10.703Z] : [1784444350703]  "GET"  "/app/map.svg"
-[info] [2026-07-19T06:59:13.411Z] : [1784444353411]  Appsail[backend]  "GET"  "/api/chat/history"
-[info] [2026-07-19T06:59:13.423Z] : [1784444353422]  "GET"  "/app/favicon.ico"
-[info] [2026-07-19T06:59:13.722Z] : [1784444353722]  Appsail[backend]  "POST"  "/api/chat/new"
-[info] [2026-07-19T06:59:14.458Z] : [1784444354458]  Appsail[backend]  "GET"  "/api/chat/history"
-[info] [2026-07-19T06:59:14.459Z] : [1784444354459]  Appsail[backend]  "GET"  "/api/chat/messages?session_id=fff6c01f-11bc-46d4-bac2-9892f50320d6"
-[info] [2026-07-19T06:59:14.473Z] : [1784444354472]  "GET"  "/app/favicon.ico"
-[info] [2026-07-19T06:59:25.547Z] : [1784444365546]  "GET"  "/app/?page=chat&session_id=fff6c01f-11bc-46d4-bac2-9892f50320d6"
-[info] [2026-07-19T06:59:25.852Z] : [1784444365852]  "GET"  "/app/static/js/bundle.js"
-[info] [2026-07-19T06:59:25.884Z] : [1784444365883]  "GET"  "/app/manifest.json"
-[info] [2026-07-19T06:59:26.413Z] : [1784444366413]  Appsail[backend]  "GET"  "/api/chat/history"
-[info] [2026-07-19T06:59:26.723Z] : [1784444366722]  "GET"  "/app/favicon.ico"
-[info] [2026-07-19T06:59:26.755Z] : [1784444366755]  "GET"  "/app/logo192.png"
-[info] [2026-07-19T06:59:26.757Z] : [1784444366756]  Appsail[backend]  "GET"  "/api/chat/messages?session_id=fff6c01f-11bc-46d4-bac2-9892f50320d6"
-[info] [2026-07-19T06:59:40.210Z] : [1784444380210]  "GET"  "/app/?page=chat&session_id=fff6c01f-11bc-46d4-bac2-9892f50320d6"
-[info] [2026-07-19T06:59:40.227Z] : [1784444380227]  "GET"  "/app/manifest.json"
-[info] [2026-07-19T06:59:40.514Z] : [1784444380513]  "GET"  "/app/static/js/bundle.js"
-[info] [2026-07-19T06:59:41.062Z] : [1784444381062]  Appsail[backend]  "GET"  "/api/chat/history"
-[info] [2026-07-19T06:59:41.078Z] : [1784444381078]  Appsail[backend]  "GET"  "/api/chat/messages?session_id=fff6c01f-11bc-46d4-bac2-9892f50320d6"
-[info] [2026-07-19T06:59:41.333Z] : [1784444381333]  "GET"  "/app/favicon.ico"
-[info] [2026-07-19T06:59:41.334Z] : [1784444381334]  "GET"  "/app/logo192.png"
-[info] [2026-07-19T07:01:44.104Z] : [react-plugin]: Compiling...
-[info] [2026-07-19T07:01:46.085Z] : [react-plugin]: Compiled with warnings.
+[info] [2026-07-25T13:32:26.927Z] : 
+[info] [2026-07-25T13:32:26.927Z] : i Client[frontend]: Plugin : "zcatalyst-cli-plugin-react" is used for client serve
+[info] [2026-07-25T13:32:26.927Z] : 
+[debug] [2026-07-25T13:32:27.697Z] : No API Gateway configuration found. Skipping API Gateway rules
+[debug] [2026-07-25T13:32:27.775Z] : No API Gateway configuration found. Skipping API Gateway rules
+[info] [2026-07-25T13:32:27.876Z] : 
+[info] [2026-07-25T13:32:27.876Z] :  >>>>>>>>>>>>>> AppSail <<<<<<<<<<<<<< 
+[info] [2026-07-25T13:32:27.877Z] : i backend: http://localhost:3001
+[info] [2026-07-25T13:32:27.877Z] : 
+[info] [2026-07-25T13:32:27.877Z] : 
+[info] [2026-07-25T13:32:27.877Z] :  >>>>>>>>>>>>> Web Client <<<<<<<<<<<<
+[info] [2026-07-25T13:32:27.877Z] : i client[frontend]: http://localhost:3000/app/
+[info] [2026-07-25T13:32:27.877Z] : 
+[info] [2026-07-25T13:32:28.336Z] : [1784986348336]  "GET"  "/app/"
+[info] [2026-07-25T13:32:40.667Z] : [react-plugin]: Compiled with warnings.
 
-[info] [2026-07-19T07:01:46.086Z] : [react-plugin]: [eslint] 
-src\components\ChatScreen.tsx
-  Line 35:7:  'quickActions' is assigned a value but never used  @typescript-eslint/no-unused-vars
-[info] [2026-07-19T07:01:46.086Z] : [react-plugin]: 
+[info] [2026-07-25T13:32:40.667Z] : [react-plugin]: [eslint] 
+src\components\ClerkAuthPage.tsx
+  Line 388:11:  'signUp' is assigned a value but never used  @typescript-eslint/no-unused-vars
+  Line 542:11:  'signIn' is assigned a value but never used  @typescript-eslint/no-unused-vars
+  Line 748:9:   'clerk' is assigned a value but never used   @typescript-eslint/no-unused-vars
+[info] [2026-07-25T13:32:40.668Z] : [react-plugin]: 
 Search for the keywords to learn more about each warning.
-[info] [2026-07-19T07:01:46.086Z] : [react-plugin]: To ignore, add // eslint-disable-next-line to the line before.
+[info] [2026-07-25T13:32:40.668Z] : [react-plugin]: To ignore, add // eslint-disable-next-line to the line before.
 
-[info] [2026-07-19T07:01:46.403Z] : [1784444506403]  "GET"  "/app/main.9c677b84f341b6d53611.hot-update.json"
-[info] [2026-07-19T07:01:46.668Z] : [1784444506668]  "GET"  "/app/main.9c677b84f341b6d53611.hot-update.js"
-[info] [2026-07-19T07:01:47.542Z] : [1784444507542]  Appsail[backend]  "GET"  "/api/chat/history"
-[info] [2026-07-19T07:01:47.572Z] : [1784444507572]  Appsail[backend]  "GET"  "/api/chat/messages?session_id=fff6c01f-11bc-46d4-bac2-9892f50320d6"
-[info] [2026-07-19T07:02:01.118Z] : [1784444521118]  Appsail[backend]  "GET"  "/api/chat/messages?session_id=a771c88d-3c9a-45bd-bf21-ea014c11dc3f"
-[info] [2026-07-19T07:02:01.124Z] : [1784444521124]  "GET"  "/app/favicon.ico"
-[info] [2026-07-19T07:02:04.188Z] : [1784444524187]  Appsail[backend]  "GET"  "/api/dashboard/stats"
-[info] [2026-07-19T07:02:04.190Z] : [1784444524190]  Appsail[backend]  "GET"  "/api/dashboard/district-crimes?timeframe=30d"
-[info] [2026-07-19T07:02:04.191Z] : [1784444524191]  Appsail[backend]  "GET"  "/api/dashboard/alerts?limit=10"
-[info] [2026-07-19T07:02:04.192Z] : [1784444524192]  Appsail[backend]  "GET"  "/api/dashboard/trends"
-[info] [2026-07-19T07:02:04.193Z] : [1784444524193]  "GET"  "/app/favicon.ico"
-[info] [2026-07-19T07:02:04.199Z] : [1784444524199]  "GET"  "/app/map.svg"
-[info] [2026-07-19T07:02:05.235Z] : [1784444525234]  Appsail[backend]  "GET"  "/api/chat/history"
-[info] [2026-07-19T07:02:05.243Z] : [1784444525243]  "GET"  "/app/favicon.ico"
-[info] [2026-07-19T07:02:05.543Z] : [1784444525543]  Appsail[backend]  "OPTIONS"  "/api/chat/new"
-[info] [2026-07-19T07:02:06.386Z] : [1784444526386]  Appsail[backend]  "POST"  "/api/chat/new"
-[info] [2026-07-19T07:02:07.166Z] : [1784444527166]  Appsail[backend]  "GET"  "/api/chat/history"
-[info] [2026-07-19T07:02:07.167Z] : [1784444527167]  Appsail[backend]  "GET"  "/api/chat/messages?session_id=75dc7c74-98d3-4824-b76e-be4aad59da89"
-[info] [2026-07-19T07:02:07.182Z] : [1784444527182]  "GET"  "/app/favicon.ico"
-[info] [2026-07-19T07:02:07.944Z] : [1784444527944]  "GET"  "/app/map.svg"
-[info] [2026-07-19T07:02:08.270Z] : [1784444528270]  "GET"  "/app/favicon.ico"
-[info] [2026-07-19T07:02:09.522Z] : [1784444529521]  Appsail[backend]  "GET"  "/api/chat/history"
-[info] [2026-07-19T07:02:09.531Z] : [1784444529530]  "GET"  "/app/favicon.ico"
-[info] [2026-07-19T07:02:09.838Z] : [1784444529838]  Appsail[backend]  "POST"  "/api/chat/new"
-[info] [2026-07-19T07:02:10.618Z] : [1784444530617]  Appsail[backend]  "GET"  "/api/chat/history"
-[info] [2026-07-19T07:02:10.619Z] : [1784444530619]  Appsail[backend]  "GET"  "/api/chat/messages?session_id=5c77794d-ea94-4b3a-9663-6c616643f0cc"
-[info] [2026-07-19T07:02:10.620Z] : [1784444530620]  "GET"  "/app/favicon.ico"
-[info] [2026-07-19T07:02:12.189Z] : [1784444532189]  Appsail[backend]  "GET"  "/api/network/graph?view=all"
-[info] [2026-07-19T07:02:12.200Z] : [1784444532199]  "GET"  "/app/favicon.ico"
-[info] [2026-07-19T07:02:12.502Z] : [1784444532502]  Appsail[backend]  "GET"  "/api/network/graph?date_from=2026-06-19&date_to=2026-07-19&view=all"
-[info] [2026-07-19T07:02:14.208Z] : [1784444534208]  Appsail[backend]  "GET"  "/api/analytics/hotspots?"
-[info] [2026-07-19T07:02:14.209Z] : [1784444534209]  Appsail[backend]  "GET"  "/api/analytics/emerging-clusters"
-[info] [2026-07-19T07:02:14.223Z] : [1784444534223]  "GET"  "/app/favicon.ico"
-[info] [2026-07-19T07:02:16.182Z] : [1784444536182]  "GET"  "/app/map.svg"
-[info] [2026-07-19T07:02:16.507Z] : [1784444536506]  "GET"  "/app/favicon.ico"
-[info] [2026-07-19T07:03:16.490Z] : [1784444596489]  Appsail[backend]  "GET"  "/api/dashboard/alerts?limit=10"
-[info] [2026-07-19T07:03:28.049Z] : [1784444608048]  Appsail[backend]  "GET"  "/api/chat/history"
-[info] [2026-07-19T07:03:28.367Z] : [1784444608367]  Appsail[backend]  "POST"  "/api/chat/new"
-[info] [2026-07-19T07:03:28.368Z] : [1784444608368]  "GET"  "/app/favicon.ico"
-[info] [2026-07-19T07:03:28.787Z] : [1784444608786]  "GET"  "/app/favicon.ico"
-[info] [2026-07-19T07:03:29.095Z] : [1784444609095]  Appsail[backend]  "GET"  "/api/chat/history"
-[info] [2026-07-19T07:03:29.096Z] : [1784444609096]  Appsail[backend]  "GET"  "/api/chat/messages?session_id=4b19f2f2-7574-4ea8-9e9f-9a747ae2270f"
-[info] [2026-07-19T09:27:31.460Z] : [1784453251460]  Appsail[backend]  "GET"  "/api/network/graph?view=all"
-[debug] [2026-07-19T09:27:31.461Z] : > refreshing access token <
-[debug] [2026-07-19T09:27:31.464Z] : >>>> HTTP REQUEST : POST https://accounts.zoho.in/oauth/v2/token 
-<request body omitted>
+[info] [2026-07-25T13:32:41.228Z] : [1784986361228]  "GET"  "/app/static/js/bundle.js"
+[info] [2026-07-25T13:32:41.474Z] : [1784986361473]  "GET"  "/app/manifest.json"
+[info] [2026-07-25T13:32:42.257Z] : [1784986362256]  "GET"  "/app/favicon.ico"
+[info] [2026-07-25T13:32:42.570Z] : [1784986362570]  "GET"  "/app/logo192.png"
+[info] [2026-07-25T13:32:43.900Z] : [1784986363900]  "GET"  "/logo.svg"
+[info] [2026-07-25T13:33:07.399Z] : [1784986387399]  "GET"  "/app/"
+[info] [2026-07-25T13:33:07.653Z] : [1784986387653]  "GET"  "/app/static/js/bundle.js"
+[info] [2026-07-25T13:33:07.765Z] : [1784986387765]  "GET"  "/app/manifest.json"
+[info] [2026-07-25T13:33:08.276Z] : [1784986388276]  "GET"  "/app/favicon.ico"
+[info] [2026-07-25T13:33:08.583Z] : [1784986388582]  "GET"  "/app/logo192.png"
+[info] [2026-07-25T13:33:09.971Z] : [1784986389970]  "GET"  "/logo.svg"
+[info] [2026-07-25T13:33:18.230Z] : [1784986398230]  "GET"  "/app/favicon.ico"
+[info] [2026-07-25T13:33:18.543Z] : [1784986398543]  "GET"  "/app/logo192.png"
+[info] [2026-07-25T13:33:29.254Z] : [1784986409254]  "GET"  "/app/"
+[info] [2026-07-25T13:33:29.305Z] : [1784986409305]  "GET"  "/app/manifest.json"
+[info] [2026-07-25T13:33:29.557Z] : [1784986409557]  "GET"  "/app/static/js/bundle.js"
+[info] [2026-07-25T13:33:30.107Z] : [1784986410107]  "GET"  "/app/favicon.ico"
+[info] [2026-07-25T13:33:30.109Z] : [1784986410109]  "GET"  "/app/logo192.png"
+[info] [2026-07-25T13:33:30.361Z] : [1784986410361]  "GET"  "/logo.svg"
+[info] [2026-07-25T13:33:53.886Z] : [1784986433886]  "GET"  "/?__clerk_handshake=eyJhbGciOiJSUzI1NiIsImNhdCI6ImNsX0I3ZDRQRDExMUFBQSIsImtpZCI6Imluc18zR3pqV3pWNUFPMzJGQkx1QTBYU09pRDJJQmsiLCJ0eXAiOiJKV1QifQ.eyJoYW5kc2hha2UiOlsiX19jbGllbnRfdWF0PTsgUGF0aD0vOyBFeHBpcmVzPVRodSwgMDEgSmFuIDE5NzAgMDA6MDA6MDAgR01UOyBTZWN1cmU7IFNhbWVTaXRlPU5vbmUiLCJfX2NsaWVudF91YXQ9MTc4NDk4NjQzMzsgUGF0aD0vOyBEb21haW49bG9jYWxob3N0OyBNYXgtQWdlPTMxNTM2MDAwMDsgU2VjdXJlOyBTYW1lU2l0ZT1Ob25lIiwiX19zZXNzaW9uPWV5SmhiR2NpT2lKU1V6STFOaUlzSW1OaGRDSTZJbU5zWDBJM1pEUlFSREV4TVVGQlFTSXNJbXRwWkNJNkltbHVjMTh6UjNwcVYzcFdOVUZQTXpKR1FreDFRVEJZVTA5cFJESkpRbXNpTENKdmFXRjBJam94TnpnME9UZzJORE16TENKMGVYQWlPaUpLVjFRaWZRLmV5SmhlbkFpT2lKb2RIUndPaTh2Ykc5allXeG9iM04wT2pNd01EQWlMQ0psZUhBaU9qRTNPRFE1T0RZME9UTXNJbVoyWVNJNld6QXNMVEZkTENKcFlYUWlPakUzT0RRNU9EWTBNek1zSW1semN5STZJbWgwZEhCek9pOHZiVzkyYVc1bkxXNWhjbmRvWVd3dE5UQXVZMnhsY21zdVlXTmpiM1Z1ZEhNdVpHVjJJaXdpYm1KbUlqb3hOemcwT1RnMk5ESXpMQ0p6YVdRaU9pSnpaWE56WHpOSGVuUnphMFp5WVZNemNEVkxTRm81ZVRSV2FHTmlka05UVkNJc0luTjBjeUk2SW1GamRHbDJaU0lzSW5OMVlpSTZJblZ6WlhKZk0wZDZkSE5yZEVkU1RERjNSR3hXWjBjMVRtOXZaR294UmxsRElpd2lkaUk2TW4wLlY1UVp1bC05S011eE02NVpDUWhBMFlGbFgyRjBJYWx1djRlaGFydGpSeTJhTFAxWDdlTUNhckxUdEhCcVViVXd3SkdYVWEyWjUzUVByZU9KbGJEV2h5MWN4U1JmejZlN09vdVlSWEFHSGt0VkZrVHVPUFVobGh4UzdPQlpYUXBJdG1TN2VvWFBvQ1ZWdFBfMlZmU0g4RjUtYVZLVlEyaFNOUmZ1azVvZFV2R3RQdjdQOTVGVDNPZzlTR3AzalJrZFdYSVg5QndvQlQ4ZnpaNjM5T3dDRk5wVHhJdHhKcDZTZ1FuLVFHZXBEYUVsTTBTdXVTTEkySkI3SVBjSmxJMm1ya215MWVtcXFGR21LeGJaM1lpM2NwU2ZybUJxMkd1enBhRWs5R0E2bXJMckJJQ3EwS09CVXFFQmtnM1BOdGtNT1pRNG5VRDZBYnRFZnZrb0dQNTB1dzsgUGF0aD0vOyBFeHBpcmVzPVN1biwgMjUgSnVsIDIwMjcgMTM6MzM6NTMgR01UOyBTZWN1cmU7IFNhbWVTaXRlPU5vbmUiLCJfX3JlZnJlc2hfWDU4QWpyMno9UFYzblk4N3FuRlhqckliR0FCTTE7IFBhdGg9LzsgRXhwaXJlcz1TdW4sIDI1IEp1bCAyMDI3IDEzOjMzOjUzIEdNVDsgSHR0cE9ubHk7IFNlY3VyZTsgU2FtZVNpdGU9Tm9uZSJdfQ.Sllo86ogzpa4BPVBxorwZcaQH7PVfxpg9jqIdAG1850eDjQ8uqgft6dp8vFS8NQnRdvz_CzMoQjdZtE_i3-qeKJ67RUlDzkakrL48BU8DkGHTv421Gh8OHqT0-TW6vPdR0krqrHNnRbDy34lXF6nI43nH6CZKTYWcsb44TBpae-rNnTHuV436OKF3IoXjPjh_OTndFmIZ2Z2a0t2MuRTKbLVtAQWmxkPL8NdHALsl-y4So7qnVqrdWlxaQhYdnmb32YjhA9-fQ-NW3ZRl7jL5fBWy0MnfZX6WcqfHZUla7v6N_-JN7RwvisxeL4SNP6eWmCeyXY2V0LkG-JCneRJTg"
+[info] [2026-07-25T13:33:54.242Z] : [1784986434242]  "GET"  "/favicon.ico"
+[info] [2026-07-25T13:35:26.836Z] : [1784986526836]  "GET"  "/app/favicon.ico"
+[info] [2026-07-25T13:35:26.838Z] : [1784986526838]  "GET"  "/app/logo192.png"
+[info] [2026-07-25T13:35:27.673Z] : [1784986527672]  "GET"  "/app/favicon.ico"
+[info] [2026-07-25T13:35:27.674Z] : [1784986527674]  "GET"  "/logo.svg"
+[info] [2026-07-25T13:35:27.721Z] : [1784986527720]  Appsail[backend]  "GET"  "/api/dashboard/stats"
+[info] [2026-07-25T13:35:27.723Z] : [1784986527723]  Appsail[backend]  "GET"  "/api/dashboard/district-crimes?timeframe=30d"
+[info] [2026-07-25T13:35:27.724Z] : [1784986527724]  Appsail[backend]  "GET"  "/api/dashboard/alerts?limit=10"
+[info] [2026-07-25T13:35:27.725Z] : [1784986527725]  Appsail[backend]  "GET"  "/api/dashboard/trends"
+[info] [2026-07-25T13:35:27.735Z] : [1784986527735]  "GET"  "/app/map.svg"
+[info] [2026-07-25T13:38:10.981Z] : [1784986690981]  Appsail[backend]  "GET"  "/api/chat/history"
+[info] [2026-07-25T13:38:10.996Z] : [1784986690996]  Appsail[backend]  "POST"  "/api/chat/new"
+[info] [2026-07-25T13:38:10.998Z] : [1784986690998]  "GET"  "/app/favicon.ico"
+[info] [2026-07-25T13:38:12.350Z] : [1784986692350]  Appsail[backend]  "GET"  "/api/chat/history"
+[info] [2026-07-25T13:38:12.364Z] : [1784986692363]  "GET"  "/app/favicon.ico"
+[info] [2026-07-25T13:38:12.667Z] : [1784986692667]  Appsail[backend]  "GET"  "/api/chat/messages?session_id=11807ff1-45d1-4b35-899b-89ccdc6eede9"
+[info] [2026-07-25T13:38:14.465Z] : [1784986694465]  Appsail[backend]  "GET"  "/api/network/graph?view=all"
+[info] [2026-07-25T13:38:14.466Z] : [1784986694466]  Appsail[backend]  "GET"  "/api/network/graph?date_from=2026-06-25&date_to=2026-07-25&view=all"
+[info] [2026-07-25T13:38:14.467Z] : [1784986694467]  "GET"  "/app/favicon.ico"
+[info] [2026-07-25T13:38:18.713Z] : [1784986698713]  Appsail[backend]  "GET"  "/api/network/profile/0?row_id=46143000000062140"
+[info] [2026-07-25T13:38:21.637Z] : [1784986701637]  Appsail[backend]  "GET"  "/api/network/graph?date_from=2026-06-25&date_to=2026-07-25&view=clusters"
+[info] [2026-07-25T13:38:25.586Z] : [1784986705586]  "GET"  "/app/map.svg"
+[info] [2026-07-25T13:38:25.900Z] : [1784986705900]  "GET"  "/app/favicon.ico"
+[info] [2026-07-25T13:38:26.495Z] : [1784986706494]  Appsail[backend]  "GET"  "/api/analytics/hotspots?"
+[info] [2026-07-25T13:38:26.497Z] : [1784986706497]  Appsail[backend]  "GET"  "/api/analytics/emerging-clusters"
+[info] [2026-07-25T13:38:26.522Z] : [1784986706521]  "GET"  "/app/favicon.ico"
+[info] [2026-07-25T13:38:57.164Z] : [1784986737164]  Appsail[backend]  "GET"  "/api/analytics/trends?granularity=month"
+[info] [2026-07-25T13:38:57.479Z] : [1784986737479]  Appsail[backend]  "GET"  "/api/analytics/festival-calendar?"
+[info] [2026-07-25T13:39:05.337Z] : [1784986745337]  "GET"  "/app/favicon.ico"
+[info] [2026-07-25T13:39:06.556Z] : [1784986746556]  Appsail[backend]  "GET"  "/api/chat/history"
+[info] [2026-07-25T13:39:06.558Z] : [1784986746558]  Appsail[backend]  "POST"  "/api/chat/new"
+[info] [2026-07-25T13:39:06.571Z] : [1784986746571]  "GET"  "/app/favicon.ico"
+[info] [2026-07-25T13:39:06.982Z] : [1784986746982]  Appsail[backend]  "GET"  "/api/chat/messages?session_id=6ee298b3-15b3-4114-9428-79947964ab0b"
+[info] [2026-07-25T13:39:06.985Z] : [1784986746985]  "GET"  "/app/favicon.ico"
+[info] [2026-07-25T13:39:07.812Z] : [1784986747812]  "GET"  "/app/favicon.ico"
+[info] [2026-07-25T13:39:07.815Z] : [1784986747815]  "GET"  "/app/map.svg"
+[info] [2026-07-25T13:39:08.185Z] : [1784986748184]  Appsail[backend]  "GET"  "/api/chat/history"
+[info] [2026-07-25T13:39:15.430Z] : [1784986755430]  Appsail[backend]  "GET"  "/api/dashboard/district-crimes?timeframe=7d"
+[info] [2026-07-25T13:39:28.107Z] : [1784986768107]  "GET"  "/app/favicon.ico"
+[info] [2026-07-25T13:39:28.457Z] : [1784986768457]  Appsail[backend]  "GET"  "/api/chat/history"
+[info] [2026-07-25T13:39:28.772Z] : [1784986768772]  Appsail[backend]  "POST"  "/api/chat/new"
+[info] [2026-07-25T13:39:28.774Z] : [1784986768774]  "GET"  "/app/favicon.ico"
+[info] [2026-07-25T13:39:29.247Z] : [1784986769247]  "GET"  "/app/favicon.ico"
+[info] [2026-07-25T13:39:29.551Z] : [1784986769551]  Appsail[backend]  "GET"  "/api/chat/history"
+[info] [2026-07-25T13:39:29.553Z] : [1784986769553]  Appsail[backend]  "GET"  "/api/chat/messages?session_id=1818218e-f9b2-4498-8bf4-13e8d8423cf8"
+[info] [2026-07-25T13:39:29.582Z] : [1784986769582]  "GET"  "/app/favicon.ico"
+[info] [2026-07-25T13:39:29.807Z] : [1784986769807]  Appsail[backend]  "POST"  "/api/chat/new"
+[info] [2026-07-25T13:39:29.848Z] : [1784986769847]  "GET"  "/app/favicon.ico"
+[info] [2026-07-25T13:39:30.608Z] : [1784986770607]  "GET"  "/app/favicon.ico"
+[info] [2026-07-25T13:39:31.297Z] : [1784986771297]  "GET"  "/app/favicon.ico"
+[info] [2026-07-25T13:39:31.693Z] : [1784986771692]  "GET"  "/app/map.svg"
+[info] [2026-07-25T13:39:32.005Z] : [1784986772005]  "GET"  "/app/favicon.ico"
+[info] [2026-07-25T13:40:25.766Z] : [1784986825766]  "GET"  "/.well-known/appspecific/com.chrome.devtools.json"
+[info] [2026-07-25T13:40:26.069Z] : [1784986826069]  "GET"  "/app/manifest.json"
+[info] [2026-07-25T13:40:26.303Z] : [1784986826303]  "GET"  "/app/static/js/bundle.js.map"
+[info] [2026-07-25T13:40:32.011Z] : [1784986832011]  Appsail[backend]  "GET"  "/api/dashboard/alerts?limit=10"
+[info] [2026-07-25T13:40:34.056Z] : [1784986834056]  Appsail[backend]  "GET"  "/api/chat/history"
+[info] [2026-07-25T13:40:34.064Z] : [1784986834064]  "GET"  "/app/favicon.ico"
+[info] [2026-07-25T13:40:34.371Z] : [1784986834371]  Appsail[backend]  "OPTIONS"  "/api/chat/new"
+[info] [2026-07-25T13:40:35.368Z] : [1784986835367]  Appsail[backend]  "POST"  "/api/chat/new"
+[info] [2026-07-25T13:40:35.747Z] : [1784986835747]  Appsail[backend]  "GET"  "/api/chat/history"
+[info] [2026-07-25T13:40:36.071Z] : [1784986836071]  Appsail[backend]  "GET"  "/api/chat/messages?session_id=74250c1d-ddeb-47ca-ac06-3771e922ada4"
+[info] [2026-07-25T13:40:36.073Z] : [1784986836073]  "GET"  "/app/favicon.ico"
+[info] [2026-07-25T13:41:50.126Z] : [react-plugin]: Compiling...
+[info] [2026-07-25T13:41:50.453Z] : [1784986910452]  "GET"  "/app/?page=chat&session_id=74250c1d-ddeb-47ca-ac06-3771e922ada4"
+[info] [2026-07-25T13:41:50.828Z] : [react-plugin]: Compiled with warnings.
 
-[info] [2026-07-19T09:27:31.470Z] : [1784453251470]  Appsail[backend]  "GET"  "/api/network/graph?date_from=2026-06-19&date_to=2026-07-19&view=all"
-[debug] [2026-07-19T09:27:31.470Z] : > refreshing access token <
-[debug] [2026-07-19T09:27:31.471Z] : >>>> HTTP REQUEST : POST https://accounts.zoho.in/oauth/v2/token 
-<request body omitted>
-
-[info] [2026-07-19T09:27:31.471Z] : [1784453251471]  "GET"  "/app/favicon.ico"
-[debug] [2026-07-19T09:27:31.472Z] : > refreshing access token <
-[debug] [2026-07-19T09:27:31.473Z] : >>>> HTTP REQUEST : POST https://accounts.zoho.in/oauth/v2/token 
-<request body omitted>
-
-[debug] [2026-07-19T09:27:31.739Z] : <<<< HTTP RESPONSE : 200
-Response Headers: {"server":"ZGS","date":"Sun, 19 Jul 2026 09:27:32 GMT","content-type":"application/json;charset=UTF-8","content-length":"2523","connection":"keep-alive","cache-control":"no-store","x-content-type-options":"nosniff","pragma":"no-cache","x-frame-options":"SAMEORIGIN","vary":"accept-encoding","content-language":"en-US","strict-transport-security":"max-age=64072000; includeSubDomains; preload"}
-
-[debug] [2026-07-19T09:27:31.746Z] : <<<< HTTP RESPONSE : 200
-Response Headers: {"server":"ZGS","date":"Sun, 19 Jul 2026 09:27:32 GMT","content-type":"application/json;charset=UTF-8","content-length":"2523","connection":"keep-alive","cache-control":"no-store","x-content-type-options":"nosniff","pragma":"no-cache","x-frame-options":"SAMEORIGIN","vary":"accept-encoding","content-language":"en-US","strict-transport-security":"max-age=64072000; includeSubDomains; preload"}
-
-[debug] [2026-07-19T09:27:31.769Z] : <<<< HTTP RESPONSE : 200
-Response Headers: {"server":"ZGS","date":"Sun, 19 Jul 2026 09:27:33 GMT","content-type":"application/json;charset=UTF-8","content-length":"2523","connection":"keep-alive","cache-control":"no-store","x-content-type-options":"nosniff","pragma":"no-cache","x-frame-options":"SAMEORIGIN","vary":"accept-encoding","content-language":"en-US","strict-transport-security":"max-age=64072000; includeSubDomains; preload"}
-
-[info] [2026-07-19T09:33:44.491Z] : [react-plugin]: Compiling...
-[info] [2026-07-19T09:33:45.520Z] : [react-plugin]: Compiled with warnings.
-
-[info] [2026-07-19T09:33:45.520Z] : [react-plugin]: [eslint] 
-src\components\ChatScreen.tsx
-  Line 35:7:  'quickActions' is assigned a value but never used  @typescript-eslint/no-unused-vars
-[info] [2026-07-19T09:33:45.520Z] : [react-plugin]: 
+[info] [2026-07-25T13:41:50.828Z] : [react-plugin]: [eslint] 
+src\components\ClerkAuthPage.tsx
+  Line 388:11:  'signUp' is assigned a value but never used  @typescript-eslint/no-unused-vars
+  Line 542:11:  'signIn' is assigned a value but never used  @typescript-eslint/no-unused-vars
+  Line 748:9:   'clerk' is assigned a value but never used   @typescript-eslint/no-unused-vars
+[info] [2026-07-25T13:41:50.828Z] : [react-plugin]: 
 Search for the keywords to learn more about each warning.
-[info] [2026-07-19T09:33:45.521Z] : [react-plugin]: To ignore, add // eslint-disable-next-line to the line before.
+[info] [2026-07-25T13:41:50.829Z] : [react-plugin]: To ignore, add // eslint-disable-next-line to the line before.
 
-[info] [2026-07-19T09:33:45.825Z] : [1784453625825]  "GET"  "/app/main.65ecab50c9311738871b.hot-update.json"
-[info] [2026-07-19T09:33:46.091Z] : [1784453626091]  "GET"  "/app/main.65ecab50c9311738871b.hot-update.js"
-[info] [2026-07-19T09:34:34.347Z] : [1784453674347]  Appsail[backend]  "GET"  "/api/network/profile/0?row_id=46143000000062140"
-[info] [2026-07-19T09:37:04.828Z] : [react-plugin]: Compiling...
-[info] [2026-07-19T09:37:05.877Z] : [react-plugin]: Compiled with warnings.
+[info] [2026-07-25T13:41:50.910Z] : [1784986910909]  "GET"  "/app/static/js/bundle.js"
+[info] [2026-07-25T13:41:51.222Z] : [1784986911222]  "GET"  "/app/manifest.json"
+[info] [2026-07-25T13:41:51.748Z] : [1784986911748]  "GET"  "/app/favicon.ico"
+[info] [2026-07-25T13:41:52.063Z] : [1784986912063]  "GET"  "/app/logo192.png"
+[info] [2026-07-25T13:41:53.454Z] : [1784986913453]  "GET"  "/logo.svg"
+[info] [2026-07-25T13:41:53.469Z] : [1784986913469]  Appsail[backend]  "GET"  "/api/chat/history"
+[info] [2026-07-25T13:41:53.547Z] : [1784986913546]  Appsail[backend]  "GET"  "/api/chat/messages?session_id=74250c1d-ddeb-47ca-ac06-3771e922ada4"
+[info] [2026-07-25T13:41:55.494Z] : [react-plugin]: Compiling...
+[info] [2026-07-25T13:41:55.509Z] : [1784986915509]  "GET"  "/app/?page=chat&session_id=74250c1d-ddeb-47ca-ac06-3771e922ada4"
+[info] [2026-07-25T13:41:55.659Z] : [react-plugin]: Compiled with warnings.
 
-[info] [2026-07-19T09:37:05.878Z] : [react-plugin]: [eslint] 
-src\components\ChatScreen.tsx
-  Line 35:7:  'quickActions' is assigned a value but never used  @typescript-eslint/no-unused-vars
-
-src\components\network\NetworkGraph.tsx
-  Line 52:10:  'drawCrispLabel' is defined but never used  @typescript-eslint/no-unused-vars
-[info] [2026-07-19T09:37:05.878Z] : [react-plugin]: 
+[info] [2026-07-25T13:41:55.660Z] : [react-plugin]: [eslint] 
+src\components\ClerkAuthPage.tsx
+  Line 388:11:  'signUp' is assigned a value but never used  @typescript-eslint/no-unused-vars
+  Line 542:11:  'signIn' is assigned a value but never used  @typescript-eslint/no-unused-vars
+  Line 748:9:   'clerk' is assigned a value but never used   @typescript-eslint/no-unused-vars
+[info] [2026-07-25T13:41:55.660Z] : [react-plugin]: 
 Search for the keywords to learn more about each warning.
-[info] [2026-07-19T09:37:05.878Z] : [react-plugin]: To ignore, add // eslint-disable-next-line to the line before.
+[info] [2026-07-25T13:41:55.660Z] : [react-plugin]: To ignore, add // eslint-disable-next-line to the line before.
 
-[info] [2026-07-19T09:37:06.187Z] : [1784453826187]  "GET"  "/app/main.5967cd74b2ec475c75a3.hot-update.json"
-[info] [2026-07-19T09:37:06.455Z] : [1784453826455]  "GET"  "/app/main.5967cd74b2ec475c75a3.hot-update.js"
-[info] [2026-07-19T09:37:28.200Z] : [react-plugin]: Compiling...
-[info] [2026-07-19T09:37:29.108Z] : [react-plugin]: Compiled with warnings.
+[info] [2026-07-25T13:41:55.716Z] : [1784986915716]  "GET"  "/app/manifest.json"
+[info] [2026-07-25T13:41:55.817Z] : [1784986915817]  "GET"  "/app/static/js/bundle.js"
+[info] [2026-07-25T13:41:56.650Z] : [1784986916650]  "GET"  "/app/favicon.ico"
+[info] [2026-07-25T13:41:56.652Z] : [1784986916652]  "GET"  "/app/logo192.png"
+[info] [2026-07-25T13:41:57.005Z] : [1784986917004]  "GET"  "/logo.svg"
+[info] [2026-07-25T13:41:57.010Z] : [1784986917009]  Appsail[backend]  "GET"  "/api/chat/history"
+[info] [2026-07-25T13:41:57.343Z] : [1784986917343]  Appsail[backend]  "GET"  "/api/chat/messages?session_id=74250c1d-ddeb-47ca-ac06-3771e922ada4"
+[info] [2026-07-25T13:41:59.508Z] : [1784986919508]  Appsail[backend]  "GET"  "/api/dashboard/stats"
+[info] [2026-07-25T13:41:59.510Z] : [1784986919509]  Appsail[backend]  "GET"  "/api/dashboard/district-crimes?timeframe=30d"
+[info] [2026-07-25T13:41:59.511Z] : [1784986919511]  Appsail[backend]  "GET"  "/api/dashboard/alerts?limit=10"
+[info] [2026-07-25T13:41:59.512Z] : [1784986919512]  Appsail[backend]  "GET"  "/api/dashboard/trends"
+[info] [2026-07-25T13:41:59.513Z] : [1784986919513]  "GET"  "/app/favicon.ico"
+[info] [2026-07-25T13:41:59.517Z] : [1784986919517]  "GET"  "/app/map.svg"
+[info] [2026-07-25T13:42:11.057Z] : [react-plugin]: Compiling...
+[info] [2026-07-25T13:42:11.071Z] : [1784986931071]  "GET"  "/app/?page=dashboard"
+[info] [2026-07-25T13:42:11.417Z] : [react-plugin]: Compiled with warnings.
 
-[info] [2026-07-19T09:37:29.108Z] : [react-plugin]: [eslint] 
-src\components\ChatScreen.tsx
-  Line 35:7:  'quickActions' is assigned a value but never used  @typescript-eslint/no-unused-vars
-[info] [2026-07-19T09:37:29.109Z] : [react-plugin]: 
+[info] [2026-07-25T13:42:11.418Z] : [react-plugin]: [eslint] 
+src\components\ClerkAuthPage.tsx
+  Line 388:11:  'signUp' is assigned a value but never used  @typescript-eslint/no-unused-vars
+  Line 542:11:  'signIn' is assigned a value but never used  @typescript-eslint/no-unused-vars
+  Line 748:9:   'clerk' is assigned a value but never used   @typescript-eslint/no-unused-vars
+[info] [2026-07-25T13:42:11.418Z] : [react-plugin]: 
 Search for the keywords to learn more about each warning.
-[info] [2026-07-19T09:37:29.109Z] : [react-plugin]: To ignore, add // eslint-disable-next-line to the line before.
+[info] [2026-07-25T13:42:11.418Z] : [react-plugin]: To ignore, add // eslint-disable-next-line to the line before.
 
-[info] [2026-07-19T09:37:29.138Z] : [1784453849138]  "GET"  "/app/main.30d03fe747e7c11167b1.hot-update.json"
-[info] [2026-07-19T09:37:29.455Z] : [1784453849455]  "GET"  "/app/main.30d03fe747e7c11167b1.hot-update.js"
+[info] [2026-07-25T13:42:11.471Z] : [1784986931471]  "GET"  "/app/static/js/bundle.js"
+[info] [2026-07-25T13:42:11.774Z] : [1784986931774]  "GET"  "/app/manifest.json"
+[info] [2026-07-25T13:42:12.378Z] : [1784986932378]  "GET"  "/app/logo.avg"
+[info] [2026-07-25T13:42:12.379Z] : [1784986932379]  "GET"  "/app/logo192.png"
+[info] [2026-07-25T13:42:12.384Z] : [1784986932384]  Appsail[backend]  "GET"  "/app/logo.avg"
+[info] [2026-07-25T13:42:12.781Z] : [1784986932781]  "GET"  "/logo.svg"
+[info] [2026-07-25T13:42:12.788Z] : [1784986932788]  Appsail[backend]  "GET"  "/api/dashboard/stats"
+[info] [2026-07-25T13:42:13.093Z] : [1784986933093]  "GET"  "/app/map.svg"
+[info] [2026-07-25T13:42:13.094Z] : [1784986933094]  Appsail[backend]  "GET"  "/api/dashboard/district-crimes?timeframe=30d"
+[info] [2026-07-25T13:42:13.095Z] : [1784986933095]  Appsail[backend]  "GET"  "/api/dashboard/alerts?limit=10"
+[info] [2026-07-25T13:42:13.096Z] : [1784986933096]  Appsail[backend]  "GET"  "/api/dashboard/trends"
+[info] [2026-07-25T13:42:13.573Z] : [react-plugin]: Compiling...
+[info] [2026-07-25T13:42:13.903Z] : [react-plugin]: Compiled with warnings.
+
+[info] [2026-07-25T13:42:13.903Z] : [react-plugin]: [eslint] 
+src\components\ClerkAuthPage.tsx
+  Line 388:11:  'signUp' is assigned a value but never used  @typescript-eslint/no-unused-vars
+  Line 542:11:  'signIn' is assigned a value but never used  @typescript-eslint/no-unused-vars
+  Line 748:9:   'clerk' is assigned a value but never used   @typescript-eslint/no-unused-vars
+[info] [2026-07-25T13:42:13.904Z] : [react-plugin]: 
+Search for the keywords to learn more about each warning.
+[info] [2026-07-25T13:42:13.904Z] : [react-plugin]: To ignore, add // eslint-disable-next-line to the line before.
+
+[info] [2026-07-25T13:42:13.932Z] : [1784986933932]  "GET"  "/app/?page=dashboard"
+[info] [2026-07-25T13:42:13.976Z] : [1784986933976]  "GET"  "/app/static/js/bundle.js"
+[info] [2026-07-25T13:42:13.978Z] : [1784986933978]  "GET"  "/app/manifest.json"
+[info] [2026-07-25T13:42:14.314Z] : [1784986934314]  "GET"  "/app/logo.svg"
+[info] [2026-07-25T13:42:14.619Z] : [1784986934619]  "GET"  "/app/logo192.png"
+[info] [2026-07-25T13:42:15.056Z] : [1784986935056]  "GET"  "/app/map.svg"
+[info] [2026-07-25T13:42:15.057Z] : [1784986935057]  "GET"  "/logo.svg"
+[info] [2026-07-25T13:42:15.072Z] : [1784986935072]  Appsail[backend]  "GET"  "/api/dashboard/stats"
+[info] [2026-07-25T13:42:15.073Z] : [1784986935073]  Appsail[backend]  "GET"  "/api/dashboard/district-crimes?timeframe=30d"
+[info] [2026-07-25T13:42:15.074Z] : [1784986935074]  Appsail[backend]  "GET"  "/api/dashboard/alerts?limit=10"
+[info] [2026-07-25T13:42:15.076Z] : [1784986935075]  Appsail[backend]  "GET"  "/api/dashboard/trends"
+[info] [2026-07-25T13:42:40.853Z] : [react-plugin]: Compiling...
+[info] [2026-07-25T13:42:41.810Z] : [react-plugin]: Compiled with warnings.
+
+[info] [2026-07-25T13:42:41.810Z] : [react-plugin]: [eslint] 
+src\components\ClerkAuthPage.tsx
+  Line 388:11:  'signUp' is assigned a value but never used  @typescript-eslint/no-unused-vars
+  Line 542:11:  'signIn' is assigned a value but never used  @typescript-eslint/no-unused-vars
+  Line 748:9:   'clerk' is assigned a value but never used   @typescript-eslint/no-unused-vars
+[info] [2026-07-25T13:42:41.810Z] : [react-plugin]: 
+Search for the keywords to learn more about each warning.
+[info] [2026-07-25T13:42:41.810Z] : [react-plugin]: To ignore, add // eslint-disable-next-line to the line before.
+
+[info] [2026-07-25T13:42:41.866Z] : [1784986961865]  "GET"  "/app/main.8404861dc28d52a13d23.hot-update.json"
+[info] [2026-07-25T13:42:42.200Z] : [1784986962200]  "GET"  "/app/main.8404861dc28d52a13d23.hot-update.js"
+[info] [2026-07-25T13:42:42.466Z] : [1784986962465]  "GET"  "/app/%PUBLIC_URL%/logo.svg"
+[info] [2026-07-25T13:42:42.470Z] : [1784986962470]  Appsail[backend]  "GET"  "/app/%PUBLIC_URL%/logo.svg"
+[info] [2026-07-25T13:42:48.994Z] : [react-plugin]: Compiling...
+[info] [2026-07-25T13:42:49.501Z] : [react-plugin]: Compiled with warnings.
+
+[info] [2026-07-25T13:42:49.501Z] : [react-plugin]: [eslint] 
+src\components\ClerkAuthPage.tsx
+  Line 388:11:  'signUp' is assigned a value but never used  @typescript-eslint/no-unused-vars
+  Line 542:11:  'signIn' is assigned a value but never used  @typescript-eslint/no-unused-vars
+  Line 748:9:   'clerk' is assigned a value but never used   @typescript-eslint/no-unused-vars
+[info] [2026-07-25T13:42:49.501Z] : [react-plugin]: 
+Search for the keywords to learn more about each warning.
+[info] [2026-07-25T13:42:49.501Z] : [react-plugin]: To ignore, add // eslint-disable-next-line to the line before.
+
+[info] [2026-07-25T13:42:49.539Z] : [1784986969539]  "GET"  "/app/main.9cb6ebbd425ac0f66658.hot-update.json"
+[info] [2026-07-25T13:42:49.850Z] : [1784986969850]  "GET"  "/app/main.9cb6ebbd425ac0f66658.hot-update.js"
+[info] [2026-07-25T13:42:50.323Z] : [1784986970323]  "GET"  "/logo.svg"
+[info] [2026-07-25T13:42:52.932Z] : [1784986972932]  "GET"  "/app/?page=dashboard"
+[info] [2026-07-25T13:42:52.978Z] : [1784986972978]  "GET"  "/app/static/js/bundle.js"
+[info] [2026-07-25T13:42:53.288Z] : [1784986973288]  "GET"  "/app/manifest.json"
+[info] [2026-07-25T13:42:53.333Z] : [1784986973333]  "GET"  "/app/logo.svg"
+[info] [2026-07-25T13:42:53.648Z] : [1784986973646]  "GET"  "/app/logo192.png"
+[info] [2026-07-25T13:42:53.781Z] : [1784986973781]  Appsail[backend]  "GET"  "/api/dashboard/stats"
+[info] [2026-07-25T13:42:54.081Z] : [1784986974081]  "GET"  "/logo.svg"
+[info] [2026-07-25T13:42:54.082Z] : [1784986974082]  "GET"  "/app/map.svg"
+[info] [2026-07-25T13:42:54.087Z] : [1784986974087]  Appsail[backend]  "GET"  "/api/dashboard/district-crimes?timeframe=30d"
+[info] [2026-07-25T13:42:54.088Z] : [1784986974088]  Appsail[backend]  "GET"  "/api/dashboard/alerts?limit=10"
+[info] [2026-07-25T13:42:54.089Z] : [1784986974089]  Appsail[backend]  "GET"  "/api/dashboard/trends"
+[info] [2026-07-25T13:46:19.548Z] : [1784987179548]  "GET"  "/app/?page=dashboard"
+[info] [2026-07-25T13:46:19.596Z] : [1784987179596]  "GET"  "/app/static/js/bundle.js"
+[info] [2026-07-25T13:46:19.937Z] : [1784987179937]  "GET"  "/app/manifest.json"
+[info] [2026-07-25T13:46:20.385Z] : [1784987180384]  "GET"  "/app/logo.svg"
+[info] [2026-07-25T13:46:20.697Z] : [1784987180697]  "GET"  "/app/logo192.png"
+[info] [2026-07-25T13:46:22.081Z] : [1784987182081]  "GET"  "/logo.svg"
+[info] [2026-07-25T13:46:22.082Z] : [1784987182082]  "GET"  "/app/map.svg"
+[info] [2026-07-25T13:46:22.084Z] : [1784987182084]  Appsail[backend]  "GET"  "/api/dashboard/stats"
+[info] [2026-07-25T13:46:22.086Z] : [1784987182085]  Appsail[backend]  "GET"  "/api/dashboard/district-crimes?timeframe=30d"
+[info] [2026-07-25T13:46:22.087Z] : [1784987182087]  Appsail[backend]  "GET"  "/api/dashboard/alerts?limit=10"
+[info] [2026-07-25T13:46:22.088Z] : [1784987182088]  Appsail[backend]  "GET"  "/api/dashboard/trends"
+[info] [2026-07-25T13:47:25.699Z] : [1784987245698]  Appsail[backend]  "GET"  "/api/dashboard/alerts?limit=10"
+[info] [2026-07-25T13:48:34.458Z] : [react-plugin]: Compiling...
+[info] [2026-07-25T13:48:35.439Z] : [react-plugin]: Compiled with warnings.
+
+[info] [2026-07-25T13:48:35.439Z] : [react-plugin]: [eslint] 
+src\components\ClerkAuthPage.tsx
+  Line 388:11:  'signUp' is assigned a value but never used  @typescript-eslint/no-unused-vars
+  Line 542:11:  'signIn' is assigned a value but never used  @typescript-eslint/no-unused-vars
+  Line 748:9:   'clerk' is assigned a value but never used   @typescript-eslint/no-unused-vars
+[info] [2026-07-25T13:48:35.439Z] : [react-plugin]: 
+Search for the keywords to learn more about each warning.
+[info] [2026-07-25T13:48:35.439Z] : [react-plugin]: To ignore, add // eslint-disable-next-line to the line before.
+
+[info] [2026-07-25T13:48:35.760Z] : [1784987315759]  "GET"  "/app/main.7603fd520726ee51c2e5.hot-update.json"
+[info] [2026-07-25T13:48:36.023Z] : [1784987316023]  "GET"  "/app/main.7603fd520726ee51c2e5.hot-update.js"
+[info] [2026-07-25T13:48:36.085Z] : [1784987316085]  "GET"  "/app/logo.svg"
+[info] [2026-07-25T13:48:56.228Z] : [1784987336228]  Appsail[backend]  "GET"  "/api/dashboard/district-crimes?timeframe=7d"
+[info] [2026-07-25T13:48:57.557Z] : [1784987337556]  Appsail[backend]  "GET"  "/api/dashboard/district-crimes?timeframe=24h"
+[info] [2026-07-25T13:49:02.708Z] : [1784987342708]  Appsail[backend]  "GET"  "/api/chat/history"
+[info] [2026-07-25T13:49:02.709Z] : [1784987342709]  Appsail[backend]  "POST"  "/api/chat/new"
+[info] [2026-07-25T13:49:03.724Z] : [1784987343723]  Appsail[backend]  "GET"  "/api/chat/history"
+[info] [2026-07-25T13:49:04.036Z] : [1784987344036]  Appsail[backend]  "POST"  "/api/chat/new"
+[info] [2026-07-25T13:49:04.370Z] : [1784987344369]  Appsail[backend]  "GET"  "/api/network/graph?view=all"
+[info] [2026-07-25T13:49:04.373Z] : [1784987344372]  Appsail[backend]  "GET"  "/api/network/graph?date_from=2026-06-25&date_to=2026-07-25&view=all"
+[info] [2026-07-25T13:49:07.242Z] : [1784987347242]  "GET"  "/app/map.svg"
+[info] [2026-07-25T13:49:13.493Z] : [1784987353493]  "GET"  "/app/map.svg"
+[info] [2026-07-25T13:50:58.372Z] : [1784987458372]  "GET"  "/app/?page=dashboard"
+[info] [2026-07-25T13:50:58.457Z] : [1784987458457]  "GET"  "/app/static/js/bundle.js"
+[info] [2026-07-25T13:50:58.793Z] : [1784987458793]  "GET"  "/app/manifest.json"
+[info] [2026-07-25T13:50:59.243Z] : [1784987459243]  "GET"  "/app/logo.svg"
+[info] [2026-07-25T13:50:59.558Z] : [1784987459558]  "GET"  "/app/logo192.png"
+[info] [2026-07-25T13:51:00.150Z] : [1784987460150]  "GET"  "/app/?page=dashboard"
+[info] [2026-07-25T13:51:00.151Z] : [1784987460151]  "GET"  "/app/logo.svg"
+[info] [2026-07-25T13:51:00.155Z] : [1784987460155]  Appsail[backend]  "GET"  "/api/dashboard/stats"
+[info] [2026-07-25T13:51:00.157Z] : [1784987460157]  Appsail[backend]  "GET"  "/api/dashboard/district-crimes?timeframe=30d"
+[info] [2026-07-25T13:51:00.158Z] : [1784987460158]  Appsail[backend]  "GET"  "/api/dashboard/alerts?limit=10"
+[info] [2026-07-25T13:51:00.159Z] : [1784987460159]  Appsail[backend]  "GET"  "/api/dashboard/trends"
+[info] [2026-07-25T13:51:00.179Z] : [1784987460179]  "GET"  "/app/manifest.json"
+[info] [2026-07-25T13:51:00.197Z] : [1784987460196]  "GET"  "/app/static/js/bundle.js"
+[info] [2026-07-25T13:51:00.828Z] : [1784987460827]  "GET"  "/app/logo.svg"
+[info] [2026-07-25T13:51:00.829Z] : [1784987460829]  "GET"  "/app/logo192.png"
+[info] [2026-07-25T13:51:01.763Z] : [1784987461762]  Appsail[backend]  "GET"  "/api/dashboard/stats"
+[info] [2026-07-25T13:51:02.065Z] : [1784987462065]  "GET"  "/app/logo.svg"
+[info] [2026-07-25T13:51:02.066Z] : [1784987462066]  "GET"  "/app/map.svg"
+[info] [2026-07-25T13:51:02.068Z] : [1784987462067]  Appsail[backend]  "GET"  "/api/dashboard/district-crimes?timeframe=30d"
+[info] [2026-07-25T13:51:02.069Z] : [1784987462069]  Appsail[backend]  "GET"  "/api/dashboard/alerts?limit=10"
+[info] [2026-07-25T13:51:02.072Z] : [1784987462072]  Appsail[backend]  "GET"  "/api/dashboard/trends"
+[info] [2026-07-25T13:51:10.658Z] : [1784987470658]  "GET"  "/app/?page=dashboard"
+[info] [2026-07-25T13:51:10.975Z] : [1784987470975]  "GET"  "/app/static/js/bundle.js"
+[info] [2026-07-25T13:51:11.002Z] : [1784987471001]  "GET"  "/app/manifest.json"
+[info] [2026-07-25T13:51:11.279Z] : [1784987471279]  "GET"  "/app/logo.svg"
+[info] [2026-07-25T13:51:11.282Z] : [1784987471282]  "GET"  "/app/logo192.png"
+[info] [2026-07-25T13:51:12.036Z] : [1784987472035]  "GET"  "/app/logo.svg"
+[info] [2026-07-25T13:51:12.036Z] : [1784987472036]  "GET"  "/app/map.svg"
+[info] [2026-07-25T13:51:12.037Z] : [1784987472037]  Appsail[backend]  "GET"  "/api/dashboard/stats"
+[info] [2026-07-25T13:51:12.038Z] : [1784987472038]  Appsail[backend]  "GET"  "/api/dashboard/district-crimes?timeframe=30d"
+[info] [2026-07-25T13:51:12.038Z] : [1784987472038]  Appsail[backend]  "GET"  "/api/dashboard/alerts?limit=10"
+[info] [2026-07-25T13:51:12.039Z] : [1784987472039]  Appsail[backend]  "GET"  "/api/dashboard/trends"
+[info] [2026-07-25T13:51:23.643Z] : [1784987483643]  "GET"  "/app/?page=dashboard"
+[info] [2026-07-25T13:51:23.689Z] : [1784987483688]  "GET"  "/app/manifest.json"
+[info] [2026-07-25T13:51:23.955Z] : [1784987483955]  "GET"  "/app/static/js/bundle.js"
+[info] [2026-07-25T13:51:24.578Z] : [1784987484578]  "GET"  "/app/logo.svg"
+[info] [2026-07-25T13:51:24.579Z] : [1784987484579]  "GET"  "/app/logo192.png"
+[info] [2026-07-25T13:51:24.728Z] : [1784987484728]  Appsail[backend]  "GET"  "/api/dashboard/stats"
+[info] [2026-07-25T13:51:24.840Z] : [1784987484839]  "GET"  "/app/map.svg"
+[info] [2026-07-25T13:51:25.029Z] : [1784987485028]  "GET"  "/app/logo.svg"
+[info] [2026-07-25T13:51:25.035Z] : [1784987485034]  Appsail[backend]  "GET"  "/api/dashboard/district-crimes?timeframe=30d"
+[info] [2026-07-25T13:51:25.035Z] : [1784987485035]  Appsail[backend]  "GET"  "/api/dashboard/alerts?limit=10"
+[info] [2026-07-25T13:51:25.036Z] : [1784987485036]  Appsail[backend]  "GET"  "/api/dashboard/trends"
+[info] [2026-07-25T13:51:38.649Z] : [1784987498648]  Appsail[backend]  "GET"  "/api/chat/history"
+[info] [2026-07-25T13:51:38.664Z] : [1784987498664]  Appsail[backend]  "OPTIONS"  "/api/chat/new"
+[info] [2026-07-25T13:51:39.529Z] : [1784987499529]  Appsail[backend]  "POST"  "/api/chat/new"
+[info] [2026-07-25T13:51:40.241Z] : [1784987500241]  Appsail[backend]  "GET"  "/api/chat/history"
+[info] [2026-07-25T13:51:40.242Z] : [1784987500242]  Appsail[backend]  "GET"  "/api/chat/messages?session_id=a7b05c79-a4d0-4c5a-bc1c-d305c01e9816"
+[info] [2026-07-25T13:51:42.333Z] : [1784987502332]  Appsail[backend]  "OPTIONS"  "/api/chat/query"
+[info] [2026-07-25T13:51:42.337Z] : [1784987502337]  Appsail[backend]  "POST"  "/api/chat/query"
+[info] [2026-07-25T13:51:49.086Z] : [1784987509086]  Appsail[backend]  "GET"  "/api/chat/messages?session_id=a7b05c79-a4d0-4c5a-bc1c-d305c01e9816"
+[info] [2026-07-25T13:51:49.088Z] : [1784987509088]  Appsail[backend]  "GET"  "/api/chat/history"
+[info] [2026-07-25T13:52:36.555Z] : [1784987556555]  Appsail[backend]  "POST"  "/api/chat/query"
+[info] [2026-07-25T13:53:30.870Z] : [1784987610870]  Appsail[backend]  "POST"  "/api/chat/query"
+[info] [2026-07-25T13:53:53.740Z] : [1784987633740]  Appsail[backend]  "GET"  "/api/chat/messages?session_id=a7b05c79-a4d0-4c5a-bc1c-d305c01e9816"
+[info] [2026-07-25T13:53:54.053Z] : [1784987634053]  Appsail[backend]  "GET"  "/api/chat/history"
+[info] [2026-07-25T13:54:15.449Z] : [1784987655449]  "GET"  "/app/map.svg"
+[info] [2026-07-25T13:54:21.939Z] : [1784987661938]  Appsail[backend]  "GET"  "/api/chat/history"
+[info] [2026-07-25T13:54:21.954Z] : [1784987661954]  Appsail[backend]  "POST"  "/api/chat/new"
+[info] [2026-07-25T13:54:22.267Z] : [1784987662267]  Appsail[backend]  "GET"  "/api/chat/messages?session_id=a7b05c79-a4d0-4c5a-bc1c-d305c01e9816"
+[info] [2026-07-25T13:54:22.999Z] : [1784987662999]  Appsail[backend]  "GET"  "/api/chat/history"
+[info] [2026-07-25T13:54:23.014Z] : [1784987663014]  Appsail[backend]  "GET"  "/api/chat/messages?session_id=8c3d5d16-db83-4095-8b6e-eff7927b06c8"
+[info] [2026-07-25T13:54:25.467Z] : [1784987665466]  Appsail[backend]  "GET"  "/api/chat/export-pdf?session_id=8c3d5d16-db83-4095-8b6e-eff7927b06c8"
+[info] [2026-07-25T13:55:10.591Z] : [1784987710591]  Appsail[backend]  "GET"  "/api/chat/messages?session_id=a771c88d-3c9a-45bd-bf21-ea014c11dc3f"
+[info] [2026-07-25T13:55:13.971Z] : [1784987713971]  Appsail[backend]  "POST"  "/api/chat/new"
+[info] [2026-07-25T13:55:14.689Z] : [1784987714688]  Appsail[backend]  "GET"  "/api/chat/history"
+[info] [2026-07-25T13:55:14.690Z] : [1784987714690]  Appsail[backend]  "GET"  "/api/chat/messages?session_id=2baf01e5-8c90-4aa8-92e4-057456009536"
+[info] [2026-07-25T13:55:31.673Z] : [1784987731673]  Appsail[backend]  "POST"  "/api/chat/query"
+[info] [2026-07-25T13:55:38.111Z] : [1784987738111]  Appsail[backend]  "GET"  "/api/chat/messages?session_id=2baf01e5-8c90-4aa8-92e4-057456009536"
+[info] [2026-07-25T13:55:38.114Z] : [1784987738113]  Appsail[backend]  "GET"  "/api/chat/history"
+[info] [2026-07-25T13:55:47.985Z] : [1784987747985]  Appsail[backend]  "POST"  "/api/chat/query"
+[info] [2026-07-25T13:56:13.253Z] : [1784987773252]  Appsail[backend]  "GET"  "/api/chat/messages?session_id=2baf01e5-8c90-4aa8-92e4-057456009536"
+[info] [2026-07-25T13:56:13.255Z] : [1784987773255]  Appsail[backend]  "GET"  "/api/chat/history"
+[info] [2026-07-25T13:57:00.591Z] : [1784987820591]  Appsail[backend]  "GET"  "/api/chat/export-pdf?session_id=2baf01e5-8c90-4aa8-92e4-057456009536"
+[info] [2026-07-25T13:58:46.687Z] : [1784987926687]  Appsail[backend]  "GET"  "/api/dashboard/stats"
+[info] [2026-07-25T13:58:46.689Z] : [1784987926688]  Appsail[backend]  "GET"  "/api/dashboard/district-crimes?timeframe=30d"
+[info] [2026-07-25T13:58:46.690Z] : [1784987926689]  Appsail[backend]  "GET"  "/api/dashboard/alerts?limit=10"
+[info] [2026-07-25T13:58:46.691Z] : [1784987926691]  Appsail[backend]  "GET"  "/api/dashboard/trends"
+[info] [2026-07-25T13:58:46.701Z] : [1784987926701]  "GET"  "/app/map.svg"
+[info] [2026-07-25T14:02:12.832Z] : [1784988132832]  Appsail[backend]  "GET"  "/api/chat/history"
+[info] [2026-07-25T14:02:12.833Z] : [1784988132833]  Appsail[backend]  "OPTIONS"  "/api/chat/new"
+[info] [2026-07-25T14:02:13.099Z] : [1784988133099]  Appsail[backend]  "POST"  "/api/chat/new"
+[info] [2026-07-25T14:02:13.230Z] : [1784988133230]  Appsail[backend]  "GET"  "/api/network/graph?view=all"
+[info] [2026-07-25T14:02:13.552Z] : [1784988133552]  Appsail[backend]  "GET"  "/api/network/graph?date_from=2026-06-25&date_to=2026-07-25&view=all"
+[info] [2026-07-25T14:02:14.900Z] : [1784988134900]  Appsail[backend]  "GET"  "/api/chat/history"
+[info] [2026-07-25T14:02:14.901Z] : [1784988134901]  Appsail[backend]  "POST"  "/api/chat/new"
+[info] [2026-07-25T14:02:15.258Z] : [1784988135258]  Appsail[backend]  "GET"  "/api/chat/messages?session_id=3aac5a81-d96c-4249-a7e0-0c6c4b986fd5"
+[info] [2026-07-25T14:02:16.405Z] : [1784988136405]  Appsail[backend]  "GET"  "/api/chat/history"
+[info] [2026-07-25T14:03:01.807Z] : [react-plugin]: Compiling...
+[info] [2026-07-25T14:03:02.773Z] : [react-plugin]: Compiled with warnings.
+
+[info] [2026-07-25T14:03:02.773Z] : [react-plugin]: [eslint] 
+src\components\ClerkAuthPage.tsx
+  Line 388:11:  'signUp' is assigned a value but never used  @typescript-eslint/no-unused-vars
+  Line 542:11:  'signIn' is assigned a value but never used  @typescript-eslint/no-unused-vars
+  Line 748:9:   'clerk' is assigned a value but never used   @typescript-eslint/no-unused-vars
+
+src\components\Sidebar.tsx
+  Line 6:17:  'useState' is defined but never used      @typescript-eslint/no-unused-vars
+  Line 6:27:  'useEffect' is defined but never used     @typescript-eslint/no-unused-vars
+  Line 16:3:  'ChevronLeft' is defined but never used   @typescript-eslint/no-unused-vars
+  Line 17:3:  'ChevronRight' is defined but never used  @typescript-eslint/no-unused-vars
+[info] [2026-07-25T14:03:02.773Z] : [react-plugin]: 
+Search for the keywords to learn more about each warning.
+[info] [2026-07-25T14:03:02.773Z] : [react-plugin]: To ignore, add // eslint-disable-next-line to the line before.
+
+[info] [2026-07-25T14:03:03.079Z] : [1784988183079]  "GET"  "/app/main.b2e3bd215beedfa005c9.hot-update.json"
+[info] [2026-07-25T14:03:03.352Z] : [1784988183352]  "GET"  "/app/main.b2e3bd215beedfa005c9.hot-update.js"
+[info] [2026-07-25T14:03:06.696Z] : [react-plugin]: Compiling...
+[info] [2026-07-25T14:03:07.469Z] : [react-plugin]: Compiled with warnings.
+
+[info] [2026-07-25T14:03:07.469Z] : [react-plugin]: [eslint] 
+src\components\ClerkAuthPage.tsx
+  Line 388:11:  'signUp' is assigned a value but never used  @typescript-eslint/no-unused-vars
+  Line 542:11:  'signIn' is assigned a value but never used  @typescript-eslint/no-unused-vars
+  Line 748:9:   'clerk' is assigned a value but never used   @typescript-eslint/no-unused-vars
+
+src\components\Sidebar.tsx
+  Line 6:17:  'useState' is defined but never used      @typescript-eslint/no-unused-vars
+  Line 6:27:  'useEffect' is defined but never used     @typescript-eslint/no-unused-vars
+  Line 16:3:  'ChevronLeft' is defined but never used   @typescript-eslint/no-unused-vars
+  Line 17:3:  'ChevronRight' is defined but never used  @typescript-eslint/no-unused-vars
+[info] [2026-07-25T14:03:07.469Z] : [react-plugin]: 
+Search for the keywords to learn more about each warning.
+[info] [2026-07-25T14:03:07.469Z] : [react-plugin]: To ignore, add // eslint-disable-next-line to the line before.
+
+[info] [2026-07-25T14:03:07.507Z] : [1784988187507]  "GET"  "/app/main.f16f405462348315a4cd.hot-update.json"
+[info] [2026-07-25T14:03:07.819Z] : [1784988187819]  "GET"  "/app/main.f16f405462348315a4cd.hot-update.js"
+[info] [2026-07-25T14:03:09.216Z] : [1784988189216]  Appsail[backend]  "GET"  "/api/network/profile/7"
+[info] [2026-07-25T14:03:13.457Z] : [react-plugin]: Compiling...
+[info] [2026-07-25T14:03:14.159Z] : [react-plugin]: Compiled with warnings.
+
+[info] [2026-07-25T14:03:14.159Z] : [react-plugin]: [eslint] 
+src\components\ClerkAuthPage.tsx
+  Line 388:11:  'signUp' is assigned a value but never used  @typescript-eslint/no-unused-vars
+  Line 542:11:  'signIn' is assigned a value but never used  @typescript-eslint/no-unused-vars
+  Line 748:9:   'clerk' is assigned a value but never used   @typescript-eslint/no-unused-vars
+
+src\components\Sidebar.tsx
+  Line 6:17:  'useState' is defined but never used      @typescript-eslint/no-unused-vars
+  Line 6:27:  'useEffect' is defined but never used     @typescript-eslint/no-unused-vars
+  Line 16:3:  'ChevronLeft' is defined but never used   @typescript-eslint/no-unused-vars
+  Line 17:3:  'ChevronRight' is defined but never used  @typescript-eslint/no-unused-vars
+[info] [2026-07-25T14:03:14.159Z] : [react-plugin]: 
+Search for the keywords to learn more about each warning.
+[info] [2026-07-25T14:03:14.159Z] : [react-plugin]: To ignore, add // eslint-disable-next-line to the line before.
+
+[info] [2026-07-25T14:03:14.187Z] : [1784988194186]  "GET"  "/app/main.eb0da3c13fd73d6bd1d8.hot-update.json"
+[info] [2026-07-25T14:03:14.496Z] : [1784988194495]  "GET"  "/app/main.eb0da3c13fd73d6bd1d8.hot-update.js"
+[info] [2026-07-25T14:03:19.915Z] : [react-plugin]: Compiling...
+[info] [2026-07-25T14:03:20.374Z] : [react-plugin]: Compiled with warnings.
+
+[info] [2026-07-25T14:03:20.374Z] : [react-plugin]: [eslint] 
+src\components\ClerkAuthPage.tsx
+  Line 388:11:  'signUp' is assigned a value but never used  @typescript-eslint/no-unused-vars
+  Line 542:11:  'signIn' is assigned a value but never used  @typescript-eslint/no-unused-vars
+  Line 748:9:   'clerk' is assigned a value but never used   @typescript-eslint/no-unused-vars
+
+src\components\Sidebar.tsx
+  Line 6:17:  'useState' is defined but never used      @typescript-eslint/no-unused-vars
+  Line 6:27:  'useEffect' is defined but never used     @typescript-eslint/no-unused-vars
+  Line 16:3:  'ChevronLeft' is defined but never used   @typescript-eslint/no-unused-vars
+  Line 17:3:  'ChevronRight' is defined but never used  @typescript-eslint/no-unused-vars
+[info] [2026-07-25T14:03:20.374Z] : [react-plugin]: 
+Search for the keywords to learn more about each warning.
+[info] [2026-07-25T14:03:20.374Z] : [react-plugin]: To ignore, add // eslint-disable-next-line to the line before.
+
+[info] [2026-07-25T14:03:20.395Z] : [1784988200395]  "GET"  "/app/main.daf021ee29cb5d76e7bd.hot-update.json"
+[info] [2026-07-25T14:03:20.712Z] : [1784988200712]  "GET"  "/app/main.daf021ee29cb5d76e7bd.hot-update.js"
+[info] [2026-07-25T14:03:26.282Z] : [react-plugin]: Compiling...
+[info] [2026-07-25T14:03:26.966Z] : [react-plugin]: Compiled with warnings.
+
+[info] [2026-07-25T14:03:26.966Z] : [react-plugin]: [eslint] 
+src\components\ClerkAuthPage.tsx
+  Line 388:11:  'signUp' is assigned a value but never used  @typescript-eslint/no-unused-vars
+  Line 542:11:  'signIn' is assigned a value but never used  @typescript-eslint/no-unused-vars
+  Line 748:9:   'clerk' is assigned a value but never used   @typescript-eslint/no-unused-vars
+
+src\components\Sidebar.tsx
+  Line 6:17:  'useState' is defined but never used   @typescript-eslint/no-unused-vars
+  Line 6:27:  'useEffect' is defined but never used  @typescript-eslint/no-unused-vars
+[info] [2026-07-25T14:03:26.966Z] : [react-plugin]: 
+Search for the keywords to learn more about each warning.
+[info] [2026-07-25T14:03:26.966Z] : [react-plugin]: To ignore, add // eslint-disable-next-line to the line before.
+
+[info] [2026-07-25T14:03:26.989Z] : [1784988206988]  "GET"  "/app/main.06cd3f8fa28e94e52ffa.hot-update.json"
+[info] [2026-07-25T14:03:27.306Z] : [1784988207306]  "GET"  "/app/main.06cd3f8fa28e94e52ffa.hot-update.js"
+[info] [2026-07-25T14:03:34.530Z] : [react-plugin]: Compiling...
+[info] [2026-07-25T14:03:35.258Z] : [react-plugin]: Compiled with warnings.
+
+[info] [2026-07-25T14:03:35.259Z] : [react-plugin]: [eslint] 
+src\components\ClerkAuthPage.tsx
+  Line 388:11:  'signUp' is assigned a value but never used  @typescript-eslint/no-unused-vars
+  Line 542:11:  'signIn' is assigned a value but never used  @typescript-eslint/no-unused-vars
+  Line 748:9:   'clerk' is assigned a value but never used   @typescript-eslint/no-unused-vars
+
+src\components\Sidebar.tsx
+  Line 6:17:  'useState' is defined but never used   @typescript-eslint/no-unused-vars
+  Line 6:27:  'useEffect' is defined but never used  @typescript-eslint/no-unused-vars
+[info] [2026-07-25T14:03:35.259Z] : [react-plugin]: 
+Search for the keywords to learn more about each warning.
+[info] [2026-07-25T14:03:35.259Z] : [react-plugin]: To ignore, add // eslint-disable-next-line to the line before.
+
+[info] [2026-07-25T14:03:35.285Z] : [1784988215284]  "GET"  "/app/main.737cc5d034ed7b1695a7.hot-update.json"
+[info] [2026-07-25T14:03:35.597Z] : [1784988215596]  "GET"  "/app/main.737cc5d034ed7b1695a7.hot-update.js"
+[info] [2026-07-25T14:03:42.229Z] : [react-plugin]: Compiling...
+[info] [2026-07-25T14:03:43.121Z] : [react-plugin]: Compiled with warnings.
+
+[info] [2026-07-25T14:03:43.121Z] : [react-plugin]: [eslint] 
+src\components\ClerkAuthPage.tsx
+  Line 388:11:  'signUp' is assigned a value but never used  @typescript-eslint/no-unused-vars
+  Line 542:11:  'signIn' is assigned a value but never used  @typescript-eslint/no-unused-vars
+  Line 748:9:   'clerk' is assigned a value but never used   @typescript-eslint/no-unused-vars
+
+src\components\Sidebar.tsx
+  Line 6:17:  'useState' is defined but never used   @typescript-eslint/no-unused-vars
+  Line 6:27:  'useEffect' is defined but never used  @typescript-eslint/no-unused-vars
+[info] [2026-07-25T14:03:43.121Z] : [react-plugin]: 
+Search for the keywords to learn more about each warning.
+[info] [2026-07-25T14:03:43.121Z] : [react-plugin]: To ignore, add // eslint-disable-next-line to the line before.
+
+[info] [2026-07-25T14:03:43.148Z] : [1784988223148]  "GET"  "/app/main.f8f8349ecb59f504a217.hot-update.json"
+[info] [2026-07-25T14:03:43.466Z] : [1784988223466]  "GET"  "/app/main.f8f8349ecb59f504a217.hot-update.js"
+[info] [2026-07-25T14:03:54.569Z] : [react-plugin]: Compiling...
+[info] [2026-07-25T14:03:55.367Z] : [react-plugin]: Compiled with warnings.
+
+[info] [2026-07-25T14:03:55.367Z] : [react-plugin]: [eslint] 
+src\App.tsx
+  Line 39:10:  'isSidebarCollapsed' is assigned a value but never used     @typescript-eslint/no-unused-vars
+  Line 44:9:   'toggleSidebarCollapse' is assigned a value but never used  @typescript-eslint/no-unused-vars
+
+src\components\ClerkAuthPage.tsx
+  Line 388:11:  'signUp' is assigned a value but never used  @typescript-eslint/no-unused-vars
+  Line 542:11:  'signIn' is assigned a value but never used  @typescript-eslint/no-unused-vars
+  Line 748:9:   'clerk' is assigned a value but never used   @typescript-eslint/no-unused-vars
+
+src\components\Sidebar.tsx
+  Line 6:17:  'useState' is defined but never used   @typescript-eslint/no-unused-vars
+  Line 6:27:  'useEffect' is defined but never used  @typescript-eslint/no-unused-vars
+[info] [2026-07-25T14:03:55.367Z] : [react-plugin]: 
+Search for the keywords to learn more about each warning.
+[info] [2026-07-25T14:03:55.367Z] : [react-plugin]: To ignore, add // eslint-disable-next-line to the line before.
+
+[info] [2026-07-25T14:03:55.386Z] : [1784988235386]  "GET"  "/app/main.2f72ff2b48282cfa6e8e.hot-update.json"
+[info] [2026-07-25T14:03:55.702Z] : [1784988235702]  "GET"  "/app/main.2f72ff2b48282cfa6e8e.hot-update.js"
+[info] [2026-07-25T14:03:56.305Z] : [1784988236305]  Appsail[backend]  "GET"  "/api/network/graph?view=all"
+[info] [2026-07-25T14:03:56.318Z] : [1784988236318]  "GET"  "/app/logo.svg"
+[info] [2026-07-25T14:03:56.628Z] : [1784988236628]  Appsail[backend]  "GET"  "/api/network/graph?date_from=2026-06-25&date_to=2026-07-25&view=all"
+[info] [2026-07-25T14:03:59.167Z] : [react-plugin]: Compiling...
+[info] [2026-07-25T14:03:59.811Z] : [react-plugin]: Compiled with warnings.
+
+[info] [2026-07-25T14:03:59.811Z] : [react-plugin]: [eslint] 
+src\App.tsx
+  Line 39:10:  'isSidebarCollapsed' is assigned a value but never used     @typescript-eslint/no-unused-vars
+  Line 44:9:   'toggleSidebarCollapse' is assigned a value but never used  @typescript-eslint/no-unused-vars
+
+src\components\ClerkAuthPage.tsx
+  Line 388:11:  'signUp' is assigned a value but never used  @typescript-eslint/no-unused-vars
+  Line 542:11:  'signIn' is assigned a value but never used  @typescript-eslint/no-unused-vars
+  Line 748:9:   'clerk' is assigned a value but never used   @typescript-eslint/no-unused-vars
+
+src\components\Sidebar.tsx
+  Line 6:17:  'useState' is defined but never used   @typescript-eslint/no-unused-vars
+  Line 6:27:  'useEffect' is defined but never used  @typescript-eslint/no-unused-vars
+[info] [2026-07-25T14:03:59.811Z] : [react-plugin]: 
+Search for the keywords to learn more about each warning.
+[info] [2026-07-25T14:03:59.811Z] : [react-plugin]: To ignore, add // eslint-disable-next-line to the line before.
+
+[info] [2026-07-25T14:04:00.126Z] : [1784988240126]  "GET"  "/app/main.b9721b4231fdb12dccf6.hot-update.json"
+[info] [2026-07-25T14:04:00.374Z] : [1784988240374]  "GET"  "/app/main.b9721b4231fdb12dccf6.hot-update.js"
+[info] [2026-07-25T14:04:04.654Z] : [react-plugin]: Compiling...
+[info] [2026-07-25T14:04:05.286Z] : [react-plugin]: Compiled with warnings.
+
+[info] [2026-07-25T14:04:05.287Z] : [react-plugin]: [eslint] 
+src\components\ClerkAuthPage.tsx
+  Line 388:11:  'signUp' is assigned a value but never used  @typescript-eslint/no-unused-vars
+  Line 542:11:  'signIn' is assigned a value but never used  @typescript-eslint/no-unused-vars
+  Line 748:9:   'clerk' is assigned a value but never used   @typescript-eslint/no-unused-vars
+
+src\components\Sidebar.tsx
+  Line 6:17:  'useState' is defined but never used   @typescript-eslint/no-unused-vars
+  Line 6:27:  'useEffect' is defined but never used  @typescript-eslint/no-unused-vars
+[info] [2026-07-25T14:04:05.287Z] : [react-plugin]: 
+Search for the keywords to learn more about each warning.
+[info] [2026-07-25T14:04:05.287Z] : [react-plugin]: To ignore, add // eslint-disable-next-line to the line before.
+
+[info] [2026-07-25T14:04:05.316Z] : [1784988245316]  "GET"  "/app/main.60ab0211cd46323341b6.hot-update.json"
+[info] [2026-07-25T14:04:05.629Z] : [1784988245629]  "GET"  "/app/main.60ab0211cd46323341b6.hot-update.js"
+[info] [2026-07-25T14:05:17.231Z] : [1784988317231]  Appsail[backend]  "GET"  "/api/dashboard/stats"
+[info] [2026-07-25T14:05:17.236Z] : [1784988317236]  Appsail[backend]  "GET"  "/api/dashboard/trends"
+[info] [2026-07-25T14:05:17.237Z] : [1784988317237]  "GET"  "/app/map.svg"
+[info] [2026-07-25T14:05:17.239Z] : [1784988317239]  Appsail[backend]  "GET"  "/api/dashboard/alerts?limit=10"
+[info] [2026-07-25T14:05:17.241Z] : [1784988317241]  Appsail[backend]  "GET"  "/api/dashboard/district-crimes?timeframe=30d"
+[info] [2026-07-25T14:06:19.396Z] : [1784988379395]  Appsail[backend]  "GET"  "/api/dashboard/alerts?limit=10"
+[info] [2026-07-25T14:06:22.711Z] : [1784988382710]  Appsail[backend]  "GET"  "/api/chat/history"
+[info] [2026-07-25T14:06:23.023Z] : [1784988383023]  Appsail[backend]  "POST"  "/api/chat/new"
+[info] [2026-07-25T14:06:23.727Z] : [1784988383727]  Appsail[backend]  "GET"  "/api/chat/history"
+[info] [2026-07-25T14:06:23.729Z] : [1784988383728]  Appsail[backend]  "GET"  "/api/chat/messages?session_id=92d5af99-f6c6-41fb-a7c0-f588607749d8"
+[info] [2026-07-25T14:06:23.901Z] : [react-plugin]: Compiling...
+[info] [2026-07-25T14:06:24.814Z] : [react-plugin]: Compiled with warnings.
+
+[info] [2026-07-25T14:06:24.814Z] : [react-plugin]: [eslint] 
+src\components\ClerkAuthPage.tsx
+  Line 388:11:  'signUp' is assigned a value but never used  @typescript-eslint/no-unused-vars
+  Line 542:11:  'signIn' is assigned a value but never used  @typescript-eslint/no-unused-vars
+  Line 748:9:   'clerk' is assigned a value but never used   @typescript-eslint/no-unused-vars
+
+src\components\Sidebar.tsx
+  Line 6:17:  'useState' is defined but never used   @typescript-eslint/no-unused-vars
+  Line 6:27:  'useEffect' is defined but never used  @typescript-eslint/no-unused-vars
+[info] [2026-07-25T14:06:24.814Z] : [react-plugin]: 
+Search for the keywords to learn more about each warning.
+[info] [2026-07-25T14:06:24.814Z] : [react-plugin]: To ignore, add // eslint-disable-next-line to the line before.
+
+[info] [2026-07-25T14:06:25.128Z] : [1784988385128]  "GET"  "/app/main.c7c3dad20d7859538f7c.hot-update.json"
+[info] [2026-07-25T14:06:25.390Z] : [1784988385389]  "GET"  "/app/main.c7c3dad20d7859538f7c.hot-update.js"
+[info] [2026-07-25T14:06:25.809Z] : [1784988385808]  Appsail[backend]  "GET"  "/api/chat/history"
+[info] [2026-07-25T14:06:26.117Z] : [1784988386117]  Appsail[backend]  "POST"  "/api/chat/new"
+[info] [2026-07-25T14:06:26.804Z] : [1784988386804]  Appsail[backend]  "GET"  "/api/chat/history"
+[info] [2026-07-25T14:06:26.805Z] : [1784988386805]  Appsail[backend]  "GET"  "/api/chat/messages?session_id=7c1fcb36-3700-4b1c-b572-94dda6cfc8fa"
+[info] [2026-07-25T14:06:30.377Z] : [react-plugin]: Compiling...
+[info] [2026-07-25T14:06:31.097Z] : [react-plugin]: Compiled with warnings.
+
+[info] [2026-07-25T14:06:31.097Z] : [react-plugin]: [eslint] 
+src\components\ClerkAuthPage.tsx
+  Line 388:11:  'signUp' is assigned a value but never used  @typescript-eslint/no-unused-vars
+  Line 542:11:  'signIn' is assigned a value but never used  @typescript-eslint/no-unused-vars
+  Line 748:9:   'clerk' is assigned a value but never used   @typescript-eslint/no-unused-vars
+
+src\components\Sidebar.tsx
+  Line 6:17:  'useState' is defined but never used   @typescript-eslint/no-unused-vars
+  Line 6:27:  'useEffect' is defined but never used  @typescript-eslint/no-unused-vars
+[info] [2026-07-25T14:06:31.097Z] : [react-plugin]: 
+Search for the keywords to learn more about each warning.
+[info] [2026-07-25T14:06:31.097Z] : [react-plugin]: To ignore, add // eslint-disable-next-line to the line before.
+
+[info] [2026-07-25T14:06:31.115Z] : [1784988391114]  "GET"  "/app/main.cbb57e7fb8ee84a78df2.hot-update.json"
+[info] [2026-07-25T14:06:31.423Z] : [1784988391423]  "GET"  "/app/main.cbb57e7fb8ee84a78df2.hot-update.js"
+[info] [2026-07-25T14:06:42.922Z] : [react-plugin]: Compiling...
+[info] [2026-07-25T14:06:43.758Z] : [react-plugin]: Compiled with warnings.
+
+[info] [2026-07-25T14:06:43.758Z] : [react-plugin]: [eslint] 
+src\components\ClerkAuthPage.tsx
+  Line 388:11:  'signUp' is assigned a value but never used  @typescript-eslint/no-unused-vars
+  Line 542:11:  'signIn' is assigned a value but never used  @typescript-eslint/no-unused-vars
+  Line 748:9:   'clerk' is assigned a value but never used   @typescript-eslint/no-unused-vars
+
+src\components\Sidebar.tsx
+  Line 6:17:  'useState' is defined but never used   @typescript-eslint/no-unused-vars
+  Line 6:27:  'useEffect' is defined but never used  @typescript-eslint/no-unused-vars
+[info] [2026-07-25T14:06:43.758Z] : [react-plugin]: 
+Search for the keywords to learn more about each warning.
+[info] [2026-07-25T14:06:43.759Z] : [react-plugin]: To ignore, add // eslint-disable-next-line to the line before.
+
+[info] [2026-07-25T14:06:43.787Z] : [1784988403787]  "GET"  "/app/main.dd58e7382e32e7a534c7.hot-update.json"
+[info] [2026-07-25T14:06:44.107Z] : [1784988404107]  "GET"  "/app/main.dd58e7382e32e7a534c7.hot-update.js"
+[info] [2026-07-25T14:09:30.172Z] : [react-plugin]: Compiling...
+[info] [2026-07-25T14:09:31.113Z] : [react-plugin]: Compiled with warnings.
+
+[info] [2026-07-25T14:09:31.113Z] : [react-plugin]: [eslint] 
+src\components\ClerkAuthPage.tsx
+  Line 388:11:  'signUp' is assigned a value but never used  @typescript-eslint/no-unused-vars
+  Line 542:11:  'signIn' is assigned a value but never used  @typescript-eslint/no-unused-vars
+  Line 748:9:   'clerk' is assigned a value but never used   @typescript-eslint/no-unused-vars
+
+src\components\Sidebar.tsx
+  Line 6:17:  'useState' is defined but never used   @typescript-eslint/no-unused-vars
+  Line 6:27:  'useEffect' is defined but never used  @typescript-eslint/no-unused-vars
+[info] [2026-07-25T14:09:31.113Z] : [react-plugin]: 
+Search for the keywords to learn more about each warning.
+[info] [2026-07-25T14:09:31.113Z] : [react-plugin]: To ignore, add // eslint-disable-next-line to the line before.
+
+[info] [2026-07-25T14:09:31.424Z] : [1784988571423]  "GET"  "/app/main.4addf7b750195f5644f5.hot-update.json"
+[info] [2026-07-25T14:09:31.688Z] : [1784988571688]  "GET"  "/app/main.4addf7b750195f5644f5.hot-update.js"
+[info] [2026-07-25T14:10:16.114Z] : [react-plugin]: Compiling...
+[info] [2026-07-25T14:10:16.968Z] : [react-plugin]: Compiled with warnings.
+
+[info] [2026-07-25T14:10:16.969Z] : [react-plugin]: [eslint] 
+src\components\ClerkAuthPage.tsx
+  Line 388:11:  'signUp' is assigned a value but never used  @typescript-eslint/no-unused-vars
+  Line 542:11:  'signIn' is assigned a value but never used  @typescript-eslint/no-unused-vars
+  Line 748:9:   'clerk' is assigned a value but never used   @typescript-eslint/no-unused-vars
+[info] [2026-07-25T14:10:16.969Z] : [react-plugin]: 
+Search for the keywords to learn more about each warning.
+[info] [2026-07-25T14:10:16.969Z] : [react-plugin]: To ignore, add // eslint-disable-next-line to the line before.
+
+[info] [2026-07-25T14:10:16.991Z] : [1784988616991]  "GET"  "/app/main.f29769cfbe4d274f8caf.hot-update.json"
+[info] [2026-07-25T14:10:17.302Z] : [1784988617302]  "GET"  "/app/main.f29769cfbe4d274f8caf.hot-update.js"
+[info] [2026-07-25T14:11:03.980Z] : [react-plugin]: Compiling...
+[info] [2026-07-25T14:11:04.852Z] : [react-plugin]: Compiled with warnings.
+
+[info] [2026-07-25T14:11:04.852Z] : [react-plugin]: [eslint] 
+src\components\ClerkAuthPage.tsx
+  Line 388:11:  'signUp' is assigned a value but never used  @typescript-eslint/no-unused-vars
+  Line 542:11:  'signIn' is assigned a value but never used  @typescript-eslint/no-unused-vars
+  Line 748:9:   'clerk' is assigned a value but never used   @typescript-eslint/no-unused-vars
+
+src\components\Sidebar.tsx
+  Line 6:17:  'useState' is defined but never used      @typescript-eslint/no-unused-vars
+  Line 6:27:  'useEffect' is defined but never used     @typescript-eslint/no-unused-vars
+  Line 16:3:  'ChevronLeft' is defined but never used   @typescript-eslint/no-unused-vars
+  Line 17:3:  'ChevronRight' is defined but never used  @typescript-eslint/no-unused-vars
+[info] [2026-07-25T14:11:04.852Z] : [react-plugin]: 
+Search for the keywords to learn more about each warning.
+[info] [2026-07-25T14:11:04.852Z] : [react-plugin]: To ignore, add // eslint-disable-next-line to the line before.
+
+[info] [2026-07-25T14:11:04.883Z] : [react-plugin]: Compiling...
+[info] [2026-07-25T14:11:04.885Z] : [1784988664885]  "GET"  "/app/main.e3533e46c5a8336f360a.hot-update.json"
+[info] [2026-07-25T14:11:05.598Z] : [react-plugin]: Compiled with warnings.
+
+[info] [2026-07-25T14:11:05.598Z] : [react-plugin]: [eslint] 
+src\components\ClerkAuthPage.tsx
+  Line 388:11:  'signUp' is assigned a value but never used  @typescript-eslint/no-unused-vars
+  Line 542:11:  'signIn' is assigned a value but never used  @typescript-eslint/no-unused-vars
+  Line 748:9:   'clerk' is assigned a value but never used   @typescript-eslint/no-unused-vars
+[info] [2026-07-25T14:11:05.598Z] : [react-plugin]: 
+Search for the keywords to learn more about each warning.
+[info] [2026-07-25T14:11:05.598Z] : [react-plugin]: To ignore, add // eslint-disable-next-line to the line before.
+
+[info] [2026-07-25T14:11:05.938Z] : [1784988665938]  "GET"  "/app/main.e3533e46c5a8336f360a.hot-update.js"
+[info] [2026-07-25T14:11:06.191Z] : [1784988666191]  "GET"  "/app/main.592318cb4937e6d68390.hot-update.json"
+[info] [2026-07-25T14:11:06.252Z] : [1784988666252]  "GET"  "/app/main.592318cb4937e6d68390.hot-update.js"
+[info] [2026-07-25T14:11:06.624Z] : [1784988666624]  Appsail[backend]  "GET"  "/api/dashboard/stats"
+[info] [2026-07-25T14:11:06.626Z] : [1784988666625]  Appsail[backend]  "GET"  "/api/dashboard/district-crimes?timeframe=30d"
+[info] [2026-07-25T14:11:06.626Z] : [1784988666626]  Appsail[backend]  "GET"  "/api/dashboard/alerts?limit=10"
+[info] [2026-07-25T14:11:06.627Z] : [1784988666627]  Appsail[backend]  "GET"  "/api/dashboard/trends"
+[info] [2026-07-25T14:11:14.787Z] : [react-plugin]: Compiling...
+[info] [2026-07-25T14:11:15.544Z] : [react-plugin]: Compiled with warnings.
+
+[info] [2026-07-25T14:11:15.544Z] : [react-plugin]: [eslint] 
+src\components\ClerkAuthPage.tsx
+  Line 388:11:  'signUp' is assigned a value but never used  @typescript-eslint/no-unused-vars
+  Line 542:11:  'signIn' is assigned a value but never used  @typescript-eslint/no-unused-vars
+  Line 748:9:   'clerk' is assigned a value but never used   @typescript-eslint/no-unused-vars
+
+src\components\Sidebar.tsx
+  Line 6:17:  'useState' is defined but never used   @typescript-eslint/no-unused-vars
+  Line 6:27:  'useEffect' is defined but never used  @typescript-eslint/no-unused-vars
+[info] [2026-07-25T14:11:15.544Z] : [react-plugin]: 
+Search for the keywords to learn more about each warning.
+[info] [2026-07-25T14:11:15.544Z] : [react-plugin]: To ignore, add // eslint-disable-next-line to the line before.
+
+[info] [2026-07-25T14:11:15.573Z] : [react-plugin]: Compiling...
+[info] [2026-07-25T14:11:15.574Z] : [1784988675574]  "GET"  "/app/main.95bea3c756c0cb648c1e.hot-update.json"
+[info] [2026-07-25T14:11:15.879Z] : [react-plugin]: Compiled with warnings.
+
+[info] [2026-07-25T14:11:15.879Z] : [react-plugin]: [eslint] 
+src\components\ClerkAuthPage.tsx
+  Line 388:11:  'signUp' is assigned a value but never used  @typescript-eslint/no-unused-vars
+  Line 542:11:  'signIn' is assigned a value but never used  @typescript-eslint/no-unused-vars
+  Line 748:9:   'clerk' is assigned a value but never used   @typescript-eslint/no-unused-vars
+
+src\components\Sidebar.tsx
+  Line 6:17:  'useState' is defined but never used   @typescript-eslint/no-unused-vars
+  Line 6:27:  'useEffect' is defined but never used  @typescript-eslint/no-unused-vars
+[info] [2026-07-25T14:11:15.879Z] : [react-plugin]: 
+Search for the keywords to learn more about each warning.
+[info] [2026-07-25T14:11:15.879Z] : [react-plugin]: To ignore, add // eslint-disable-next-line to the line before.
+
+[info] [2026-07-25T14:11:16.220Z] : [1784988676219]  "GET"  "/app/main.95bea3c756c0cb648c1e.hot-update.js"
+[info] [2026-07-25T14:11:16.861Z] : [1784988676861]  "GET"  "/app/?page=dashboard"
+[info] [2026-07-25T14:11:17.170Z] : [1784988677169]  "GET"  "/app/static/js/bundle.js"
+[info] [2026-07-25T14:11:17.201Z] : [1784988677201]  "GET"  "/app/manifest.json"
+[info] [2026-07-25T14:11:17.994Z] : [1784988677994]  "GET"  "/app/logo.svg"
+[info] [2026-07-25T14:11:17.996Z] : [1784988677996]  "GET"  "/app/logo192.png"
+[info] [2026-07-25T14:11:18.214Z] : [1784988678214]  Appsail[backend]  "GET"  "/api/dashboard/stats"
+[info] [2026-07-25T14:11:18.248Z] : [1784988678248]  "GET"  "/app/logo.svg"
+[info] [2026-07-25T14:11:18.508Z] : [1784988678507]  "GET"  "/app/map.svg"
+[info] [2026-07-25T14:11:18.524Z] : [1784988678524]  Appsail[backend]  "GET"  "/api/dashboard/district-crimes?timeframe=30d"
+[info] [2026-07-25T14:11:18.526Z] : [1784988678526]  Appsail[backend]  "GET"  "/api/dashboard/alerts?limit=10"
+[info] [2026-07-25T14:11:18.527Z] : [1784988678527]  Appsail[backend]  "GET"  "/api/dashboard/trends"
+[info] [2026-07-25T14:11:27.513Z] : [1784988687512]  "GET"  "/app/manifest.json"
+[info] [2026-07-25T14:11:27.516Z] : [1784988687516]  "GET"  "/.well-known/appspecific/com.chrome.devtools.json"
+[info] [2026-07-25T14:11:28.172Z] : [1784988688172]  "GET"  "/app/static/js/bundle.js.map"
+[info] [2026-07-25T14:11:54.541Z] : [react-plugin]: Compiling...
+[info] [2026-07-25T14:11:55.192Z] : [react-plugin]: Compiled with warnings.
+
+[info] [2026-07-25T14:11:55.193Z] : [react-plugin]: [eslint] 
+src\components\ClerkAuthPage.tsx
+  Line 388:11:  'signUp' is assigned a value but never used  @typescript-eslint/no-unused-vars
+  Line 542:11:  'signIn' is assigned a value but never used  @typescript-eslint/no-unused-vars
+  Line 748:9:   'clerk' is assigned a value but never used   @typescript-eslint/no-unused-vars
+
+src\components\Sidebar.tsx
+  Line 6:17:  'useState' is defined but never used      @typescript-eslint/no-unused-vars
+  Line 6:27:  'useEffect' is defined but never used     @typescript-eslint/no-unused-vars
+  Line 16:3:  'ChevronLeft' is defined but never used   @typescript-eslint/no-unused-vars
+  Line 17:3:  'ChevronRight' is defined but never used  @typescript-eslint/no-unused-vars
+[info] [2026-07-25T14:11:55.193Z] : [react-plugin]: 
+Search for the keywords to learn more about each warning.
+[info] [2026-07-25T14:11:55.193Z] : [react-plugin]: To ignore, add // eslint-disable-next-line to the line before.
+
+[info] [2026-07-25T14:11:55.216Z] : [1784988715215]  "GET"  "/app/main.11e3a838bcd8a0e618a8.hot-update.json"
+[info] [2026-07-25T14:11:55.536Z] : [1784988715536]  "GET"  "/app/main.11e3a838bcd8a0e618a8.hot-update.js"
+[info] [2026-07-25T14:11:55.798Z] : [1784988715797]  "GET"  "/app/main.11e3a838bcd8a0e618a8.hot-update.js.map"
+[info] [2026-07-25T14:12:01.928Z] : [1784988721928]  Appsail[backend]  "GET"  "/api/chat/history"
+[info] [2026-07-25T14:12:01.930Z] : [1784988721929]  Appsail[backend]  "POST"  "/api/chat/new"
+[info] [2026-07-25T14:12:02.372Z] : [1784988722372]  Appsail[backend]  "GET"  "/api/chat/messages?session_id=83e12061-2411-484f-b596-41e3575a1961"
+[info] [2026-07-25T14:12:04.222Z] : [1784988724222]  Appsail[backend]  "GET"  "/api/network/graph?view=all"
+[info] [2026-07-25T14:12:04.224Z] : [1784988724223]  Appsail[backend]  "GET"  "/api/network/graph?date_from=2026-06-25&date_to=2026-07-25&view=all"
+[info] [2026-07-25T14:12:04.830Z] : [1784988724830]  Appsail[backend]  "GET"  "/api/analytics/hotspots?"
+[info] [2026-07-25T14:12:04.832Z] : [1784988724832]  Appsail[backend]  "GET"  "/api/analytics/emerging-clusters"
+[info] [2026-07-25T14:12:06.533Z] : [1784988726533]  Appsail[backend]  "GET"  "/api/chat/history"
+[info] [2026-07-25T14:12:06.536Z] : [1784988726536]  Appsail[backend]  "POST"  "/api/chat/new"
+[info] [2026-07-25T14:12:20.756Z] : [1784988740756]  Appsail[backend]  "GET"  "/api/network/profile/4"
+[info] [2026-07-25T14:12:25.086Z] : [1784988745085]  Appsail[backend]  "GET"  "/api/network/graph?date_from=2026-06-25&date_to=2026-07-25&view=clusters"
+[info] [2026-07-25T14:12:28.988Z] : [1784988748988]  Appsail[backend]  "GET"  "/api/network/graph?crime_type=Robbery&date_from=2026-06-25&date_to=2026-07-25&view=all"
+[info] [2026-07-25T14:12:31.982Z] : [1784988751982]  Appsail[backend]  "GET"  "/api/network/profile/0?row_id=46143000000062150"
+[info] [2026-07-25T14:12:36.924Z] : [1784988756924]  Appsail[backend]  "GET"  "/api/network/graph?crime_type=Chain+Snatching&date_from=2026-06-25&date_to=2026-07-25&view=all"
+[info] [2026-07-25T14:12:43.678Z] : [1784988763678]  Appsail[backend]  "GET"  "/api/network/profile/0?row_id=46143000000062140"
+[info] [2026-07-25T14:12:47.572Z] : [1784988767572]  Appsail[backend]  "GET"  "/api/network/profile/3"
+[info] [2026-07-25T14:12:50.697Z] : [1784988770696]  Appsail[backend]  "GET"  "/api/network/graph?crime_type=Chain+Snatching&date_from=2025-12-31&date_to=2026-07-25&view=all"
+[info] [2026-07-25T14:12:56.534Z] : [1784988776534]  Appsail[backend]  "GET"  "/api/network/graph?date_from=2025-12-31&date_to=2026-07-25&view=all"
+[info] [2026-07-25T14:13:01.265Z] : [1784988781265]  Appsail[backend]  "GET"  "/api/network/graph?crime_type=Vehicle+Theft&date_from=2025-12-31&date_to=2026-07-25&view=all"
+[info] [2026-07-25T14:13:04.337Z] : [1784988784337]  Appsail[backend]  "GET"  "/api/network/graph?crime_type=Vehicle+Theft&district=Belagavi&date_from=2025-12-31&date_to=2026-07-25&view=all"
+[info] [2026-07-25T14:13:08.563Z] : [1784988788563]  Appsail[backend]  "GET"  "/api/network/graph?crime_type=Vehicle+Theft&district=Mangalore&date_from=2025-12-31&date_to=2026-07-25&view=all"
+[info] [2026-07-25T14:13:12.420Z] : [1784988792419]  Appsail[backend]  "GET"  "/api/network/graph?crime_type=Vehicle+Theft&district=Dharwad&date_from=2025-12-31&date_to=2026-07-25&view=all"
+[info] [2026-07-25T14:13:16.173Z] : [1784988796173]  Appsail[backend]  "GET"  "/api/network/profile/0?row_id=46143000000062130"
+[info] [2026-07-25T14:13:24.941Z] : [1784988804941]  Appsail[backend]  "GET"  "/api/network/graph?crime_type=Vehicle+Theft&district=Dharwad&date_from=2025-12-31&date_to=2026-07-25&view=clusters"
+[info] [2026-07-25T14:13:28.653Z] : [1784988808652]  Appsail[backend]  "GET"  "/api/network/graph?district=Dharwad&date_from=2025-12-31&date_to=2026-07-25&view=all"
+[info] [2026-07-25T14:14:55.245Z] : [1784988895244]  "GET"  "/app/?page=analytics"
+[info] [2026-07-25T14:14:55.285Z] : [1784988895284]  "GET"  "/app/static/js/bundle.js"
+[info] [2026-07-25T14:14:55.597Z] : [1784988895597]  "GET"  "/app/manifest.json"
+[info] [2026-07-25T14:14:55.723Z] : [1784988895723]  "GET"  "/app/logo.svg"
+[info] [2026-07-25T14:14:56.038Z] : [1784988896038]  "GET"  "/app/logo192.png"
+[info] [2026-07-25T14:14:56.553Z] : [1784988896553]  "GET"  "/app/logo.svg"
+[info] [2026-07-25T14:14:56.558Z] : [1784988896558]  Appsail[backend]  "GET"  "/api/analytics/hotspots?"
+[info] [2026-07-25T14:14:56.559Z] : [1784988896559]  Appsail[backend]  "GET"  "/api/analytics/emerging-clusters"
+[info] [2026-07-25T14:15:14.644Z] : [1784988914643]  Appsail[backend]  "GET"  "/api/network/graph?view=all"
+[info] [2026-07-25T14:15:14.957Z] : [1784988914957]  Appsail[backend]  "GET"  "/api/network/graph?date_from=2026-06-25&date_to=2026-07-25&view=all"
+[info] [2026-07-25T14:15:16.329Z] : [1784988916329]  Appsail[backend]  "GET"  "/api/chat/history"
+[info] [2026-07-25T14:15:16.345Z] : [1784988916345]  Appsail[backend]  "OPTIONS"  "/api/chat/new"
+[info] [2026-07-25T14:15:16.685Z] : [1784988916685]  Appsail[backend]  "POST"  "/api/chat/new"
+[info] [2026-07-25T14:15:17.245Z] : [1784988917244]  "GET"  "/app/map.svg"
+[info] [2026-07-25T14:15:17.407Z] : [1784988917407]  Appsail[backend]  "GET"  "/api/chat/history"
+[info] [2026-07-25T14:15:17.409Z] : [1784988917409]  Appsail[backend]  "GET"  "/api/chat/messages?session_id=96342a04-56e0-4ce3-943e-994d5a2d573b"
+[info] [2026-07-25T14:15:17.548Z] : [1784988917548]  Appsail[backend]  "GET"  "/api/dashboard/stats"
+[info] [2026-07-25T14:15:17.549Z] : [1784988917549]  Appsail[backend]  "GET"  "/api/dashboard/district-crimes?timeframe=30d"
+[info] [2026-07-25T14:15:17.550Z] : [1784988917550]  Appsail[backend]  "GET"  "/api/dashboard/alerts?limit=10"
+[info] [2026-07-25T14:15:17.551Z] : [1784988917551]  Appsail[backend]  "GET"  "/api/dashboard/trends"
+[info] [2026-07-25T14:16:38.721Z] : [1784988998720]  Appsail[backend]  "GET"  "/api/chat/history"
+[info] [2026-07-25T14:16:38.723Z] : [1784988998722]  Appsail[backend]  "POST"  "/api/chat/new"
+[info] [2026-07-25T14:16:39.160Z] : [1784988999160]  Appsail[backend]  "GET"  "/api/chat/messages?session_id=8c4ed6e4-78f9-403f-9f44-dedabd1f87b4"
+[info] [2026-07-25T14:16:40.300Z] : [1784989000299]  Appsail[backend]  "GET"  "/api/chat/history"
+[info] [2026-07-25T14:16:42.076Z] : [1784989002075]  "GET"  "/app/map.svg"
+[info] [2026-07-25T14:20:03.726Z] : [react-plugin]: Compiling...
+[info] [2026-07-25T14:20:04.877Z] : [react-plugin]: Compiled with warnings.
+
+[info] [2026-07-25T14:20:04.878Z] : [react-plugin]: [eslint] 
+src\components\ClerkAuthPage.tsx
+  Line 388:11:  'signUp' is assigned a value but never used  @typescript-eslint/no-unused-vars
+  Line 542:11:  'signIn' is assigned a value but never used  @typescript-eslint/no-unused-vars
+  Line 748:9:   'clerk' is assigned a value but never used   @typescript-eslint/no-unused-vars
+
+src\components\Sidebar.tsx
+  Line 6:17:  'useState' is defined but never used      @typescript-eslint/no-unused-vars
+  Line 6:27:  'useEffect' is defined but never used     @typescript-eslint/no-unused-vars
+  Line 16:3:  'ChevronLeft' is defined but never used   @typescript-eslint/no-unused-vars
+  Line 17:3:  'ChevronRight' is defined but never used  @typescript-eslint/no-unused-vars
+[info] [2026-07-25T14:20:04.878Z] : [react-plugin]: 
+Search for the keywords to learn more about each warning.
+[info] [2026-07-25T14:20:04.878Z] : [react-plugin]: To ignore, add // eslint-disable-next-line to the line before.
+
+[info] [2026-07-25T14:20:05.199Z] : [1784989205199]  "GET"  "/app/main.ca9f21d8d9c4a6876a28.hot-update.json"
+[info] [2026-07-25T14:20:05.447Z] : [1784989205446]  "GET"  "/app/main.ca9f21d8d9c4a6876a28.hot-update.js"
+[info] [2026-07-25T14:20:10.522Z] : [react-plugin]: Compiling...
+[info] [2026-07-25T14:20:10.788Z] : [react-plugin]: Compiled with warnings.
+
+[info] [2026-07-25T14:20:10.788Z] : [react-plugin]: [eslint] 
+src\components\ClerkAuthPage.tsx
+  Line 388:11:  'signUp' is assigned a value but never used  @typescript-eslint/no-unused-vars
+  Line 542:11:  'signIn' is assigned a value but never used  @typescript-eslint/no-unused-vars
+  Line 748:9:   'clerk' is assigned a value but never used   @typescript-eslint/no-unused-vars
+
+src\components\Sidebar.tsx
+  Line 6:17:  'useState' is defined but never used      @typescript-eslint/no-unused-vars
+  Line 6:27:  'useEffect' is defined but never used     @typescript-eslint/no-unused-vars
+  Line 16:3:  'ChevronLeft' is defined but never used   @typescript-eslint/no-unused-vars
+  Line 17:3:  'ChevronRight' is defined but never used  @typescript-eslint/no-unused-vars
+[info] [2026-07-25T14:20:10.788Z] : [react-plugin]: 
+Search for the keywords to learn more about each warning.
+[info] [2026-07-25T14:20:10.789Z] : [react-plugin]: To ignore, add // eslint-disable-next-line to the line before.
+
+[info] [2026-07-25T14:20:10.904Z] : [react-plugin]: Files successfully emitted, waiting for typecheck results...
+[info] [2026-07-25T14:20:19.821Z] : [react-plugin]: Compiling...
+[info] [2026-07-25T14:20:20.457Z] : [react-plugin]: Compiled with warnings.
+
+[info] [2026-07-25T14:20:20.462Z] : [react-plugin]: [eslint] 
+src\components\ClerkAuthPage.tsx
+  Line 388:11:  'signUp' is assigned a value but never used  @typescript-eslint/no-unused-vars
+  Line 542:11:  'signIn' is assigned a value but never used  @typescript-eslint/no-unused-vars
+  Line 748:9:   'clerk' is assigned a value but never used   @typescript-eslint/no-unused-vars
+
+src\components\Sidebar.tsx
+  Line 6:17:  'useState' is defined but never used      @typescript-eslint/no-unused-vars
+  Line 6:27:  'useEffect' is defined but never used     @typescript-eslint/no-unused-vars
+  Line 16:3:  'ChevronLeft' is defined but never used   @typescript-eslint/no-unused-vars
+  Line 17:3:  'ChevronRight' is defined but never used  @typescript-eslint/no-unused-vars
+[info] [2026-07-25T14:20:20.462Z] : [react-plugin]: 
+Search for the keywords to learn more about each warning.
+[info] [2026-07-25T14:20:20.462Z] : [react-plugin]: To ignore, add // eslint-disable-next-line to the line before.
+
+[info] [2026-07-25T14:20:20.489Z] : [1784989220489]  "GET"  "/app/main.85a66a9f9215f3255ac3.hot-update.json"
+[info] [2026-07-25T14:20:20.812Z] : [1784989220812]  "GET"  "/app/main.85a66a9f9215f3255ac3.hot-update.js"
+[info] [2026-07-25T14:20:46.969Z] : [react-plugin]: Compiling...
+[info] [2026-07-25T14:20:48.033Z] : [react-plugin]: Compiled with warnings.
+
+[info] [2026-07-25T14:20:48.033Z] : [react-plugin]: [eslint] 
+src\components\ClerkAuthPage.tsx
+  Line 388:11:  'signUp' is assigned a value but never used  @typescript-eslint/no-unused-vars
+  Line 542:11:  'signIn' is assigned a value but never used  @typescript-eslint/no-unused-vars
+  Line 748:9:   'clerk' is assigned a value but never used   @typescript-eslint/no-unused-vars
+
+src\components\Sidebar.tsx
+  Line 6:17:  'useState' is defined but never used      @typescript-eslint/no-unused-vars
+  Line 6:27:  'useEffect' is defined but never used     @typescript-eslint/no-unused-vars
+  Line 16:3:  'ChevronLeft' is defined but never used   @typescript-eslint/no-unused-vars
+  Line 17:3:  'ChevronRight' is defined but never used  @typescript-eslint/no-unused-vars
+[info] [2026-07-25T14:20:48.033Z] : [react-plugin]: 
+Search for the keywords to learn more about each warning.
+[info] [2026-07-25T14:20:48.033Z] : [react-plugin]: To ignore, add // eslint-disable-next-line to the line before.
+
+[info] [2026-07-25T14:20:48.060Z] : [1784989248060]  "GET"  "/app/main.9222156c21f8ac7d4b9f.hot-update.json"
+[info] [2026-07-25T14:20:48.382Z] : [1784989248382]  "GET"  "/app/main.9222156c21f8ac7d4b9f.hot-update.js"

@@ -276,19 +276,24 @@ class NetworkGraphBuilder:
         # NOT CrimeSubHead.CrimeSubHeadID (the logical/small int column). We must select ROWID.
         if crime_type:
             crime_type_query = f"""
-                SELECT CrimeSubHead.ROWID
+                SELECT CrimeSubHead.ROWID, CrimeSubHead.CrimeHeadName
                 FROM CrimeSubHead
                 WHERE CrimeSubHead.CrimeHeadName = '{crime_type}'
                 LIMIT 100
             """
             try:
                 crime_type_result = self.zcql.execute_query(crime_type_query)
+                rows_found = crime_type_result if isinstance(crime_type_result, list) else []
                 target_crime_type_ids = [
                     self._to_int(self._value(row, "CrimeSubHead", "ROWID", "ROWID"))
-                    for row in (crime_type_result if isinstance(crime_type_result, list) else [])
+                    for row in rows_found
                 ]
                 target_crime_type_ids = [cid for cid in target_crime_type_ids if cid is not None]
-                print(f"[DEBUG] Crime type '{crime_type}' resolved to ROWIDs: {target_crime_type_ids}")
+                matched_names = [
+                    self._value(row, "CrimeSubHead", "CrimeHeadName", "CrimeHeadName")
+                    for row in rows_found
+                ]
+                print(f"[DEBUG] Crime type filter '{crime_type}' → ROWIDs: {target_crime_type_ids}, DB names: {matched_names}")
 
                 if target_crime_type_ids:
                     # Filter nodes by crime type using tracked crime_types_by_resolved_id
@@ -303,6 +308,8 @@ class NetworkGraphBuilder:
                         edge for edge in edges
                         if edge.source in node_ids_set and edge.target in node_ids_set
                     ]
+                else:
+                    print(f"[WARNING] Crime type '{crime_type}' matched 0 rows in CrimeSubHead — filter skipped")
             except Exception as exc:
                 print(f"[Warning] Failed to filter by crime type: {exc}")
         
