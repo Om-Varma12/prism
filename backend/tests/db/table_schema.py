@@ -29,7 +29,8 @@ def print_schema(request: Request):
                     "column_name": column['column_name'],
                     "data_type": column['data_type'],
                     "is_mandatory": column['is_mandatory'],
-                    "is_unique": column['is_unique']
+                    "is_unique": column['is_unique'],
+                    "max_length": column.get("max_length")
                 })
             schema_dict[table_name] = cols
 
