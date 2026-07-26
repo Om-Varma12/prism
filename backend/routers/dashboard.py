@@ -139,8 +139,8 @@ async def get_district_crimes(
         if crime_type:
             district_stats[d_name]["crime_types"].append(crime_type)
     
-    # print(f"District stats: {dict(district_stats)}")
-    # print(f"=== END DEBUG ===\n")
+    print(f"District stats: {dict(district_stats)}")
+    print(f"=== END DEBUG ===\n")
     
     results = []
     for d_name, d_data in district_stats.items():

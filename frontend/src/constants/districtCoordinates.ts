@@ -26,7 +26,7 @@ export const districtCoordinates: Record<string, { cx: number; cy: number }> = {
   Koppal: { cx: 2.05, cy: 2.67 },
   "Uttara Kannada": { cx: 0.6, cy: 3.25 },
   Haveri: { cx: 1.3, cy: 3.35 },
-  Udupi: { cx: 0.78, cy: 4.45 },
+  Udupi: { cx: 1.6, cy: 4.26 },
   Davanagere: { cx: 1.7, cy: 3.7 },
   Chikmagalur: { cx: 1.5, cy: 4.5 },
   Chitradurga: { cx: 2.2, cy: 3.95 },
