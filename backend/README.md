@@ -80,9 +80,9 @@ source .venv/bin/activate  # Windows: .venv\Scripts\activate
 
 # Install dependencies using project spec
 pip install --upgrade pip
-pip install -r pyproject.toml
+pip install -r requirements.txt
 ```
-*(Alternatively, you can use `uv` for a fast installation: `uv pip install -r pyproject.toml`)*
+*(Alternatively, you can use `uv` for a fast installation: `uv pip install -r requirements.txt`)*
 
 ### 3. Environment Variables (`.env`)
 Create a `.env` file in the `backend` directory. Local development requires Zoho OAuth credentials to query the Catalyst QuickML LLM APIs:

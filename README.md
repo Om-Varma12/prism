@@ -1,52 +1,53 @@
-# PRISM: Police Record Information & Security Management System
+# PRISM: Police Record Information & Security Management
 
-PRISM is a state-of-the-art, industrial-grade AI-powered intelligence analytics and decision-support portal built for the Karnataka Police FIR database. The platform integrates a multi-agent AI chat assistant, dynamic geospatial hotspot mapping, temporal crime forecasting, and a graph-based criminal network explorer to enable law enforcement agencies to translate raw records into actionable crime-fighting intelligence.
+> AI-powered crime intelligence & analytics platform for the Karnataka State Police Department
+
+*"A crime is not an isolated event. It's a node in a network of people, places, behaviors, and time."*
+
+PRISM turns static FIR records into conversational, network-aware, predictive intelligence — enabling officers and analysts to ask questions in plain language (English or Kannada), see criminal associations as a live graph, and act on forecasted hotspots before incidents escalate.
 
 ---
 
-## 🚀 Key Features
+## 🏆 Hackathon Context
 
-*   **💬 Intelligence Chat Assistant (English & Kannada)**
-    *   **Indic Translation**: Translates queries in Kannada script or transliterated "Manglish" (e.g. `bengalurinalli eshtu case ide?`) to refined English before processing.
-    *   **Text-to-SQL Agent**: Converts conversational questions into secure, optimized ZCQL database queries. Automatically prevents SQL injection and applies strict validation.
-    *   **Dynamic UI Rendering**: Automatically maps arbitrary SQL results (counts, grouped summaries, or full rows) into responsive, dynamic data tables on the fly.
-    *   **General & Conversational Agent**: Handles non-database context, help inquiries, and general system tutorials seamlessly.
-*   **📊 Command & Analytics Dashboard**
-    *   Interactive geospatial distribution of crimes using SVG maps.
-    *   Key performance metrics (total FIRs, active investigations, high-risk offenders, active alerts).
-    *   Spike detection and auto-alert engine with chronological tracking.
-*   **📍 Advanced Analytics Hub**
-    *   **Geospatial Hotspots**: Heatmap clusters generated using density-based spatial clustering (DBSCAN).
-    *   **Crime Forecasting**: Time-series predictive forecasting using Meta's Prophet model.
-    *   **Offender Risk Board**: Multi-dimensional risk scoring algorithm identifying high-rate recidivists.
-*   **🕸️ Criminal Network Explorer**
-    *   D3.js force-directed graph rendering criminal associations.
-    *   Community detection (Louvain modularity) and centrality algorithms (degree and betweenness) to map gang clusters and locate key ringleaders.
+Built for **Zoho Catalyst Hackathon — Problem Statement 1 (PS1)**: Design an AI-powered analytics platform for the Karnataka State Police FIR database to enable data-driven law enforcement decisions.
+
+The KSP-provided ER schema is treated as the source of truth. All ZCQL queries follow the join rules and constraints documented in [`backend/db/schema.md`](backend/db/schema.md).
+
+---
+
+## ✨ Feature Pillars
+
+| # | Pillar |
+|---|---|
+| 1 | **Conversational Crime Intelligence** — NL chat (English + Kannada + Manglish voice), Text-to-SQL agent, dynamic table rendering, PDF export |
+| 2 | **Criminal Network Analysis** — D3.js force graph, co-accused linking, community detection (Louvain), centrality ranking |
+| 3 | **Pattern & Trend Analytics** — DBSCAN geospatial hotspots, seasonal trend lines, Prophet time-series forecasting |
+| 4 | **Offender Profiling & Risk Scoring** — Multi-factor recidivism risk score, nightly precompute, absconding flags |
+| 5 | **Explainable, Role-Gated Intelligence** — SQL transparency drawer, role-aware query restrictions, audit logging |
 
 ---
 
 ## 🛠️ Architecture & Tech Stack
 
-```mermaid
-graph TD
-    User([Police Officer / Analyst]) -->|Vite React App| FE[Frontend Client]
-    FE -->|API Calls / OAuth2| GW[Catalyst API Gateway]
-    GW -->|Route Request| BE[AppSail FastAPI Backend]
-    
-    subgraph Backend Architecture
-        BE -->|Routing Agent| Router[Query Router]
-        Router -->|Kannada| Trans[Translation Service]
-        Router -->|Database Route| SQLAgent[Text-to-SQL Agent]
-        Router -->|General Route| GenAgent[General Chat Agent]
-        
-        SQLAgent -->|ZCQL Query| Val[Query Validator / Sanitizer]
-        Val -->|Executed ZCQL| DB[(Catalyst Data Store)]
-        DB -->|Raw JSON| Struct[Response Structurer]
-        Struct -->|Natural Response + Table Data| FE
-        
-        BE -->|Scheduled Jobs| Scheduler[APScheduler / Cron]
-        Scheduler -->|Precompute stats| DB
-    end
+![PRISM Architecture Diagram](resources/arch-dia.png)
+
+### Tech Stack
+
+| Layer | Technology |
+|---|---|
+| **Frontend** | React 19 + TypeScript, Create React App, Tailwind CSS, D3.js, Recharts, Leaflet |
+| **Backend** | FastAPI (Python 3.13), multi-agent pipeline (Router → Text-to-SQL → Structurer) |
+| **LLM** | Zoho Catalyst QuickML (hosted LLM serving — `crm-di-glm47b_30b_it`) |
+| **Database** | Zoho Catalyst Data Store (ZCQL), schema per KSP-provided ER diagram |
+| **Analytics** | NetworkX + Louvain (graph/community), scikit-learn DBSCAN (hotspots), Prophet (forecasting) |
+| **Auth** | Clerk (custom branded login screen, session management) |
+| **Infra** | Zoho Catalyst — AppSail, API Gateway, Cron, Cache, Stratus, Domain Mappings |
+
+**AppSail is the brain. Data Store is the memory. Cron + Signals is the nervous system. Cache + Gateway keep it fast and secure.**
+
+```
+React SPA → Catalyst API Gateway → AppSail (FastAPI multi-agent backend) → Catalyst Data Store
 ```
 
 ### Infrastructure Layer (Zoho Catalyst)
@@ -58,19 +59,66 @@ graph TD
 
 ---
 
-## 📁 Repository Overview
-
-A detailed layout of all components can be found in the [project-structure.md](file:///d:/STUDY/PROJECTS/prism/project-structure.md) file. A summary:
+## 📁 Repository Structure
 
 ```
 prism/
-├── frontend/             # React + TypeScript SPA client (CRA)
-├── backend/              # FastAPI Python backend (Catalyst AppSail deployment)
-├── implementations/      # Markdown feature specifications & architecture plans
-├── resources/            # Local copies of Catalyst SDK & ZCQL documentation
-├── services-used.md      # Consolidated list of Zoho Catalyst services used
-└── project-structure.md  # Comprehensive project directory tree reference
+│
+├── frontend/                   # React + TypeScript SPA (Create React App)
+│   ├── public/                 # Static assets & index.html
+│   └── src/
+│       ├── components/         # Page-level screen components & shared UI
+│       ├── constants/          # API URLs, config constants
+│       ├── data/               # Static reference data (districts, crime types, etc.)
+│       ├── hooks/              # Custom React hooks (useChat, useNetwork, etc.)
+│       ├── lib/                # Utility / helper functions
+│       ├── pages/              # Top-level page wrappers
+│       ├── services/           # Axios API service modules
+│       └── types/              # Shared TypeScript type definitions
+│
+├── backend/                    # FastAPI Python backend (Catalyst AppSail)
+│   ├── agents/                 # Multi-agent AI pipeline
+│   │   ├── general_chat/       # General conversational agent
+│   │   ├── network_agent/      # Criminal network graph builder
+│   │   ├── response_structurer/# Formats SQL results into natural language + tables
+│   │   ├── router/             # Intent classifier (DB query / general / Kannada)
+│   │   ├── text_to_sql/        # Translates English queries → ZCQL
+│   │   └── title_generator/    # Background session title generation
+│   ├── analytics/              # DBSCAN hotspot, Prophet forecasting, risk scoring
+│   ├── core/                   # database.py — SDK dependency helpers (get_zcql, get_datastore)
+│   ├── data/                   # Static reference data used by backend
+│   ├── db/                     # schema.md — full table reference & ZCQL constraints
+│   ├── jobs/                   # APScheduler cron job definitions
+│   ├── routers/                # FastAPI route handlers
+│   │   ├── analytics.py        # Hotspots, trends, risk board, forecasting
+│   │   ├── chat.py             # Conversational AI pipeline endpoint
+│   │   ├── dashboard.py        # KPI stats, alerts, district crime counts
+│   │   └── network.py          # Criminal network graph API
+│   ├── schemas/                # Pydantic request/response models
+│   ├── services/               # Shared service utilities (LLM calls, translation)
+│   └── tests/
+│       ├── db/                 # Data seeding & truncation endpoints
+│       └── llm_serving/        # LLM connectivity tests
+│
+├── implementations/            # Feature specs & architecture decision docs
+│   ├── analytics/
+│   ├── chat-interface/
+│   ├── dashboard/
+│   └── network-explorer/
+│
+├── resources/                  # Local copies of Catalyst SDK & ZCQL documentation
+│   ├── arch-dia.png            # System architecture diagram
+│   ├── cache/
+│   ├── quickml/
+│   ├── stratus/
+│   └── zcql/
+│
+├── catalyst.json               # Catalyst project configuration (AppSail + client)
+├── services-used.md            # All Zoho Catalyst services provisioned
+└── project-structure.md        # Extended project directory reference
 ```
+
+> 📖 **Database schema pointer**: Before writing any backend query, read [`backend/db/schema.md`](backend/db/schema.md). It contains the full table reference, join rules, and ZCQL constraints derived from the KSP-provided ER diagram — the single most important reference file for backend work.
 
 ---
 
@@ -78,59 +126,94 @@ prism/
 
 ### Prerequisites
 *   [Node.js](https://nodejs.org/) v18+ & npm v9+
-*   [Python](https://www.python.org/) v3.10+ & [uv](https://github.com/astral-sh/uv) (recommended package manager)
-*   [Zoho Catalyst CLI](https://catalyst.zoho.com/help/tutorials/command-line-interface.html) (if deploying cloud resources)
+*   [Python](https://www.python.org/) v3.10+
+*   **Zoho Catalyst CLI** — Required to run the unified dev server. Install it by following the [Installing Catalyst CLI Guide](https://docs.catalyst.zoho.com/en/getting-started/installing-catalyst-cli/).
+*   A **Zoho Catalyst project** with Data Store tables provisioned (see schema.md)
+*   A **Clerk application** (free tier) for authentication — get your publishable key from [dashboard.clerk.com](https://dashboard.clerk.com)
 
-### 1. Backend Setup
-1. Navigate to the backend directory:
+---
+
+### Step-by-Step Setup
+
+#### 1. Configure the Frontend Client
+1. Navigate to the `frontend` directory:
    ```bash
-   cd backend
+   cd frontend
    ```
-2. Create and activate a virtual environment (using `uv` or standard `venv`):
+2. Copy the environment variables template and configure your parameters:
    ```bash
-   uv venv
+   cp .env.example .env
+   ```
+   > 🔑 **Required**: Open `frontend/.env` and insert your Clerk publishable key (`REACT_APP_CLERK_PUBLISHABLE_KEY`) from the [Clerk Dashboard](https://dashboard.clerk.com).
+3. Install frontend dependencies:
+   ```bash
+   npm install
+   ```
+
+#### 2. Configure the Backend Server
+1. Navigate to the `backend` directory:
+   ```bash
+   cd ../backend
+   ```
+2. Create and activate a Python virtual environment:
+   ```bash
+   python -m venv .venv
    # On Windows:
    .venv\Scripts\activate
    # On macOS/Linux:
    source .venv/bin/activate
    ```
-3. Install dependencies:
+3. Install backend dependencies:
    ```bash
-   uv pip install -r pyproject.toml
+   pip install -r requirements.txt
    ```
-4. Copy the environment template and fill in your Zoho Catalyst OAuth credentials:
+4. Copy the environment variables template and configure your parameters:
    ```bash
    cp .env.example .env
    ```
-5. Run the FastAPI development server:
-   ```bash
-   uvicorn main:app --host 0.0.0.0 --port 3001 --reload
-   ```
-
-> 💡 *Refer to [backend/README.md](file:///d:/STUDY/PROJECTS/prism/backend/README.md) for detailed credentials setup.*
-
-### 2. Frontend Setup
-1. Navigate to the frontend directory:
-   ```bash
-   cd ../frontend
-   ```
-2. Install client dependencies:
-   ```bash
-   npm install
-   ```
-3. Start the Vite/CRA React development server:
-   ```bash
-   npm start
-   ```
-4. Access the web app in your browser at `http://localhost:3000`.
-
-> 💡 *Refer to [frontend/README.md](file:///d:/STUDY/PROJECTS/prism/frontend/README.md) for more interface configuration details.*
+   > 🔑 **Required**: Open `backend/.env` and populate your Zoho Catalyst Client ID, Client Secret, and Refresh Token. Refer to [backend/README.md](backend/README.md#3-environment-variables-env) for details on how to generate these.
 
 ---
 
-## 📦 Deployment Workflow
+### 🏃 Running the Project Locally
 
-To deploy the service to your active Zoho Catalyst environment:
+Once both folders have their dependencies installed and `.env` files properly configured:
+
+1. Return to the **root level** of the project:
+   ```bash
+   cd ..
+   ```
+2. Start the unified development server:
+   ```bash
+   catalyst serve
+   ```
+   This command starts the local Catalyst environment, automatically hosting:
+   *   The **FastAPI backend** (AppSail)
+   *   The **React frontend client** (served via the React plugin)
+
+   Both services launch simultaneously and are automatically routed and connected together.
+3. Access the web app in your browser (typically at `http://localhost:3000` or the port output by the CLI).
+
+> 💡 *For more details on specific components, refer to [backend/README.md](backend/README.md) and [frontend/README.md](frontend/README.md).*
+
+---
+
+### 🌱 Seeding Demo Data
+
+After launching the server, use these endpoints to populate the database with sample data:
+
+| Endpoint | Description |
+|---|---|
+| `GET /db/tests/insert-derived-data` | Seeds `dashboard_stats`, `crime_alerts`, `risk_scores`, `conversations`, `audit_logs` |
+| `GET /db/tests/insert-new-data` | Inserts 20 rows per derived table with dates within the last 7 days |
+| `GET /db/tests/insert-recent-cases` | Seeds recent `CaseMaster` records with fresh timestamps |
+| `GET /db/tests/truncate-derived` | Clears all derived/analytics tables (use before re-seeding) |
+
+---
+
+## 📦 Deployment
+
+Deploy to your active Zoho Catalyst environment:
 
 1. Authenticate with Catalyst:
    ```bash
@@ -140,7 +223,40 @@ To deploy the service to your active Zoho Catalyst environment:
    ```bash
    catalyst project:use
    ```
-3. Deploy both client and backend functions:
+3. Deploy both client and backend:
    ```bash
    catalyst deploy
    ```
+
+All Catalyst services provisioned for this project are documented in [`services-used.md`](services-used.md).
+
+---
+
+## 🧠 Key Design Decisions
+
+- **Entity resolution is application-layer**: The KSP schema has no cross-case offender identity field (`PersonID` is per-FIR). Accused name matching across cases uses `rapidfuzz` string similarity at query time — not a normalized table.
+- **Risk scores are nightly precomputed**: Scores are written to the `risk_scores` table once per cron cycle and served statically. This avoids expensive per-request joins across `CaseMaster`, `Accused`, and `ArrestSurrender` for every page load.
+- **QuickML is used only for LLM serving, not RAG**: The system uses a custom multi-agent pipeline (Router → Translation → Text-to-SQL → Validator → Structurer) rather than an off-the-shelf RAG framework. This gives full control over query generation, validation, and structured response formatting.
+
+---
+
+## ⚠️ Known Limitations
+
+- **No cross-FIR offender identity**: The schema does not have a global offender ID. Network links are inferred from shared accused names and co-case appearances — fuzzy, not authoritative.
+- **Kannada via translation, not native NLU**: The system translates Kannada/Manglish queries to English before processing. Native Kannada NLU or a Kannada-trained model is not integrated.
+- **Financial crime linking not supported**: The schema lacks financial transaction tables. PMLA and money laundering cases appear in `CaseMaster` but cannot be linked to transaction data.
+- **Forecasting requires sufficient historical data**: Meta's Prophet requires a meaningful time-series baseline. Thin data in a district may produce unreliable trend projections.
+
+---
+
+## 👥 Team
+
+Built by **Elden Lords** for the Zoho Catalyst Hackathon.
+
+---
+
+## 📄 License & Acknowledgments
+
+- **Database Schema**: Derived from the Karnataka State Police FIR schema provided as part of PS1.
+- **LLM Serving**: Powered by Zoho Catalyst QuickML.
+- Built on **Zoho Catalyst** — AppSail, Data Store, API Gateway, Cache, Cron, and Stratus.

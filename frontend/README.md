@@ -62,21 +62,32 @@ Navigate to the `frontend` folder and install packages:
 npm install
 ```
 
-### 3. API Configuration
-Verify that `src/constants/api.ts` (or the corresponding config file) references the correct API URL for the backend:
-*   Local Backend Dev Server: `http://localhost:3001` (FastAPI)
-*   Deployed Catalyst Gateway: The deployment gateway domain provided by Zoho.
+### 3. Environment Variables Configuration
+Create a `.env` file in the `frontend` folder:
+```bash
+cp .env.example .env
+```
+> 🔑 **Required**: Open `frontend/.env` and configure `REACT_APP_CLERK_PUBLISHABLE_KEY` with your Clerk API key. Without this key, the application will fail to run with a publishable key missing error.
 
-### 4. Running the Dev Client
-Start the local server:
+### 4. Running the Application
+For local development, it is highly recommended to run the unified dev server from the **root directory** of the repository:
+```bash
+# Return to root directory
+cd ..
+# Start unified server
+catalyst serve
+```
+This runs the frontend and backend together, setting up routing proxies automatically.
+
+If you wish to run only the frontend standalone (without backend mock API gateway routing):
 ```bash
 npm start
 ```
-Open `http://localhost:3000` to view the application in development mode.
+This serves the client at `http://localhost:3000`.
 
 ### 5. Production Build
-To build the application for deployment or web-client hosting:
+To compile the production-ready build:
 ```bash
 npm run build
 ```
-The output files will be compiled and optimized in the `build/` directory, ready to be hosted via Catalyst Web Client Hosting.
+The output will be placed in the `build/` directory, ready to be deployed to Catalyst Web Client Hosting.

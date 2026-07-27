@@ -8,4 +8,4 @@
 | 4 | **Stratus** | Store generated PDFs (conversation exports), case attachment placeholders |
 | 5 | **Cache** | Cache frequent queries — district stats, dashboard KPIs — avoid recomputation |
 | 6 | **Quick ML** | LLM Serving — Served as the backend LLM for Text-to-SQL, query routing, and general AI tasks. |
-| 7 | **Authentication** | Login & Sign-up |
+| 7 | **Clerk Authentication (External)** | Custom user authentication, session management, and secure login screen |
