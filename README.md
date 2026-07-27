@@ -10,7 +10,8 @@ PRISM turns static FIR records into conversational, network-aware, predictive in
 
 ## 🏆 Hackathon Context
 
-Built for **Zoho Catalyst Hackathon — Problem Statement 1 (PS1)**: Design an AI-powered analytics platform for the Karnataka State Police FIR database to enable data-driven law enforcement decisions.
+Built for **Zoho Catalyst Hackathon — Problem Statement 1 (PS1)**: Intelligent Conversational AI for KSP Crime Database
+Design and develop an Intelligent Conversational AI and Crime Analytics Platform that enables investigators, analysts, and policymakers to interact with the state crime database using natural language queries, while also providing advanced analytical capabilities grounded in criminology and sociological insights. 
 
 The KSP-provided ER schema is treated as the source of truth. All ZCQL queries follow the join rules and constraints documented in [`backend/db/schema.md`](backend/db/schema.md).
 
