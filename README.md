@@ -100,19 +100,6 @@ prism/
 │       ├── db/                 # Data seeding & truncation endpoints
 │       └── llm_serving/        # LLM connectivity tests
 │
-├── implementations/            # Feature specs & architecture decision docs
-│   ├── analytics/
-│   ├── chat-interface/
-│   ├── dashboard/
-│   └── network-explorer/
-│
-├── resources/                  # Local copies of Catalyst SDK & ZCQL documentation
-│   ├── arch-dia.png            # System architecture diagram
-│   ├── cache/
-│   ├── quickml/
-│   ├── stratus/
-│   └── zcql/
-│
 ├── catalyst.json               # Catalyst project configuration (AppSail + client)
 ├── services-used.md            # All Zoho Catalyst services provisioned
 └── project-structure.md        # Extended project directory reference
